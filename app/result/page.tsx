@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import GeneratedResult from '../components/GeneratedResult'
 
-export default function ResultPage() {
+function ResultContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -25,11 +25,19 @@ export default function ResultPage() {
   if (!imageUrl) return null
 
   return (
+    <GeneratedResult 
+      imageUrl={imageUrl} 
+      onCreateAnother={handleCreateAnother}
+    />
+  )
+}
+
+export default function ResultPage() {
+  return (
     <div className="min-h-screen bg-background py-16 flex items-center justify-center">
-      <GeneratedResult 
-        imageUrl={imageUrl} 
-        onCreateAnother={handleCreateAnother}
-      />
+      <Suspense fallback={<div className="text-white text-xl">Loading...</div>}>
+        <ResultContent />
+      </Suspense>
     </div>
   )
 }
