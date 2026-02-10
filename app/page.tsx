@@ -57,15 +57,15 @@ export default function Home() {
               🔥 #1 Viral Trend 2026
             </div>
             <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6" style={{ color: '#1A1A2E' }}>
-              Turn Your <span className="text-[#FF6B9D]">Work Selfie</span> Into a Cartoon
+              Turn Your <span className="text-[#FF6B9D]">Work Selfie</span> Into a Meme
             </h1>
             <p className="text-xl mb-8 text-gray-600 leading-relaxed">
-              Upload a photo, enter your job, and our AI creates a hilarious cartoon caricature of you at work. Share it everywhere. 
+              Upload a photo, enter your job, and our AI turns you into a hilarious meme. Animate it. Share it everywhere. 
               <span className="font-bold"> It&apos;s that simple.</span>
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/create" className="bg-[#FF6B9D] text-white px-8 py-4 rounded-full text-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 inline-block">
-                Create My Cartoon 🎨
+                Create My Meme 🎨
               </Link>
               <a href="#how-it-works" className="border-2 border-[#1A1A2E] text-[#1A1A2E] px-8 py-4 rounded-full text-xl font-bold hover:bg-[#1A1A2E] hover:text-white transition-all duration-300 inline-block">
                 See How It Works
@@ -113,7 +113,7 @@ export default function Home() {
           {[
             { num: '1', icon: '📸', title: 'Upload Your Selfie', desc: 'Take a photo or upload one from your camera roll. Works with any clear face photo.', color: '#FF6B9D' },
             { num: '2', icon: '💼', title: 'Enter Your Details', desc: 'Your job title, favourite accessories, and where you work. We build the scene around YOU.', color: '#FFD93D' },
-            { num: '3', icon: '🎉', title: 'Get Your Cartoon!', desc: 'Our AI generates a unique caricature in seconds. Share it, meme it, love it.', color: '#6BCB77' },
+            { num: '3', icon: '🎉', title: 'Bring It to Life!', desc: 'Your meme is generated in seconds. Turn it into an animated meme, share it everywhere, go viral!', color: '#6BCB77' },
           ].map((step, i) => (
             <AnimatedSection key={step.num} delay={i * 150}>
               <div className="text-center p-8 rounded-3xl border-2 border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 group">
@@ -260,7 +260,7 @@ export default function Home() {
       {/* Final CTA */}
       <section className="py-20 bg-gradient-to-r from-[#FF6B9D] via-[#FF8C42] to-[#FFD93D]">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">Your Cartoon is Waiting 🎨</h2>
+          <h2 className="text-4xl md:text-5xl font-black mb-6">Your Meme is Waiting 🎨</h2>
           <p className="text-xl mb-10 opacity-90">3 free generations. No account needed. Takes 10 seconds.</p>
           <Link href="/create" className="bg-white text-[#FF6B9D] px-10 py-5 rounded-full text-2xl font-black hover:scale-105 hover:shadow-2xl transition-all duration-300 inline-block">
             Create My Meme — Free ✨

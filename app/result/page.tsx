@@ -4,124 +4,126 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
+interface MemeResult {
+  imageUrl: string
+  prompt: string
+  cost?: string
+  style: string
+  jobTitle: string
+}
+
 export default function ResultPage() {
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
-  const [style, setStyle] = useState('')
-  const [jobTitle, setJobTitle] = useState('')
+  const [result, setResult] = useState<MemeResult | null>(null)
+  const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
-    // Extract parameters from URL
-    const params = new URLSearchParams(window.location.search)
-    const image = params.get('image')
-    const selectedStyle = params.get('style')
-    const selectedJobTitle = params.get('jobTitle')
-
-    if (image) setImageUrl(image)
-    if (selectedStyle) setStyle(selectedStyle)
-    if (selectedJobTitle) setJobTitle(selectedJobTitle)
+    const stored = sessionStorage.getItem('mymeme_result')
+    if (stored) {
+      setResult(JSON.parse(stored))
+    }
   }, [])
 
-  const handleDownload = () => {
-    if (imageUrl) {
-      const link = document.createElement('a')
-      link.href = imageUrl
-      link.download = `mymeme-${style}-${jobTitle}.png`
-      link.click()
+  const handleDownload = async () => {
+    if (!result?.imageUrl) return
+    setDownloading(true)
+    try {
+      const res = await fetch(result.imageUrl)
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `mymeme-${result.style}-${Date.now()}.jpg`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      window.open(result.imageUrl, '_blank')
     }
+    setDownloading(false)
   }
 
-  const handleShare = async () => {
-    if (navigator.share && imageUrl) {
-      try {
-        const blob = await fetch(imageUrl).then(r => r.blob())
-        const file = new File([blob], `mymeme-${style}-${jobTitle}.png`, { type: 'image/png' })
-        
-        await navigator.share({
-          title: `My ${style} Work Meme`,
-          text: `Check out my hilarious work meme as a ${jobTitle}!`,
-          files: [file]
-        })
-      } catch (error) {
-        console.error('Sharing failed', error)
-      }
-    } else {
-      // Fallback for browsers without native share
-      alert('Sharing not supported. Try downloading and sharing manually.')
-    }
-  }
-
-  const handleCreateAnother = () => {
-    window.location.href = '/create'
-  }
-
-  if (!imageUrl) {
+  if (!result) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <p className="text-2xl text-dark-blue">
-          Loading your meme... 🚀
-        </p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#FFF5E1]">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🎨</div>
+          <h1 className="text-2xl font-bold mb-4" style={{ color: '#1A1A2E' }}>No meme yet!</h1>
+          <p className="text-gray-500 mb-8">Create one first — it only takes 10 seconds.</p>
+          <Link href="/create" className="bg-[#FF6B9D] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all">
+            Create My Meme 🎨
+          </Link>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-bright-yellow/10 py-20">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-4xl font-bold mb-8 text-dark-blue">
-          Your Awesome Work Meme! 🎉
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF5E1] to-white py-12">
+      <div className="max-w-2xl mx-auto px-4 text-center">
+        <h1 className="text-4xl md:text-5xl font-black mb-2" style={{ color: '#1A1A2E' }}>
+          Your Meme is Ready! 🎉
         </h1>
+        <p className="text-gray-500 mb-8">Looking good as a {result.style} {result.jobTitle}!</p>
 
-        <div className="bg-white p-8 rounded-xl shadow-lg mb-8">
-          <Image 
-            src={imageUrl} 
-            alt="Generated meme" 
-            width={600} 
-            height={600} 
-            className="mx-auto rounded-lg mb-6 animate-fade-in-up"
-          />
-          <p className="text-xl text-dark-blue">
-            {jobTitle} in {style} style
-          </p>
+        {/* Generated Image */}
+        <div className="bg-white rounded-3xl shadow-2xl p-4 mb-8 inline-block">
+          <div className="relative w-full max-w-lg mx-auto aspect-square">
+            <Image
+              src={result.imageUrl}
+              alt={`AI cartoon caricature — ${result.jobTitle}`}
+              fill
+              className="rounded-2xl object-cover"
+              unoptimized
+            />
+          </div>
         </div>
 
-        <div className="flex justify-center space-x-4 mb-8">
-          <button 
+        {/* Action Buttons */}
+        <div className="flex flex-wrap justify-center gap-4 mb-8">
+          <button
             onClick={handleDownload}
-            className="
-              bg-mint-green text-white 
-              px-8 py-3 rounded-full 
-              hover:bg-mint-green/90 transition-all
-            "
+            disabled={downloading}
+            className="bg-[#FF6B9D] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all"
           >
-            Download 💾
+            {downloading ? 'Downloading...' : '💾 Download'}
           </button>
-          <button 
-            onClick={handleShare}
-            className="
-              bg-coral-orange text-white 
-              px-8 py-3 rounded-full 
-              hover:bg-coral-orange/90 transition-all
-            "
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({ title: 'MyMeme!', text: `Check out my cartoon caricature as a ${result.jobTitle}!`, url: result.imageUrl })
+              } else {
+                navigator.clipboard.writeText(result.imageUrl)
+                alert('Image URL copied!')
+              }
+            }}
+            className="bg-[#6BCB77] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all"
           >
-            Share 🔗
+            📤 Share
           </button>
+          <Link href="/create" className="bg-[#FFD93D] text-[#1A1A2E] px-8 py-3 rounded-full font-bold hover:scale-105 transition-all">
+            🔄 Make Another
+          </Link>
         </div>
 
-        <div className="space-y-4">
-          <button 
-            onClick={handleCreateAnother}
-            className="
-              bg-primary-pink text-white 
-              px-10 py-4 rounded-full text-xl
-              hover:bg-primary-pink/90 transition-all
-            "
-          >
-            Create Another Meme 🎨
-          </button>
+        {/* Meme Maker Teaser */}
+        <div className="bg-white rounded-2xl p-6 border-2 border-dashed border-[#FF8C42] mb-8">
+          <h3 className="text-xl font-bold mb-2" style={{ color: '#1A1A2E' }}>😂 Make It a Meme!</h3>
+          <p className="text-gray-500 mb-4">Put your cartoon face into famous meme templates — Drake, Distracted Boyfriend, and more!</p>
+          <span className="inline-block bg-[#FF8C42]/20 text-[#FF8C42] px-4 py-2 rounded-full font-bold text-sm">
+            Coming Soon ✨
+          </span>
+        </div>
 
-          <p className="text-sm text-dark-blue/70">
-            Not quite right? Try another style or photo! 🔄
-          </p>
+        {/* Social Sizing Teaser */}
+        <div className="bg-gray-50 rounded-2xl p-6">
+          <h3 className="text-lg font-bold mb-3" style={{ color: '#1A1A2E' }}>📱 Auto-Sized for Social</h3>
+          <div className="flex justify-center gap-3 flex-wrap">
+            {['Instagram Post', 'Facebook Cover', 'WhatsApp DP', 'TikTok', 'Twitter Header'].map((platform) => (
+              <span key={platform} className="bg-white px-3 py-1 rounded-full text-sm text-gray-500 border">
+                {platform}
+              </span>
+            ))}
+          </div>
+          <p className="text-sm text-gray-400 mt-3">Premium feature — coming soon</p>
         </div>
       </div>
     </div>
