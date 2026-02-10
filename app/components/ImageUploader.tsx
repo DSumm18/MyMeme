@@ -55,8 +55,8 @@ export default function ImageUploader({
   return (
     <div 
       className={`
-        dropzone p-8 rounded-lg text-center 
-        ${dragActive ? 'bg-secondary/10 border-secondary' : 'bg-background'}
+        border-2 border-dashed border-purple-600 hover:border-pink-500 transition-colors duration-300 p-8 rounded-lg text-center 
+        ${dragActive ? 'bg-pink-500/10 border-secondary' : 'bg-purple-50'}
       `}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
@@ -85,7 +85,7 @@ export default function ImageUploader({
               setPreviewImage(null)
               if (inputRef.current) inputRef.current.value = ''
             }}
-            className="btn-primary px-4 py-2 rounded-full"
+            className="bg-purple-600 text-white hover:bg-pink-500 transform hover:scale-105 transition-all duration-300 px-4 py-2 rounded-full"
           >
             Change Image
           </button>
@@ -96,12 +96,12 @@ export default function ImageUploader({
             Drag & Drop your selfie or 
             <button 
               onClick={() => inputRef.current?.click()}
-              className="text-primary ml-2 underline"
+              className="text-purple-600 ml-2 underline"
             >
               Click to Upload
             </button>
           </p>
-          <div className="text-6xl text-primary/50 text-center mb-4">
+          <div className="text-6xl text-purple-600/50 text-center mb-4">
             📸
           </div>
           <p className="text-sm text-gray-500">

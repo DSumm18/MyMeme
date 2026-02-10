@@ -71,7 +71,7 @@ export default function GeneratedResult({
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-8 bg-background rounded-lg shadow-lg">
+    <div className="max-w-2xl mx-auto p-8 bg-purple-50 rounded-lg shadow-lg">
       <div className="mb-8 text-center">
         <Image 
           src={imageUrl} 
@@ -84,7 +84,7 @@ export default function GeneratedResult({
       
       <div className="space-y-6">
         <div>
-          <h3 className="text-2xl font-bold text-primary mb-4">
+          <h3 className="text-2xl font-bold text-purple-600 mb-4">
             Share Your Caricature
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -95,8 +95,8 @@ export default function GeneratedResult({
                 className={`
                   flex flex-col items-center p-4 rounded-lg transition-all duration-300
                   ${copiedFormat === format.id 
-                    ? 'bg-secondary text-white' 
-                    : 'bg-white hover:bg-primary/10'}
+                    ? 'bg-pink-500 text-white' 
+                    : 'bg-white hover:bg-purple-600/10'}
                 `}
               >
                 <span className="text-3xl mb-2">{format.emoji}</span>
@@ -113,13 +113,13 @@ export default function GeneratedResult({
         <div className="flex space-x-4">
           <button 
             onClick={handleDownload}
-            className="btn-primary flex-1 py-3 rounded-full"
+            className="bg-purple-600 text-white hover:bg-pink-500 transform hover:scale-105 transition-all duration-300 flex-1 py-3 rounded-full"
           >
             Download Image
           </button>
           <button 
             onClick={onCreateAnother}
-            className="bg-background border border-primary text-primary flex-1 py-3 rounded-full hover:bg-primary/10"
+            className="bg-purple-50 border border-purple-600 text-purple-600 flex-1 py-3 rounded-full hover:bg-purple-600/10"
           >
             Create Another
           </button>
@@ -127,7 +127,7 @@ export default function GeneratedResult({
         
         <div className="text-center">
           <button 
-            className="text-gray-500 hover:text-primary transition opacity-50 hover:opacity-100 text-sm"
+            className="text-gray-500 hover:text-purple-600 transition opacity-50 hover:opacity-100 text-sm"
             disabled
           >
             Make it a Meme (Coming Soon)

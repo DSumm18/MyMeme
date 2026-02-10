@@ -60,9 +60,9 @@ export default function CreatePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background py-16">
+    <div className="min-h-screen bg-purple-50 py-16">
       <div className="max-w-4xl mx-auto px-4 space-y-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-center text-primary">
+        <h1 className="text-3xl md:text-4xl font-bold text-center text-purple-600">
           Create Your Cartoon Caricature
         </h1>
 
@@ -72,7 +72,7 @@ export default function CreatePage() {
 
         <div className="space-y-6">
           <div>
-            <label htmlFor="jobTitle" className="block text-lg font-semibold text-primary mb-2">
+            <label htmlFor="jobTitle" className="block text-lg font-semibold text-purple-600 mb-2">
               What's your job?
             </label>
             <input 
@@ -81,12 +81,12 @@ export default function CreatePage() {
               value={jobTitle}
               onChange={(e) => setJobTitle(e.target.value)}
               placeholder="e.g., Teacher, Nurse, Designer" 
-              className="w-full px-4 py-3 rounded-lg border border-primary/20 focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-3 rounded-lg border border-purple-600/20 focus:ring-2 focus:ring-primary"
             />
           </div>
 
           <div>
-            <label className="block text-lg font-semibold text-primary mb-2">
+            <label className="block text-lg font-semibold text-purple-600 mb-2">
               Gender
             </label>
             <div className="flex space-x-4">
@@ -97,8 +97,8 @@ export default function CreatePage() {
                   className={`
                     px-4 py-2 rounded-full transition-all duration-300
                     ${gender === option.toLowerCase() 
-                      ? 'bg-primary text-white' 
-                      : 'bg-background border border-primary text-primary'}
+                      ? 'bg-purple-600 text-white' 
+                      : 'bg-purple-50 border border-purple-600 text-purple-600'}
                   `}
                 >
                   {option}
@@ -117,7 +117,7 @@ export default function CreatePage() {
             className={`
               w-full py-4 rounded-full text-xl font-bold transition-all duration-300
               ${image && jobTitle 
-                ? 'btn-primary hover:scale-105' 
+                ? 'bg-purple-600 text-white hover:bg-pink-500 transform hover:scale-105 transition-all duration-300 hover:scale-105' 
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
             `}
           >

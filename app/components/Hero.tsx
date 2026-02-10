@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 export default function Hero() {
   return (
-    <section className="py-16 px-4 text-center bg-gradient-to-br from-primary to-secondary">
+    <section className="py-16 px-4 text-center bg-gradient-to-br from-purple-600 to-pink-500">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
           Turn Yourself Into a Cartoon
@@ -13,7 +13,7 @@ export default function Hero() {
         </p>
         <Link 
           href="/create" 
-          className="btn-primary px-8 py-4 rounded-full text-xl shadow-lg hover:shadow-xl inline-block transform hover:scale-105"
+          className="bg-purple-600 text-white hover:bg-pink-500 transform hover:scale-105 transition-all duration-300 px-8 py-4 rounded-full text-xl shadow-lg hover:shadow-xl inline-block transform hover:scale-105"
         >
           Create Your Cartoon Now
         </Link>

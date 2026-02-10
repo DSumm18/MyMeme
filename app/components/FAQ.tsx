@@ -27,7 +27,7 @@ export default function FAQ() {
   return (
     <section className="py-16 bg-white">
       <div className="max-w-2xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-primary">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-purple-600">
           Frequently Asked Questions
         </h2>
         <div className="space-y-4">
@@ -42,11 +42,11 @@ export default function FAQ() {
               >
                 <span className={`
                   text-lg font-semibold 
-                  ${activeIndex === index ? 'text-primary' : 'text-gray-800'}
+                  ${activeIndex === index ? 'text-purple-600' : 'text-gray-800'}
                 `}>
                   {faq.question}
                 </span>
-                <span className="text-primary text-2xl">
+                <span className="text-purple-600 text-2xl">
                   {activeIndex === index ? '−' : '+'}
                 </span>
               </button>

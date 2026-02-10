@@ -34,7 +34,7 @@ function ResultContent() {
 
 export default function ResultPage() {
   return (
-    <div className="min-h-screen bg-background py-16 flex items-center justify-center">
+    <div className="min-h-screen bg-purple-50 py-16 flex items-center justify-center">
       <Suspense fallback={<div className="text-white text-xl">Loading...</div>}>
         <ResultContent />
       </Suspense>

@@ -44,7 +44,7 @@ export default function StyleSelector({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold text-primary">
+      <h3 className="text-xl font-semibold text-purple-600">
         Choose Your Art Style
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -55,8 +55,8 @@ export default function StyleSelector({
             className={`
               p-4 rounded-lg cursor-pointer transition-all duration-300 
               ${selectedStyle === style.id 
-                ? 'bg-primary text-white border-4 border-secondary scale-105' 
-                : 'bg-background hover:bg-primary/10'}
+                ? 'bg-purple-600 text-white border-4 border-secondary scale-105' 
+                : 'bg-purple-50 hover:bg-purple-600/10'}
             `}
           >
             <Image 

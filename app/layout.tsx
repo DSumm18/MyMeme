@@ -29,7 +29,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} bg-background min-h-screen`}>
+      <body className={`${inter.className} bg-purple-50 min-h-screen`}>
         {children}
         {/* Google Analytics or other analytics placeholder */}
         <script 

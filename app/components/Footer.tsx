@@ -4,7 +4,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="bg-primary text-white py-12">
+    <footer className="bg-purple-600 text-white py-12">
       <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8">
         <div>
           <h3 className="text-xl font-bold mb-4">MyMeme</h3>
@@ -16,10 +16,10 @@ export default function Footer() {
         <div>
           <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
           <nav className="space-y-2">
-            <Link href="/" className="block hover:text-secondary transition">Home</Link>
-            <Link href="/create" className="block hover:text-secondary transition">Create Cartoon</Link>
-            <Link href="/privacy" className="block hover:text-secondary transition">Privacy Policy</Link>
-            <Link href="/terms" className="block hover:text-secondary transition">Terms of Service</Link>
+            <Link href="/" className="block hover:text-pink-500 transition">Home</Link>
+            <Link href="/create" className="block hover:text-pink-500 transition">Create Cartoon</Link>
+            <Link href="/privacy" className="block hover:text-pink-500 transition">Privacy Policy</Link>
+            <Link href="/terms" className="block hover:text-pink-500 transition">Terms of Service</Link>
           </nav>
         </div>
         
@@ -30,7 +30,7 @@ export default function Footer() {
               href="https://twitter.com/mymeme" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="hover:text-secondary transition"
+              className="hover:text-pink-500 transition"
             >
               Twitter
             </a>
@@ -38,13 +38,13 @@ export default function Footer() {
               href="https://instagram.com/mymeme" 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="hover:text-secondary transition"
+              className="hover:text-pink-500 transition"
             >
               Instagram
             </a>
             <a 
               href="mailto:support@mymeme.ai" 
-              className="hover:text-secondary transition"
+              className="hover:text-pink-500 transition"
             >
               Contact
             </a>

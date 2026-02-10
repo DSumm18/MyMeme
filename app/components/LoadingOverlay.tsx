@@ -27,7 +27,7 @@ export default function LoadingOverlay({ isLoading }: { isLoading: boolean }) {
   if (!isLoading) return null
 
   return (
-    <div className="fixed inset-0 bg-primary/80 z-50 flex flex-col items-center justify-center">
+    <div className="fixed inset-0 bg-purple-600/80 z-50 flex flex-col items-center justify-center">
       <div className="animate-pulse text-6xl mb-8">
         🎨
       </div>
