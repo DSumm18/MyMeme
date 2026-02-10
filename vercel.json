@@ -1,9 +1,3 @@
 {
-  "version": 2,
-  "routes": [
-    { "src": "/", "dest": "/" },
-    { "src": "/create", "dest": "/create" },
-    { "src": "/result", "dest": "/result" },
-    { "src": "/api/generate", "dest": "/api/generate" }
-  ]
+  "framework": "nextjs"
 }
