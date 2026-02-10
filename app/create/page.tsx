@@ -1,132 +1,169 @@
 'use client'
 
-import { useState } from 'react'
-import ImageUploader from '../components/ImageUploader'
-import StyleSelector from '../components/StyleSelector'
-import LoadingOverlay from '../components/LoadingOverlay'
-import { useRouter } from 'next/navigation'
+import { useState, useRef } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export default function CreatePage() {
-  const [image, setImage] = useState<File | null>(null)
+  const [selectedStyle, setSelectedStyle] = useState('')
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [jobTitle, setJobTitle] = useState('')
-  const [gender, setGender] = useState('')
-  const [style, setStyle] = useState('caricature')
-  const [isLoading, setIsLoading] = useState(false)
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null)
-  const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleGenerate = async () => {
-    if (!image || !jobTitle) {
-      alert('Please upload an image and enter your job title')
-      return
+  const styles = [
+    { 
+      id: 'caricature', 
+      name: 'Caricature', 
+      image: '/style-caricature.jpg',
+      description: 'Exaggerated nurse style!' 
+    },
+    { 
+      id: 'teacher', 
+      name: 'Teacher', 
+      image: '/style-teacher.jpg',
+      description: 'Classroom-chic cartoon!' 
+    },
+    { 
+      id: 'anime', 
+      name: 'Anime', 
+      image: '/style-anime.jpg',
+      description: 'Japanese anime office worker!' 
+    },
+    { 
+      id: 'watercolor', 
+      name: 'Watercolor', 
+      image: '/style-watercolor.jpg',
+      description: 'Artistic watercolor chef!' 
     }
+  ]
 
-    setIsLoading(true)
-
-    try {
-      // Convert image to base64
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
       const reader = new FileReader()
-      reader.readAsDataURL(image)
-      reader.onloadend = async () => {
-        const base64Image = reader.result as string
-
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            image: base64Image,
-            jobTitle,
-            gender,
-            style
-          })
-        })
-
-        if (!response.ok) {
-          throw new Error('Image generation failed')
-        }
-
-        const data = await response.json()
-        setGeneratedImage(data.imageUrl)
-        router.push(`/result?imageUrl=${encodeURIComponent(data.imageUrl)}`)
+      reader.onloadend = () => {
+        setSelectedImage(reader.result as string)
       }
-    } catch (error) {
-      console.error('Error generating image:', error)
-      alert('Failed to generate image. Please try again.')
-    } finally {
-      setIsLoading(false)
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleGenerate = () => {
+    if (selectedImage && selectedStyle && jobTitle) {
+      // Redirect to result page with parameters
+      const params = new URLSearchParams({
+        image: selectedImage,
+        style: selectedStyle,
+        jobTitle
+      })
+      window.location.href = `/result?${params.toString()}`
+    } else {
+      alert('Please complete all steps: upload image, choose style, and enter job title!')
     }
   }
 
   return (
-    <div className="min-h-screen bg-purple-50 py-16">
-      <div className="max-w-4xl mx-auto px-4 space-y-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-center text-purple-600">
-          Create Your Cartoon Caricature
+    <div className="min-h-screen bg-white py-20">
+      <div className="max-w-4xl mx-auto px-4">
+        <h1 className="text-4xl font-bold mb-8 text-center text-dark-blue">
+          Create Your Work Meme 🎨
         </h1>
 
-        <ImageUploader 
-          onImageUpload={(file) => setImage(file)}
-        />
-
-        <div className="space-y-6">
-          <div>
-            <label htmlFor="jobTitle" className="block text-lg font-semibold text-purple-600 mb-2">
-              What's your job?
-            </label>
+        {/* Image Upload */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">📸 Upload Your Selfie</h2>
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="
+              border-2 border-dashed border-primary-pink 
+              rounded-xl p-12 text-center cursor-pointer 
+              hover:bg-primary-pink/10 transition-colors
+            "
+          >
+            {selectedImage ? (
+              <Image 
+                src={selectedImage} 
+                alt="Uploaded selfie" 
+                width={300} 
+                height={300} 
+                className="mx-auto rounded-lg"
+              />
+            ) : (
+              <div className="text-dark-blue/70">
+                Click to upload your work selfie or drag & drop
+              </div>
+            )}
             <input 
-              type="text" 
-              id="jobTitle"
-              value={jobTitle}
-              onChange={(e) => setJobTitle(e.target.value)}
-              placeholder="e.g., Teacher, Nurse, Designer" 
-              className="w-full px-4 py-3 rounded-lg border border-purple-600/20 focus:ring-2 focus:ring-primary"
+              type="file" 
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              className="hidden"
             />
           </div>
+        </section>
 
-          <div>
-            <label className="block text-lg font-semibold text-purple-600 mb-2">
-              Gender
-            </label>
-            <div className="flex space-x-4">
-              {['Male', 'Female', 'Non-Binary'].map((option) => (
-                <button
-                  key={option}
-                  onClick={() => setGender(option.toLowerCase())}
-                  className={`
-                    px-4 py-2 rounded-full transition-all duration-300
-                    ${gender === option.toLowerCase() 
-                      ? 'bg-purple-600 text-white' 
-                      : 'bg-purple-50 border border-purple-600 text-purple-600'}
-                  `}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <StyleSelector 
-            onStyleSelect={(selectedStyle) => setStyle(selectedStyle)}
+        {/* Job Title Input */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">💼 What's Your Job?</h2>
+          <input 
+            type="text" 
+            value={jobTitle}
+            onChange={(e) => setJobTitle(e.target.value)}
+            placeholder="E.g., Nurse, Teacher, Software Engineer"
+            className="
+              w-full p-4 border-2 border-mint-green 
+              rounded-xl focus:outline-none 
+              focus:border-primary-pink transition-colors
+            "
           />
+        </section>
 
+        {/* Style Selection */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4">🎨 Choose Your Style</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            {styles.map((style) => (
+              <div 
+                key={style.id}
+                onClick={() => setSelectedStyle(style.id)}
+                className={`
+                  p-4 rounded-xl cursor-pointer transition-all 
+                  ${selectedStyle === style.id 
+                    ? 'bg-primary-pink/20 scale-105 border-2 border-primary-pink' 
+                    : 'bg-white hover:bg-bright-yellow/20'}
+                `}
+              >
+                <Image 
+                  src={style.image} 
+                  alt={style.name} 
+                  width={300} 
+                  height={300} 
+                  className="rounded-lg mb-4"
+                />
+                <h3 className="text-xl font-semibold">{style.name}</h3>
+                <p className="text-sm text-dark-blue/70">{style.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Generate Button */}
+        <div className="text-center">
           <button 
             onClick={handleGenerate}
-            disabled={!image || !jobTitle}
+            disabled={!selectedImage || !selectedStyle || !jobTitle}
             className={`
-              w-full py-4 rounded-full text-xl font-bold transition-all duration-300
-              ${image && jobTitle 
-                ? 'bg-purple-600 text-white hover:bg-pink-500 transform hover:scale-105 transition-all duration-300 hover:scale-105' 
+              px-12 py-4 text-xl rounded-full transition-all
+              ${selectedImage && selectedStyle && jobTitle 
+                ? 'bg-primary-pink text-white hover:bg-primary-pink/90' 
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
             `}
           >
-            Generate Caricature
+            Generate My Meme 🚀
           </button>
         </div>
       </div>
-
-      <LoadingOverlay isLoading={isLoading} />
     </div>
   )
 }

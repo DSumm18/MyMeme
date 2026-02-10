@@ -1,36 +1,25 @@
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss'
 
 const config: Config = {
   content: [
-    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
     extend: {
       colors: {
-        'primary': '#9C27B0', // Vibrant purple
-        'secondary': '#FF4081', // Bright pink
-        'accent': '#7C4DFF', // Deep purple accent
-        'background': '#F3E5F5', // Light lavender background
+        'primary-pink': '#FF6B9D',
+        'bright-yellow': '#FFD93D',
+        'mint-green': '#6BCB77',
+        'coral-orange': '#FF8C42',
+        'dark-blue': '#1A1A2E',
       },
-      fontFamily: {
-        'sans': ['Inter', 'ui-sans-serif', 'system-ui'],
+      borderRadius: {
+        'xl': '1rem',
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-      },
-      keyframes: {
-        shimmer: {
-          '0%': { backgroundPosition: '-1000px 0' },
-          '100%': { backgroundPosition: '1000px 0' },
-        }
-      },
-      animation: {
-        shimmer: 'shimmer 2s infinite linear',
-      }
     },
   },
   plugins: [],
 }
-export default config;
+export default config

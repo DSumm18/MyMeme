@@ -2,34 +2,37 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 240, 229, 245;
-  --background-end-rgb: 255, 255, 255;
+/* Custom scroll animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-    to bottom,
-    transparent,
-    rgb(var(--background-end-rgb))
-  ) rgb(var(--background-start-rgb));
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out;
 }
 
-::-webkit-scrollbar {
-  width: 8px;
+@keyframes cardHover {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  }
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #9C27B0;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #7C4DFF;
+.card-hover:hover {
+  animation: cardHover 0.5s ease-in-out;
 }
