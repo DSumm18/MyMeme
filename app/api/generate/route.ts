@@ -110,39 +110,40 @@ export async function POST(req: NextRequest) {
       }, { status: 502 })
     }
 
-    // PhotoMaker task
-    const photoMakerTask = {
-      taskType: "photoMaker",
+    // PuLID task (much better face likeness than PhotoMaker)
+    const generateTask = {
+      taskType: "imageInference",
       taskUUID: randomUUID(),
-      model: "civitai:139562@344487",
-      inputImages: [imageUUID],
-      style: "No style",
-      strength: 15,
-      positivePrompt: `img, portrait of this ${gender || 'person'}, ${styleDesc}${jobTitleText}`.substring(0, 295),
+      model: "runware:101@1",
+      positivePrompt: `${styleDesc}${jobTitleText}`.substring(0, 295),
       height: 1024,
       width: 1024,
-      steps: 20,
+      steps: 25,
       numberResults: 1,
       outputType: "URL",
       outputFormat: "JPG",
-      includeCost: true
+      includeCost: true,
+      puLID: {
+        inputImages: [imageUUID],
+        weight: 0.8
+      }
     }
 
-    // Enhanced logging for PhotoMaker task
-    console.log('PhotoMaker Task:', JSON.stringify({
-      ...photoMakerTask,
-      imageUUID: '[REDACTED]'
+    // Enhanced logging for PuLID task
+    console.log('PuLID Task:', JSON.stringify({
+      ...generateTask,
+      puLID: { inputImages: ['[REDACTED]'], weight: 0.8 }
     }))
 
-    // PhotoMaker API call with retry
+    // PuLID API call with retry
     let data = null
     let lastError = ''
     
     for (let attempt = 0; attempt < 2; attempt++) {
       if (attempt > 0) {
         // Update taskUUID for retry
-        photoMakerTask.taskUUID = randomUUID()
-        console.log(`PhotoMaker retry attempt ${attempt + 1}`)
+        generateTask.taskUUID = randomUUID()
+        console.log(`PuLID retry attempt ${attempt + 1}`)
       }
       
       const runwareRes = await fetch('https://api.runware.ai/v1', {
@@ -151,12 +152,12 @@ export async function POST(req: NextRequest) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
         },
-        body: JSON.stringify([photoMakerTask]),
+        body: JSON.stringify([generateTask]),
       })
 
       if (!runwareRes.ok) {
         lastError = await runwareRes.text()
-        console.error('Runware PhotoMaker HTTP error:', { status: runwareRes.status, body: lastError })
+        console.error('Runware PuLID HTTP error:', { status: runwareRes.status, body: lastError })
         continue
       }
 
@@ -165,7 +166,7 @@ export async function POST(req: NextRequest) {
       // Check for errors in response body (Runware returns 200 with errors array)
       if (resData?.errors?.length > 0) {
         lastError = JSON.stringify(resData.errors)
-        console.error('Runware PhotoMaker inference error:', resData.errors)
+        console.error('Runware PuLID inference error:', resData.errors)
         continue
       }
       
@@ -192,7 +193,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ 
       imageUrl,
       cost: cost ? `$${cost.toFixed(4)}` : undefined,
-      prompt: photoMakerTask.positivePrompt,
+      prompt: generateTask.positivePrompt,
       inputStyle: style,
       inputMetadata: {
         jobTitle,
