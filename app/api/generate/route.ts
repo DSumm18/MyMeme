@@ -3,7 +3,7 @@ import { randomUUID } from 'crypto'
 
 export async function POST(req: NextRequest) {
   try {
-    const { image, jobTitle, gender, style, accessories, location } = await req.json()
+    const { image, jobTitle, gender = '', style, accessories, location } = await req.json()
 
     // Input validation with more detailed checks
     if (!image) {
@@ -37,9 +37,21 @@ export async function POST(req: NextRequest) {
     // Style map remains the same...
     const styleMap: Record<string, string> = {
       caricature: "A fun cartoon caricature with exaggerated features, big expressive eyes, colorful vibrant style, professional digital art caricature illustration",
+      anime: "A Japanese anime character portrait, large expressive anime eyes, clean lineart, vibrant hair colors, anime art style like Studio Ghibli or Makoto Shinkai",
+      pixar: "A Pixar 3D animated character, smooth plastic-like skin, big round eyes, warm lighting, Pixar movie still, Disney Pixar animation style",
+      gta: "A GTA V loading screen character portrait, bold outlines, saturated colors, stylized realism, Grand Theft Auto artwork style by Stephen Bliss",
+      superhero: "A comic book superhero portrait, wearing a superhero costume with cape, dynamic pose, bold comic book colors, Marvel DC comic art style",
+      'clay-3d': "A claymation character portrait, sculpted clay figure, soft rounded features, stop-motion animation style like Wallace and Gromit, warm studio lighting",
+      simpsons: "A Simpsons cartoon character, yellow skin, overbite, large round eyes, Matt Groening art style, The Simpsons TV show character design",
       watercolor: "A beautiful soft watercolor painting portrait, artistic brushstrokes, gentle pastel colors, fine art watercolor style",
-      // ... other styles remain the same
-      minecraft: "A Minecraft character portrait, blocky pixelated 3D style, square head, voxel art, Minecraft game aesthetic"
+      'pop-art': "A pop art portrait in the style of Andy Warhol and Roy Lichtenstein, bold primary colors, halftone dots, thick black outlines, comic book pop art",
+      renaissance: "A classical Renaissance oil painting portrait, dramatic lighting like Rembrandt, rich warm tones, old master painting technique, museum quality fine art",
+      'pencil-sketch': "A detailed pencil sketch portrait, hand-drawn graphite art, fine hatching and shading, realistic pencil drawing on white paper, artist sketch",
+      'comic-book': "A comic book character portrait, bold black ink outlines, cell shading, vivid colors, action comic panel art style, superhero comic illustration",
+      lego: "A LEGO minifigure portrait, blocky plastic toy character, yellow LEGO skin, simple dot eyes, LEGO brick world background, toy photography style",
+      sticker: "A die-cut sticker design portrait, thick white border, glossy finish, cute kawaii style, chibi proportions, sticker sheet art",
+      'retro-80s': "A retro 1980s synthwave portrait, neon pink and blue colors, chrome text effects, grid background, VHS aesthetic, outrun synthwave art style",
+      minecraft: "A Minecraft character portrait, blocky pixelated 3D style, square head and body, voxel art, Minecraft game aesthetic"
     }
 
     const styleDesc = styleMap[style] || styleMap.caricature
@@ -103,8 +115,8 @@ export async function POST(req: NextRequest) {
       model: "civitai:139562@344487",
       inputImages: [imageUUID],
       style: "No style",
-      strength: 40,
-      positivePrompt: `${styleDesc}${jobTitleText}${accessoriesText}${locationText}. Preserve the person's face and identity exactly.`,
+      strength: 15,
+      positivePrompt: `img, a portrait of this exact ${gender || 'person'}, ${styleDesc}${jobTitleText}${accessoriesText}${locationText}. Keep the same face, same gender, same features, same identity.`,
       height: 1024,
       width: 1024,
       steps: 25,

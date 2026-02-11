@@ -141,9 +141,9 @@ export default function Home() {
         </AnimatedSection>
         <div className="grid md:grid-cols-3 gap-8">
           {[
-            { num: '1', icon: '📸', title: 'Upload Your Selfie', desc: 'Take a photo or upload one from your camera roll. Works with any clear face photo.', color: '#FF6B9D' },
-            { num: '2', icon: '💼', title: 'Enter Your Details', desc: 'Your job title, favourite accessories, and where you work. We build the scene around YOU.', color: '#FFD93D' },
-            { num: '3', icon: '🎉', title: 'Bring It to Life!', desc: 'Your meme is generated in seconds. Turn it into an animated meme, share it everywhere, go viral!', color: '#6BCB77' },
+            { num: '1', icon: '📸', title: 'Upload Your Photo', desc: 'Take a selfie or upload any photo with a clear face. That\'s all we need.', color: '#FF6B9D' },
+            { num: '2', icon: '🎨', title: 'Pick Your Style', desc: 'Choose from 16 incredible styles — Anime, Pixar, GTA, Superhero, and more.', color: '#FFD93D' },
+            { num: '3', icon: '⚡', title: 'Get Your Art!', desc: 'AI transforms your photo in seconds. Download, share, go viral!', color: '#6BCB77' },
           ].map((step, i) => (
             <AnimatedSection key={step.num} delay={i * 150}>
               <div className="text-center p-8 rounded-3xl border-2 border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 group">

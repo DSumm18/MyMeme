@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { loadingPhrases } from './LoadingPhrases'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 // Loading emojis for animation
 const LOADING_EMOJIS = ['🎨', '🖌️', '✨', '🎭', '🖼️']
@@ -95,10 +95,21 @@ function compressImage(file: File, maxWidth: number, quality: number): Promise<s
   })
 }
 
-export default function CreatePage() {
+export default function CreatePageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <CreatePage />
+    </Suspense>
+  )
+}
+
+function CreatePage() {
   const router = useRouter()
-  const [selectedStyle, setSelectedStyle] = useState('caricature')
+  const searchParams = useSearchParams()
+  const initialStyle = searchParams.get('style') || 'caricature'
+  const [selectedStyle, setSelectedStyle] = useState(initialStyle)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [gender, setGender] = useState('')
   const [jobTitle, setJobTitle] = useState('')
   const [accessories, setAccessories] = useState('')
   const [location, setLocation] = useState('')
@@ -184,6 +195,7 @@ export default function CreatePage() {
         body: JSON.stringify({
           image: selectedImage,
           style: selectedStyle,
+          gender,
           jobTitle,
           accessories,
           location,
@@ -283,10 +295,33 @@ export default function CreatePage() {
             </div>
           </div>
 
-          {/* Optional Details */}
+          {/* Step 3: Quick Info */}
           <div className="mb-10">
             <h2 className="text-xl font-bold mb-3 flex items-center gap-2" style={{ color: '#1A1A2E' }}>
               <span className="bg-[#FFD93D] text-[#1A1A2E] w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">3</span>
+              Quick Info <span className="text-sm font-normal text-gray-400">(helps AI accuracy)</span>
+            </h2>
+            <div className="flex gap-3 mb-4">
+              {['Male', 'Female', 'Other'].map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setGender(g.toLowerCase())}
+                  className={`px-6 py-3 rounded-xl font-bold transition-all ${
+                    gender === g.toLowerCase()
+                      ? 'bg-[#FF6B9D] text-white scale-105 shadow-md'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Optional Details */}
+          <div className="mb-10">
+            <h2 className="text-xl font-bold mb-3 flex items-center gap-2" style={{ color: '#1A1A2E' }}>
+              <span className="bg-[#6BCB77] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">4</span>
               Optional Details
             </h2>
             <div className="space-y-4">
