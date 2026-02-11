@@ -99,12 +99,22 @@ export default function Home() {
           </div>
           {/* Style Carousel */}
           <div className="relative">
-            <div className={`bg-gradient-to-br ${styles[activeStyleIdx].color} rounded-3xl shadow-2xl p-8 transition-all duration-500 min-h-[400px] flex flex-col items-center justify-center text-white`}>
-              <div className="text-8xl mb-4 animate-bounce">{styles[activeStyleIdx].emoji}</div>
-              <h3 className="text-3xl font-black mb-2">{styles[activeStyleIdx].name}</h3>
-              <p className="text-lg opacity-90">{styles[activeStyleIdx].description}</p>
-              <div className="mt-6 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-sm">
-                Your photo → {styles[activeStyleIdx].name} style
+            <div className="relative rounded-3xl shadow-2xl overflow-hidden min-h-[400px] bg-white">
+              <div className="grid grid-cols-2 h-full min-h-[400px]">
+                <div className="relative">
+                  <Image src="/styles/before.jpg" alt="Original photo" fill className="object-cover" />
+                  <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-bold">Before</div>
+                </div>
+                <div className="relative">
+                  <Image 
+                    key={styles[activeStyleIdx].id}
+                    src={`/styles/${styles[activeStyleIdx].id}.jpg`} 
+                    alt={`${styles[activeStyleIdx].name} style`} 
+                    fill 
+                    className="object-cover transition-opacity duration-500" 
+                  />
+                  <div className="absolute bottom-4 right-4 bg-[#FF6B9D] text-white px-3 py-1 rounded-full text-sm font-bold">{styles[activeStyleIdx].name}</div>
+                </div>
               </div>
             </div>
             {/* Carousel dots */}
@@ -174,8 +184,13 @@ export default function Home() {
                 <Link href={`/create?style=${style.id}`}
                   className={`cursor-pointer rounded-3xl overflow-hidden transition-all duration-300 group block hover:scale-105 hover:shadow-lg`}
                 >
-                  <div className={`relative aspect-square overflow-hidden bg-gradient-to-br ${style.color} flex items-center justify-center`}>
-                    <span className="text-6xl group-hover:scale-125 transition-transform duration-300">{style.emoji}</span>
+                  <div className="relative aspect-square overflow-hidden">
+                    <Image 
+                      src={`/styles/${style.id}.jpg`}
+                      alt={`${style.name} style example`}
+                      fill 
+                      className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                    />
                   </div>
                   <div className="p-4 bg-white">
                     <h3 className="font-bold text-lg" style={{ color: '#1A1A2E' }}>{style.name}</h3>
@@ -185,6 +200,43 @@ export default function Home() {
               </AnimatedSection>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Animation Feature */}
+      <section className="py-20 bg-[#1A1A2E] text-white">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <AnimatedSection>
+            <div className="inline-block bg-[#FF6B9D] text-white text-sm font-bold px-4 py-1 rounded-full mb-6">
+              ✨ NEW FEATURE
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black mb-6">
+              Bring Your Photos to Life 🎬
+            </h2>
+            <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
+              Turn any photo into a stunning 5-second animation. Watch faces smile, heads turn, and images come alive with AI magic.
+            </p>
+          </AnimatedSection>
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            {[
+              { icon: '👨‍👩‍👧‍👦', title: 'Family Photos', desc: 'Bring old family photos to life — watch loved ones smile and look at each other' },
+              { icon: '🖼️', title: 'Art & Portraits', desc: 'Animate paintings, caricatures, and artistic portraits for stunning effects' },
+              { icon: '📱', title: 'Profile Pics', desc: 'Create animated profile pictures and live wallpapers that stand out' },
+            ].map((item, i) => (
+              <AnimatedSection key={i} delay={i * 150}>
+                <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#FF6B9D]/50 transition-all">
+                  <div className="text-5xl mb-4">{item.icon}</div>
+                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                  <p className="text-gray-400">{item.desc}</p>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+          <AnimatedSection delay={300}>
+            <Link href="/create" className="inline-block mt-12 bg-[#FF6B9D] text-white px-10 py-5 rounded-full text-xl font-black hover:scale-105 hover:shadow-xl transition-all duration-300">
+              Try Animation Free 🎬
+            </Link>
+          </AnimatedSection>
         </div>
       </section>
 
