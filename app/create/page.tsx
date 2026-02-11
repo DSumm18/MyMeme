@@ -16,22 +16,22 @@ export default function CreatePage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const styles = [
-    { id: 'caricature', name: 'Caricature', image: '/styles/caricature.jpg', description: 'Big head, big personality!' },
-    { id: 'watercolor', name: 'Watercolor', image: '/styles/watercolor.jpg', description: 'Soft artistic portrait!' },
-    { id: 'anime', name: 'Anime', image: '/styles/anime.jpg', description: 'Kawaii cartoon style!' },
-    { id: 'pop-art', name: 'Pop Art', image: '/styles/pop-art.jpg', description: 'Bold comic book vibes!' },
-    { id: 'clay-3d', name: 'Claymation', image: '/styles/clay-3d.jpg', description: 'Sculpted clay figure look!' },
-    { id: 'superhero', name: 'Superhero', image: '/styles/superhero.jpg', description: 'Comic book hero pose!' },
-    { id: 'renaissance', name: 'Oil Painting', image: '/styles/renaissance.jpg', description: 'Classic masterpiece style!' },
-    { id: 'pencil-sketch', name: 'Pencil Sketch', image: '/styles/pencil-sketch.jpg', description: 'Hand-drawn artistry!' },
-    { id: 'pixar', name: 'Pixar', image: '/styles/pixar.jpg', description: 'Animated character magic!' },
-    { id: 'retro-80s', name: 'Retro 80s', image: '/styles/retro-80s.jpg', description: 'Synthwave nostalgia!' },
-    { id: 'comic-book', name: 'Comic Book', image: '/styles/comic-book.jpg', description: 'Superhero comic style!' },
-    { id: 'sticker', name: 'Sticker', image: '/styles/sticker.jpg', description: 'Die-cut cool vibes!' },
-    { id: 'lego', name: 'Lego', image: '/styles/lego.jpg', description: 'Blocky toy character!' },
-    { id: 'gta', name: 'GTA Style', image: '/styles/gta.jpg', description: 'Video game loading screen!' },
-    { id: 'simpsons', name: 'Simpsons', image: '/styles/simpsons.jpg', description: 'Yellow cartoon character!' },
-    { id: 'minecraft', name: 'Minecraft', image: '/styles/minecraft.jpg', description: 'Pixelated block world!' }
+    { id: 'caricature', name: 'Caricature', emoji: '🎨', bg: 'bg-pink-100', description: 'Big head, big personality!' },
+    { id: 'watercolor', name: 'Watercolor', emoji: '🖌️', bg: 'bg-blue-100', description: 'Soft artistic portrait!' },
+    { id: 'anime', name: 'Anime', emoji: '⚡', bg: 'bg-purple-100', description: 'Kawaii cartoon style!' },
+    { id: 'pop-art', name: 'Pop Art', emoji: '💥', bg: 'bg-yellow-100', description: 'Bold comic book vibes!' },
+    { id: 'clay-3d', name: 'Claymation', emoji: '🧊', bg: 'bg-orange-100', description: 'Sculpted clay figure look!' },
+    { id: 'superhero', name: 'Superhero', emoji: '🦸', bg: 'bg-red-100', description: 'Comic book hero pose!' },
+    { id: 'renaissance', name: 'Oil Painting', emoji: '🖼️', bg: 'bg-brown-100', description: 'Classic masterpiece style!' },
+    { id: 'pencil-sketch', name: 'Pencil Sketch', emoji: '✏️', bg: 'bg-gray-100', description: 'Hand-drawn artistry!' },
+    { id: 'pixar', name: 'Pixar', emoji: '✨', bg: 'bg-teal-100', description: 'Animated character magic!' },
+    { id: 'retro-80s', name: 'Retro 80s', emoji: '🕹️', bg: 'bg-pink-200', description: 'Synthwave nostalgia!' },
+    { id: 'comic-book', name: 'Comic Book', emoji: '💬', bg: 'bg-green-100', description: 'Comic book style!' },
+    { id: 'sticker', name: 'Sticker', emoji: '🏷️', bg: 'bg-mint-100', description: 'Die-cut cool vibes!' },
+    { id: 'lego', name: 'Lego', emoji: '🧱', bg: 'bg-yellow-100', description: 'Blocky toy character!' },
+    { id: 'gta', name: 'GTA Style', emoji: '🔫', bg: 'bg-purple-200', description: 'Video game loading screen!' },
+    { id: 'simpsons', name: 'Simpsons', emoji: '🟡', bg: 'bg-yellow-100', description: 'Yellow cartoon character!' },
+    { id: 'minecraft', name: 'Minecraft', emoji: '⛏️', bg: 'bg-brown-100', description: 'Pixelated block world!' }
   ]
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +76,8 @@ export default function CreatePage() {
         throw new Error(data.error || 'Generation failed')
       }
 
-      // Store result in sessionStorage and navigate
+      // Store result in sessionStorage and the original image
+      sessionStorage.setItem('mymeme_original', selectedImage)
       sessionStorage.setItem('mymeme_result', JSON.stringify({
         imageUrl: data.imageUrl,
         prompt: data.prompt,
@@ -142,8 +143,8 @@ export default function CreatePage() {
                     : 'hover:shadow-md hover:scale-102'
                 }`}
               >
-                <div className="relative aspect-square">
-                  <Image src={style.image} alt={style.name} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />
+                <div className={`aspect-square flex items-center justify-center text-6xl ${style.bg}`}>
+                  {style.emoji}
                 </div>
                 <div className="p-3 bg-white">
                   <h3 className="font-bold text-sm">{style.name}</h3>

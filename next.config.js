@@ -2,7 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['runware.ai', 'storage.googleapis.com']
+    remotePatterns: [
+      { protocol: 'https', hostname: 'im.runware.ai' },
+      { protocol: 'https', hostname: '*.runware.ai' },
+    ],
   },
   env: {
     RUNWARE_API_KEY: process.env.RUNWARE_API_KEY

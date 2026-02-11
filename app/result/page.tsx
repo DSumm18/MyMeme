@@ -14,12 +14,17 @@ interface MemeResult {
 
 export default function ResultPage() {
   const [result, setResult] = useState<MemeResult | null>(null)
+  const [originalImage, setOriginalImage] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('mymeme_result')
+    const storedOriginal = sessionStorage.getItem('mymeme_original')
     if (stored) {
       setResult(JSON.parse(stored))
+    }
+    if (storedOriginal) {
+      setOriginalImage(storedOriginal)
     }
   }, [])
 
@@ -58,22 +63,45 @@ export default function ResultPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFF5E1] to-white py-12">
-      <div className="max-w-2xl mx-auto px-4 text-center">
+      <div className="max-w-4xl mx-auto px-4 text-center">
         <h1 className="text-4xl md:text-5xl font-black mb-2" style={{ color: '#1A1A2E' }}>
           Your Meme is Ready! 🎉
         </h1>
         <p className="text-gray-500 mb-8">Looking good as a {result.style} {result.jobTitle}!</p>
 
-        {/* Generated Image */}
-        <div className="bg-white rounded-3xl shadow-2xl p-4 mb-8 inline-block">
-          <div className="relative w-full max-w-lg mx-auto aspect-square">
-            <Image
-              src={result.imageUrl}
-              alt={`AI cartoon caricature — ${result.jobTitle}`}
-              fill
-              className="rounded-2xl object-cover"
-              unoptimized
-            />
+        {/* Before/After Comparison */}
+        <div className="flex flex-col md:flex-row justify-center items-center gap-8 mb-8">
+          {/* Original Image - Left */}
+          {originalImage && (
+            <div className="bg-white rounded-3xl shadow-2xl p-4 w-full md:w-1/2">
+              <div className="relative aspect-square">
+                <Image
+                  src={originalImage}
+                  alt="Original Photo"
+                  fill
+                  className="rounded-2xl object-cover"
+                />
+                <div className="absolute top-4 left-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  Original
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Generated Image - Right */}
+          <div className="bg-white rounded-3xl shadow-2xl p-4 w-full md:w-1/2">
+            <div className="relative aspect-square">
+              <Image
+                src={result.imageUrl}
+                alt={`AI cartoon caricature — ${result.jobTitle}`}
+                fill
+                className="rounded-2xl object-cover"
+                unoptimized
+              />
+              <div className="absolute top-4 left-4 bg-[#FF6B9D] text-white px-3 py-1 rounded-full text-sm">
+                {result.style}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -104,26 +132,14 @@ export default function ResultPage() {
           </Link>
         </div>
 
-        {/* Meme Maker Teaser */}
-        <div className="bg-white rounded-2xl p-6 border-2 border-dashed border-[#FF8C42] mb-8">
-          <h3 className="text-xl font-bold mb-2" style={{ color: '#1A1A2E' }}>😂 Make It a Meme!</h3>
-          <p className="text-gray-500 mb-4">Put your cartoon face into famous meme templates — Drake, Distracted Boyfriend, and more!</p>
-          <span className="inline-block bg-[#FF8C42]/20 text-[#FF8C42] px-4 py-2 rounded-full font-bold text-sm">
-            Coming Soon ✨
-          </span>
-        </div>
-
-        {/* Social Sizing Teaser */}
-        <div className="bg-gray-50 rounded-2xl p-6">
-          <h3 className="text-lg font-bold mb-3" style={{ color: '#1A1A2E' }}>📱 Auto-Sized for Social</h3>
-          <div className="flex justify-center gap-3 flex-wrap">
-            {['Instagram Post', 'Facebook Cover', 'WhatsApp DP', 'TikTok', 'Twitter Header'].map((platform) => (
-              <span key={platform} className="bg-white px-3 py-1 rounded-full text-sm text-gray-500 border">
-                {platform}
-              </span>
-            ))}
-          </div>
-          <p className="text-sm text-gray-400 mt-3">Premium feature — coming soon</p>
+        {/* Try Another Style Button */}
+        <div className="text-center mb-8">
+          <Link 
+            href="/create" 
+            className="bg-[#6BCB77] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all inline-flex items-center gap-2"
+          >
+            🎨 Try Another Style
+          </Link>
         </div>
       </div>
     </div>
