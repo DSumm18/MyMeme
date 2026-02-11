@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
 
+export const maxDuration = 60
+
 export async function POST(req: NextRequest) {
   try {
     const { image, jobTitle, gender = '', style, accessories, location } = await req.json()
@@ -116,7 +118,7 @@ export async function POST(req: NextRequest) {
       inputImages: [imageUUID],
       style: "No style",
       strength: 15,
-      positivePrompt: `img, a portrait of this exact ${gender || 'person'}, ${styleDesc}${jobTitleText}${accessoriesText}${locationText}. Keep the same face, same gender, same features, same identity.`,
+      positivePrompt: `img, portrait of this ${gender || 'person'}, ${styleDesc}${jobTitleText}`.substring(0, 295),
       height: 1024,
       width: 1024,
       steps: 20,
