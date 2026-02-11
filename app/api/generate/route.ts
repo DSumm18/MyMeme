@@ -39,15 +39,45 @@ export async function POST(req: NextRequest) {
     const locationText = location ? `, in a ${location} setting` : ''
     const jobTitleText = jobTitle ? `, as a ${jobTitle}` : ''
 
-    // Construct PhotoMaker task
+    // Step 1: Upload image to Runware to get a UUID
+    const uploadTask = {
+      taskType: "imageUpload",
+      taskUUID: randomUUID(),
+      image: image, // data URI from client
+    }
+
+    const uploadRes = await fetch('https://api.runware.ai/v1', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify([uploadTask]),
+    })
+
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text()
+      console.error('Runware upload error:', uploadRes.status, errText)
+      return NextResponse.json({ error: 'Image upload failed' }, { status: 502 })
+    }
+
+    const uploadData = await uploadRes.json()
+    const imageUUID = uploadData?.data?.[0]?.imageUUID
+
+    if (!imageUUID) {
+      console.error('No imageUUID in upload response:', JSON.stringify(uploadData))
+      return NextResponse.json({ error: 'Image upload failed' }, { status: 502 })
+    }
+
+    // Step 2: Run PhotoMaker with uploaded image UUID
     const photoMakerTask = {
       taskType: "photoMaker",
       taskUUID: randomUUID(),
       model: "civitai:139562@344487",
-      inputImages: [image], // Input is data URI from client
-      style: "No style", // Always use "No style" as instructed
-      strength: 40, // As recommended, in the 35-45 range
-      positivePrompt: `Transform this portrait into a stylized illustration${jobTitleText}${accessoriesText}${locationText}. ${styleDesc}. Preserve original face and identity. High-quality artistic rendering.`,
+      inputImages: [imageUUID], // Use UUID from upload
+      style: "No style",
+      strength: 40,
+      positivePrompt: `${styleDesc}${jobTitleText}${accessoriesText}${locationText}. Preserve the person's face and identity exactly.`,
       height: 1024,
       width: 1024,
       steps: 25,
@@ -57,7 +87,7 @@ export async function POST(req: NextRequest) {
       includeCost: true
     }
 
-    // Send to Runware API
+    // Send PhotoMaker request to Runware API
     const runwareRes = await fetch('https://api.runware.ai/v1', {
       method: 'POST',
       headers: {
