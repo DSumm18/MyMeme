@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
       taskType: "imageInference",
       taskUUID: randomUUID(),
       model: "runware:101@1",
-      positivePrompt: `${styleDesc}${jobTitleText}`.substring(0, 295),
+      positivePrompt: `${styleDesc}${jobTitleText}${accessoriesText}${locationText}`.substring(0, 295),
       height: 1024,
       width: 1024,
       steps: 25,
