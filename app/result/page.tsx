@@ -62,7 +62,8 @@ export default function ResultPage() {
     if (!ctx) return
 
     // Load image onto canvas
-    const img = new Image()
+    const img = new window.Image()
+    img.crossOrigin = 'anonymous'
     img.onload = () => {
       // Set canvas size to match image
       canvas.width = img.width
@@ -76,7 +77,7 @@ export default function ResultPage() {
       ctx.textAlign = 'center'
       ctx.fillStyle = 'white'
       ctx.strokeStyle = 'black'
-      ctx.lineWidth = Math.floor(canvas.width * 0.004)
+      ctx.lineWidth = Math.floor(canvas.width * 0.008)
 
       // Top text
       if (topText) {
