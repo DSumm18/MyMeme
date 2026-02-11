@@ -38,12 +38,12 @@ export async function POST(req: NextRequest) {
 
     // Style map remains the same...
     const styleMap: Record<string, string> = {
-      caricature: "A fun cartoon caricature with exaggerated features, big expressive eyes, colorful vibrant style, professional digital art caricature illustration",
+      caricature: "A professional caricature portrait, exaggerated funny features, big head small body, vibrant colors, sharp clean lines, editorial cartoon style",
       anime: "A Japanese anime character portrait, large expressive anime eyes, clean lineart, vibrant hair colors, anime art style like Studio Ghibli or Makoto Shinkai",
       pixar: "A Pixar 3D animated character, smooth plastic-like skin, big round eyes, warm lighting, Pixar movie still, Disney Pixar animation style",
       gta: "A GTA V loading screen character portrait, bold outlines, saturated colors, stylized realism, Grand Theft Auto artwork style by Stephen Bliss",
       superhero: "A comic book superhero portrait, wearing a superhero costume with cape, dynamic pose, bold comic book colors, Marvel DC comic art style",
-      'clay-3d': "A claymation character portrait, sculpted clay figure, soft rounded features, stop-motion animation style like Wallace and Gromit, warm studio lighting",
+      'clay-3d': "A cute Pixar-quality claymation character, smooth sculpted clay, soft round features, detailed texture, warm cinematic lighting, Aardman Studios quality",
       simpsons: "A Simpsons cartoon character, yellow skin, overbite, large round eyes, Matt Groening art style, The Simpsons TV show character design",
       watercolor: "A beautiful soft watercolor painting portrait, artistic brushstrokes, gentle pastel colors, fine art watercolor style",
       'pop-art': "A pop art portrait in the style of Andy Warhol and Roy Lichtenstein, bold primary colors, halftone dots, thick black outlines, comic book pop art",
@@ -56,10 +56,15 @@ export async function POST(req: NextRequest) {
       minecraft: "A Minecraft character portrait, blocky pixelated 3D style, square head and body, voxel art, Minecraft game aesthetic"
     }
 
+    // Build prompt with scene context FIRST, then style
+    // Location and accessories are important for the scene - don't bury them at the end
     const styleDesc = styleMap[style] || styleMap.caricature
-    const accessoriesText = accessories ? `, with ${accessories}` : ''
-    const locationText = location ? `, in a ${location} setting` : ''
-    const jobTitleText = jobTitle ? `, as a ${jobTitle}` : ''
+    const sceneDetails = [
+      jobTitle ? `as a ${jobTitle}` : '',
+      location ? `in a ${location}` : '',
+      accessories ? `with ${accessories}` : '',
+    ].filter(Boolean).join(', ')
+    const sceneText = sceneDetails ? `, ${sceneDetails}` : ''
 
     // Image upload task
     const uploadTask = {
@@ -115,7 +120,7 @@ export async function POST(req: NextRequest) {
       taskType: "imageInference",
       taskUUID: randomUUID(),
       model: "runware:101@1",
-      positivePrompt: `${styleDesc}${jobTitleText}${accessoriesText}${locationText}`.substring(0, 295),
+      positivePrompt: `${styleDesc}${sceneText}`.substring(0, 295),
       height: 1024,
       width: 1024,
       steps: 25,
