@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
       positivePrompt: `img, a portrait of this exact ${gender || 'person'}, ${styleDesc}${jobTitleText}${accessoriesText}${locationText}. Keep the same face, same gender, same features, same identity.`,
       height: 1024,
       width: 1024,
-      steps: 25,
+      steps: 20,
       numberResults: 1,
       outputType: "URL",
       outputFormat: "JPG",
@@ -132,42 +132,59 @@ export async function POST(req: NextRequest) {
       imageUUID: '[REDACTED]'
     }))
 
-    // PhotoMaker API call
-    const runwareRes = await fetch('https://api.runware.ai/v1', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify([photoMakerTask]),
-    })
-
-    // Detailed error handling for PhotoMaker
-    if (!runwareRes.ok) {
-      const errText = await runwareRes.text()
-      console.error('Runware PhotoMaker error:', {
-        status: runwareRes.status,
-        body: errText
+    // PhotoMaker API call with retry
+    let data = null
+    let lastError = ''
+    
+    for (let attempt = 0; attempt < 2; attempt++) {
+      if (attempt > 0) {
+        // Update taskUUID for retry
+        photoMakerTask.taskUUID = randomUUID()
+        console.log(`PhotoMaker retry attempt ${attempt + 1}`)
+      }
+      
+      const runwareRes = await fetch('https://api.runware.ai/v1', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify([photoMakerTask]),
       })
-      return NextResponse.json({ 
-        error: 'Image generation failed', 
-        details: errText 
-      }, { status: 502 })
+
+      if (!runwareRes.ok) {
+        lastError = await runwareRes.text()
+        console.error('Runware PhotoMaker HTTP error:', { status: runwareRes.status, body: lastError })
+        continue
+      }
+
+      const resData = await runwareRes.json()
+      
+      // Check for errors in response body (Runware returns 200 with errors array)
+      if (resData?.errors?.length > 0) {
+        lastError = JSON.stringify(resData.errors)
+        console.error('Runware PhotoMaker inference error:', resData.errors)
+        continue
+      }
+      
+      if (resData?.data?.[0]?.imageURL) {
+        data = resData
+        break
+      }
+      
+      lastError = JSON.stringify(resData)
+      console.error('No imageURL in response:', resData)
     }
 
-    const data = await runwareRes.json()
-    const imageUrl = data?.data?.[0]?.imageURL
-    const cost = data?.data?.[0]?.cost
-
-    if (!imageUrl) {
-      console.error('No imageURL in Runware response:', {
-        fullResponse: JSON.stringify(data)
-      })
+    if (!data) {
       return NextResponse.json({ 
-        error: 'No image generated', 
-        response: data 
+        error: 'Image generation failed after retries. Please try again.', 
+        details: lastError 
       }, { status: 502 })
     }
+    
+    const imageUrl = data.data[0].imageURL
+    const cost = data.data[0].cost
 
     // Successful generation response
     return NextResponse.json({ 
