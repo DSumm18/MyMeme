@@ -9,19 +9,29 @@ export default function CreatePage() {
   const [selectedStyle, setSelectedStyle] = useState('caricature')
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [jobTitle, setJobTitle] = useState('')
-  const [occupation, setOccupation] = useState('')
   const [accessories, setAccessories] = useState('')
   const [location, setLocation] = useState('')
-  const [gender, setGender] = useState('person')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const styles = [
-    { id: 'caricature', name: 'Caricature', image: '/style-caricature.jpg', description: 'Big head, big personality!' },
-    { id: 'teacher', name: 'Classroom', image: '/style-teacher.jpg', description: 'Chalkboard cartoon vibes!' },
-    { id: 'anime', name: 'Anime', image: '/style-anime.jpg', description: 'Kawaii office style!' },
-    { id: 'watercolor', name: 'Watercolor', image: '/style-watercolor.jpg', description: 'Soft artistic portrait!' },
+    { id: 'caricature', name: 'Caricature', image: '/styles/caricature.jpg', description: 'Big head, big personality!' },
+    { id: 'watercolor', name: 'Watercolor', image: '/styles/watercolor.jpg', description: 'Soft artistic portrait!' },
+    { id: 'anime', name: 'Anime', image: '/styles/anime.jpg', description: 'Kawaii cartoon style!' },
+    { id: 'pop-art', name: 'Pop Art', image: '/styles/pop-art.jpg', description: 'Bold comic book vibes!' },
+    { id: 'clay-3d', name: 'Claymation', image: '/styles/clay-3d.jpg', description: 'Sculpted clay figure look!' },
+    { id: 'superhero', name: 'Superhero', image: '/styles/superhero.jpg', description: 'Comic book hero pose!' },
+    { id: 'renaissance', name: 'Oil Painting', image: '/styles/renaissance.jpg', description: 'Classic masterpiece style!' },
+    { id: 'pencil-sketch', name: 'Pencil Sketch', image: '/styles/pencil-sketch.jpg', description: 'Hand-drawn artistry!' },
+    { id: 'pixar', name: 'Pixar', image: '/styles/pixar.jpg', description: 'Animated character magic!' },
+    { id: 'retro-80s', name: 'Retro 80s', image: '/styles/retro-80s.jpg', description: 'Synthwave nostalgia!' },
+    { id: 'comic-book', name: 'Comic Book', image: '/styles/comic-book.jpg', description: 'Superhero comic style!' },
+    { id: 'sticker', name: 'Sticker', image: '/styles/sticker.jpg', description: 'Die-cut cool vibes!' },
+    { id: 'lego', name: 'Lego', image: '/styles/lego.jpg', description: 'Blocky toy character!' },
+    { id: 'gta', name: 'GTA Style', image: '/styles/gta.jpg', description: 'Video game loading screen!' },
+    { id: 'simpsons', name: 'Simpsons', image: '/styles/simpsons.jpg', description: 'Yellow cartoon character!' },
+    { id: 'minecraft', name: 'Minecraft', image: '/styles/minecraft.jpg', description: 'Pixelated block world!' }
   ]
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,8 +49,8 @@ export default function CreatePage() {
   }
 
   const handleGenerate = async () => {
-    if (!selectedImage || !jobTitle) {
-      setError('Please upload a selfie and enter your job title!')
+    if (!selectedImage) {
+      setError('Please upload a selfie!')
       return
     }
 
@@ -53,10 +63,8 @@ export default function CreatePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           image: selectedImage,
-          jobTitle,
-          gender,
           style: selectedStyle,
-          occupation,
+          jobTitle,
           accessories,
           location,
         }),
@@ -117,64 +125,10 @@ export default function CreatePage() {
           </div>
         </div>
 
-        {/* Step 2: Your Details */}
+        {/* Step 2: Style */}
         <div className="mb-10">
           <h2 className="text-xl font-bold mb-3 flex items-center gap-2" style={{ color: '#1A1A2E' }}>
-            <span className="bg-[#FFD93D] text-[#1A1A2E] w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">2</span>
-            Tell Us About You
-          </h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-bold mb-1 text-gray-700">Job Title *</label>
-              <input
-                type="text"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                placeholder="e.g. Nurse, Teacher, Chef, Software Engineer"
-                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6B9D] transition-colors"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-bold mb-1 text-gray-700">Gender (optional)</label>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6B9D]"
-                >
-                  <option value="person">Any</option>
-                  <option value="female">Female</option>
-                  <option value="male">Male</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold mb-1 text-gray-700">Accessories (optional)</label>
-                <input
-                  type="text"
-                  value={accessories}
-                  onChange={(e) => setAccessories(e.target.value)}
-                  placeholder="e.g. stethoscope, coffee mug"
-                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6B9D]"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-bold mb-1 text-gray-700">Location / Scene (optional)</label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. hospital ward, busy kitchen, office desk"
-                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6B9D]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Step 3: Style */}
-        <div className="mb-10">
-          <h2 className="text-xl font-bold mb-3 flex items-center gap-2" style={{ color: '#1A1A2E' }}>
-            <span className="bg-[#6BCB77] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">3</span>
+            <span className="bg-[#6BCB77] text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">2</span>
             Pick Your Style
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -200,6 +154,48 @@ export default function CreatePage() {
           </div>
         </div>
 
+        {/* Optional Details */}
+        <div className="mb-10">
+          <h2 className="text-xl font-bold mb-3 flex items-center gap-2" style={{ color: '#1A1A2E' }}>
+            <span className="bg-[#FFD93D] text-[#1A1A2E] w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">3</span>
+            Optional Details
+          </h2>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-bold mb-1 text-gray-700">Job Title (optional)</label>
+              <input
+                type="text"
+                value={jobTitle}
+                onChange={(e) => setJobTitle(e.target.value)}
+                placeholder="e.g. Nurse, Teacher, Chef, Software Engineer"
+                className="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6B9D] transition-colors"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-bold mb-1 text-gray-700">Accessories (optional)</label>
+                <input
+                  type="text"
+                  value={accessories}
+                  onChange={(e) => setAccessories(e.target.value)}
+                  placeholder="e.g. stethoscope, coffee mug"
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6B9D]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold mb-1 text-gray-700">Location / Scene (optional)</label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. hospital ward, office desk"
+                  className="w-full p-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-[#FF6B9D]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Error */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-center">
@@ -211,11 +207,11 @@ export default function CreatePage() {
         <div className="text-center">
           <button
             onClick={handleGenerate}
-            disabled={loading || !selectedImage || !jobTitle}
+            disabled={loading || !selectedImage}
             className={`px-12 py-4 text-xl rounded-full font-black transition-all duration-300 ${
               loading
                 ? 'bg-gray-300 text-gray-500 cursor-wait'
-                : selectedImage && jobTitle
+                : selectedImage
                 ? 'bg-[#FF6B9D] text-white hover:scale-105 hover:shadow-xl'
                 : 'bg-gray-200 text-gray-400 cursor-not-allowed'
             }`}

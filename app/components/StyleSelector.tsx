@@ -7,26 +7,98 @@ const styles = [
   { 
     id: 'caricature', 
     name: 'Caricature', 
-    image: '/style-caricature.jpg',
-    description: 'Classic, fun cartoon style'
+    image: '/styles/caricature.jpg',
+    description: 'Big head, big personality!'
   },
   { 
     id: 'watercolor', 
     name: 'Watercolor', 
-    image: '/style-watercolor.jpg',
-    description: 'Soft, artistic watercolor'
+    image: '/styles/watercolor.jpg',
+    description: 'Soft artistic portrait!'
   },
   { 
     id: 'anime', 
     name: 'Anime', 
-    image: '/style-anime.jpg',
-    description: 'Japanese animation style'
+    image: '/styles/anime.jpg',
+    description: 'Kawaii cartoon style!'
   },
   { 
-    id: 'popArt', 
+    id: 'pop-art', 
     name: 'Pop Art', 
-    image: '/style-pop-art.jpg',
-    description: 'Bold, colorful comic style'
+    image: '/styles/pop-art.jpg',
+    description: 'Bold comic book vibes!'
+  },
+  { 
+    id: 'clay-3d', 
+    name: 'Claymation', 
+    image: '/styles/clay-3d.jpg',
+    description: 'Sculpted clay figure look!'
+  },
+  { 
+    id: 'superhero', 
+    name: 'Superhero', 
+    image: '/styles/superhero.jpg',
+    description: 'Comic book hero pose!'
+  },
+  { 
+    id: 'renaissance', 
+    name: 'Oil Painting', 
+    image: '/styles/renaissance.jpg',
+    description: 'Classic masterpiece style!'
+  },
+  { 
+    id: 'pencil-sketch', 
+    name: 'Pencil Sketch', 
+    image: '/styles/pencil-sketch.jpg',
+    description: 'Hand-drawn artistry!'
+  },
+  { 
+    id: 'pixar', 
+    name: 'Pixar', 
+    image: '/styles/pixar.jpg',
+    description: 'Animated character magic!'
+  },
+  { 
+    id: 'retro-80s', 
+    name: 'Retro 80s', 
+    image: '/styles/retro-80s.jpg',
+    description: 'Synthwave nostalgia!'
+  },
+  { 
+    id: 'comic-book', 
+    name: 'Comic Book', 
+    image: '/styles/comic-book.jpg',
+    description: 'Superhero comic style!'
+  },
+  { 
+    id: 'sticker', 
+    name: 'Sticker', 
+    image: '/styles/sticker.jpg',
+    description: 'Die-cut cool vibes!'
+  },
+  { 
+    id: 'lego', 
+    name: 'Lego', 
+    image: '/styles/lego.jpg',
+    description: 'Blocky toy character!'
+  },
+  { 
+    id: 'gta', 
+    name: 'GTA Style', 
+    image: '/styles/gta.jpg',
+    description: 'Video game loading screen!'
+  },
+  { 
+    id: 'simpsons', 
+    name: 'Simpsons', 
+    image: '/styles/simpsons.jpg',
+    description: 'Yellow cartoon character!'
+  },
+  { 
+    id: 'minecraft', 
+    name: 'Minecraft', 
+    image: '/styles/minecraft.jpg',
+    description: 'Pixelated block world!'
   }
 ]
 
@@ -44,7 +116,7 @@ export default function StyleSelector({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-semibold text-purple-600">
+      <h3 className="text-2xl font-bold text-center text-purple-600">
         Choose Your Art Style
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -53,22 +125,23 @@ export default function StyleSelector({
             key={style.id}
             onClick={() => handleStyleSelect(style.id)}
             className={`
-              p-4 rounded-lg cursor-pointer transition-all duration-300 
+              p-2 rounded-xl cursor-pointer transition-all duration-300 
               ${selectedStyle === style.id 
-                ? 'bg-purple-600 text-white border-4 border-secondary scale-105' 
-                : 'bg-purple-50 hover:bg-purple-600/10'}
+                ? 'ring-4 ring-[#FF6B9D] scale-105 shadow-xl' 
+                : 'hover:bg-purple-50 hover:scale-105'}
             `}
           >
-            <Image 
-              src={style.image} 
-              alt={`${style.name} Style`} 
-              width={200} 
-              height={200} 
-              className="rounded-lg mb-4 aspect-square object-cover"
-            />
-            <div className="text-center">
-              <h4 className="font-semibold">{style.name}</h4>
-              <p className="text-sm opacity-70">
+            <div className="relative aspect-square rounded-lg overflow-hidden">
+              <Image 
+                src={style.image} 
+                alt={`${style.name} Style`} 
+                fill
+                className="object-cover transform transition-all duration-300"
+              />
+            </div>
+            <div className="text-center mt-2">
+              <h4 className="font-bold text-sm">{style.name}</h4>
+              <p className="text-xs text-gray-500 mt-1">
                 {style.description}
               </p>
             </div>
