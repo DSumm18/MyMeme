@@ -5,6 +5,54 @@ import { loadingPhrases } from './LoadingPhrases'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
+// Loading emojis for animation
+const LOADING_EMOJIS = ['🎨', '🖌️', '✨', '🎭', '🖼️']
+
+const LoadingOverlay = ({ 
+  onCancel, 
+  currentPhrase, 
+  currentEmoji 
+}: { 
+  onCancel: () => void, 
+  currentPhrase: string, 
+  currentEmoji: string 
+}) => {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+      <div className="bg-white max-w-md rounded-2xl p-8 text-center">
+        {/* Emoji Animation */}
+        <div 
+          key={currentEmoji} 
+          className="text-6xl mb-4 animate-spin-slow animate-pulse-scale"
+        >
+          {currentEmoji}
+        </div>
+
+        {/* Rotating Phrases */}
+        <p 
+          key={currentPhrase} 
+          className="text-lg mb-4 animate-fade-in-out"
+        >
+          {currentPhrase}
+        </p>
+
+        {/* Progress Indication */}
+        <p className="text-sm text-gray-500 mb-4">
+          Usually takes about 15 seconds
+        </p>
+
+        {/* Cancel Button */}
+        <button 
+          onClick={onCancel} 
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // New utility function for image compression and resizing
 function compressImage(file: File, maxWidth: number, quality: number): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -58,7 +106,31 @@ export default function CreatePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [currentPhrase, setCurrentPhrase] = useState(loadingPhrases[0])
+  const [currentEmoji, setCurrentEmoji] = useState(LOADING_EMOJIS[0])
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Manage loading phrase and emoji rotation
+  useEffect(() => {
+    if (!loading) return
+
+    // Phrase rotation
+    const phraseInterval = setInterval(() => {
+      const randomPhrase = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)]
+      setCurrentPhrase(randomPhrase)
+    }, 2500)
+
+    // Emoji rotation
+    const emojiInterval = setInterval(() => {
+      const randomEmoji = LOADING_EMOJIS[Math.floor(Math.random() * LOADING_EMOJIS.length)]
+      setCurrentEmoji(randomEmoji)
+    }, 2000)
+
+    // Cleanup intervals when loading is false
+    return () => {
+      clearInterval(phraseInterval)
+      clearInterval(emojiInterval)
+    }
+  }, [loading])
 
   // Styles array remains the same as before...
 
@@ -80,6 +152,20 @@ export default function CreatePage() {
     }
   }
 
-  // Rest of the component (handleGenerate, useEffect, render) remains exactly the same as before
-  // ... (paste the rest of the previous implementation)
+  // Main component render logic
+  return (
+    <>
+      {loading && (
+        <LoadingOverlay 
+          onCancel={() => setLoading(false)} 
+          currentPhrase={currentPhrase}
+          currentEmoji={currentEmoji}
+        />
+      )}
+      <main className="p-8">
+        {/* Existing component render content */}
+      </main>
+    </>
+  )
+}
 }

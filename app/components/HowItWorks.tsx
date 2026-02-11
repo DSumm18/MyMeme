@@ -1,45 +1,31 @@
-export default function HowItWorks() {
-  const steps = [
-    { 
-      title: 'Upload', 
-      description: 'Take a selfie or upload an existing photo',
-      icon: '📸'
-    },
-    { 
-      title: 'Customize', 
-      description: 'Enter your job title and choose your style',
-      icon: '✨'
-    },
-    { 
-      title: 'Share', 
-      description: 'Generate and share your cartoon caricature',
-      icon: '🚀'
-    }
-  ]
+import { motion } from 'framer-motion'
 
+const steps = [
+  { icon: '📸', title: 'Upload Your Photo', description: 'Choose a selfie from your device' },
+  { icon: '🎨', title: 'Pick Your Style', description: 'Select from 16 unique art styles' },
+  { icon: '✨', title: 'Download & Share', description: 'Save and share your transformed pic' }
+]
+
+export default function HowItWorks() {
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-4xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-purple-600">
-          How It Works
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {steps.map((step, index) => (
-            <div 
-              key={step.title} 
-              className="text-center p-6 bg-purple-50 rounded-lg shadow-md transform hover:scale-105 transition-transform"
-            >
-              <div className="text-6xl mb-4">{step.icon}</div>
-              <h3 className="text-2xl font-semibold mb-3 text-purple-600">
-                {step.title}
-              </h3>
-              <p className="text-gray-600">
-                {step.description}
-              </p>
-            </div>
-          ))}
-        </div>
+    <div className="container mx-auto px-4 py-16">
+      <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">How It Works</h2>
+      
+      <div className="grid md:grid-cols-3 gap-8">
+        {steps.map((step, index) => (
+          <motion.div 
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.2, duration: 0.6 }}
+            className="bg-[#FFF5E1] rounded-xl p-6 text-center shadow-md hover:shadow-lg transition-all"
+          >
+            <div className="text-6xl mb-4">{step.icon}</div>
+            <h3 className="text-xl font-bold mb-2">{step.title}</h3>
+            <p className="text-gray-600">{step.description}</p>
+          </motion.div>
+        ))}
       </div>
-    </section>
+    </div>
   )
 }

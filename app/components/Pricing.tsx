@@ -1,66 +1,82 @@
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+
 export default function Pricing() {
   const plans = [
     {
-      title: 'Free Trial',
+      name: 'Free',
       price: '£0',
-      features: ['1 Free Generation', 'Basic Styles', 'Low Resolution'],
+      features: ['3 Transformations', 'Watermarked', 'Basic Styles'],
       cta: 'Start Free',
-      recommended: false
+      highlight: false
     },
     {
-      title: 'Weekly Unlimited',
+      name: 'Pro Weekly',
       price: '£1.49',
-      features: ['Unlimited Generations', 'All Styles', 'High Resolution', 'Share Directly'],
-      cta: 'Get Unlimited',
-      recommended: true
+      period: '/week',
+      features: ['Unlimited Transformations', 'No Watermarks', 'HD Downloads', 'All Styles'],
+      cta: 'Go Pro',
+      highlight: true
     },
     {
-      title: 'Per Generation',
-      price: '£0.49',
-      features: ['Single Generation', 'Choose Style', 'High Resolution', 'Save Image'],
-      cta: 'Generate Now',
-      recommended: false
+      name: 'Yearly',
+      price: '£19.99',
+      period: '/year',
+      features: ['Save 60%', 'Unlimited Transformations', 'No Watermarks', 'HD Downloads', 'All Styles'],
+      cta: 'Best Value',
+      highlight: false
     }
   ]
 
   return (
-    <section className="py-16 bg-gradient-to-br from-background to-white">
-      <div className="max-w-4xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-purple-600">
-          Simple Pricing
-        </h2>
-        <div className="grid md:grid-cols-3 gap-8">
-          {plans.map((plan) => (
-            <div 
-              key={plan.title}
-              className={`
-                p-6 rounded-lg shadow-lg text-center transform transition-all duration-300
-                ${plan.recommended 
-                  ? 'bg-purple-600 text-white scale-105 border-4 border-secondary' 
-                  : 'bg-white text-gray-800 hover:bg-purple-50'}
-              `}
-            >
-              <h3 className="text-2xl font-semibold mb-4">{plan.title}</h3>
-              <div className="text-4xl font-bold mb-6">{plan.price}/week</div>
-              <ul className="mb-8 space-y-3">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="text-sm">
-                    ✅ {feature}
-                  </li>
-                ))}
-              </ul>
-              <button className={`
-                w-full py-3 rounded-full font-bold transition-colors
-                ${plan.recommended 
-                  ? 'bg-pink-500 text-white hover:bg-purple-700' 
-                  : 'bg-purple-600/10 text-purple-600 hover:bg-purple-600/20'}
-              `}>
+    <div className="container mx-auto px-4 py-16">
+      <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+        Start Free, Upgrade When You're Hooked
+      </h2>
+      
+      <div className="flex flex-col md:flex-row justify-center gap-8">
+        {plans.map((plan, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.2, duration: 0.6 }}
+            className={`
+              w-full md:w-80 p-6 rounded-xl shadow-lg text-center 
+              ${plan.highlight ? 'bg-[#FF6B9D] text-white' : 'bg-white border'}
+            `}
+          >
+            <h3 className="text-2xl font-bold mb-4">{plan.name}</h3>
+            <p className="text-4xl font-bold mb-2">
+              {plan.price}
+              <span className="text-lg">{plan.period || ''}</span>
+            </p>
+            
+            <ul className="my-6 space-y-2">
+              {plan.features.map((feature, featureIndex) => (
+                <li key={featureIndex} className={plan.highlight ? 'text-white opacity-80' : 'text-gray-600'}>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            
+            <Link href="/create">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`
+                  w-full py-3 rounded-full font-bold mt-4 transition-all
+                  ${plan.highlight 
+                    ? 'bg-white text-[#FF6B9D] hover:bg-gray-100' 
+                    : 'bg-[#6BCB77] text-white hover:bg-green-600'}
+                `}
+              >
                 {plan.cta}
-              </button>
-            </div>
-          ))}
-        </div>
+              </motion.button>
+            </Link>
+          </motion.div>
+        ))}
       </div>
-    </section>
+    </div>
   )
 }
