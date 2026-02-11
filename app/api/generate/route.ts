@@ -14,89 +14,58 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
-    // Expanded style map with new descriptions
+    // Style map for PhotoMaker prompts
     const styleMap: Record<string, string> = {
-      caricature: 'A fun cartoon caricature illustration with exaggerated features, big head, vibrant colors, professional digital art, highly detailed',
-      watercolor: 'Soft watercolor painting style with fluid, translucent colors, delicate brush strokes, ethereal and dreamy quality',
-      anime: 'Japanese anime style illustration, clean lines, vibrant anime aesthetic, expressive big eyes, dynamic character design',
-      'pop-art': 'Bold pop art style, Roy Lichtenstein dots, comic book aesthetic, high contrast colors, graphic illustration',
-      'clay-3d': 'Claymation-style character, textured clay appearance, smooth rounded forms, warm lighting, handcrafted look',
-      superhero: 'Dramatic superhero comic book pose, muscular silhouette, heroic stance, dynamic action lighting, bold color palette',
-      'renaissance': 'Classical Renaissance oil painting, rich color palette, dramatic lighting, detailed portraiture, chiaroscuro technique',
-      'pencil-sketch': 'Detailed pencil sketch, hand-drawn look, cross-hatching shading, textured paper background, soft graphite lines',
-      pixar: 'Pixar-style 3D cartoon render, smooth surfaces, big expressive eyes, soft color palette, charming character design',
-      'retro-80s': 'Retro synthwave illustration, neon colors, stylized 80s aesthetic, glowing outlines, futuristic vaporwave design',
-      'comic-book': 'Dynamic comic book illustration, bold outlines, dramatic shading, graphic novel style, vibrant color blocking',
-      sticker: 'Die-cut sticker style, clean vector graphics, white border, minimalist design, flat color illustration',
-      lego: 'LEGO minifigure style, blocky geometric forms, plastic toy aesthetic, bright colors, simplified character details',
-      gta: 'Grand Theft Auto loading screen style, gritty urban illustration, high contrast, stylized character rendering',
-      simpsons: 'Simpsons cartoon style, bright yellow skin, exaggerated features, simplified anatomy, iconic cartoon look',
-      minecraft: 'Minecraft blocky pixel art style, low-resolution cubic forms, 8-bit aesthetic, simplified color palette'
+      caricature: "A fun cartoon caricature with exaggerated features, big expressive eyes, colorful vibrant style, professional digital art caricature illustration",
+      watercolor: "A beautiful soft watercolor painting portrait, artistic brushstrokes, gentle pastel colors, fine art watercolor style",
+      anime: "A Japanese anime style illustration, clean lines, large expressive eyes, vibrant anime aesthetic, studio quality anime art",
+      'pop-art': "A bold pop art portrait in the style of Roy Lichtenstein, Ben-Day dots, primary colors, comic book pop art aesthetic",
+      'clay-3d': "A 3D clay figure sculpture, Claymation style, smooth clay texture, Aardman animation style, sculpted clay character",
+      superhero: "An epic superhero comic book portrait, dramatic lighting, superhero costume, powerful pose, Marvel/DC comic book style",
+      'renaissance': "A classical Renaissance oil painting portrait, rich textures, dramatic chiaroscuro lighting, Old Masters painting style",
+      'pencil-sketch': "A detailed pencil sketch portrait, hand-drawn graphite, cross-hatching shading, artistic pencil drawing on paper",
+      pixar: "A 3D Pixar-style animated character, smooth surfaces, big expressive eyes, cinematic lighting, Disney Pixar animation",
+      'retro-80s': "A retro 1980s synthwave portrait, neon colors, chrome effects, grid background, outrun aesthetic",
+      'comic-book': "A bold comic book illustration, thick ink outlines, dynamic halftone dots, superhero comic art style",
+      sticker: "A cute die-cut sticker illustration, white border, kawaii style, flat colors, adorable sticker design",
+      lego: "A Lego minifigure portrait, blocky plastic toy style, yellow skin, Lego character design",
+      gta: "A GTA V loading screen style portrait, hyper-stylized illustration, Grand Theft Auto art style, sharp edges",
+      simpsons: "A Simpsons cartoon character, yellow skin, overbite, Matt Groening art style, Springfield cartoon",
+      minecraft: "A Minecraft character portrait, blocky pixelated 3D style, square head, voxel art, Minecraft game aesthetic"
     }
 
     const styleDesc = styleMap[style] || styleMap.caricature
     const accessoriesText = accessories ? `, with ${accessories}` : ''
     const locationText = location ? `, in a ${location} setting` : ''
+    const jobTitleText = jobTitle ? `, as a ${jobTitle}` : ''
 
-    // Updated prompt to focus on transforming the existing photo
-    const prompt = `Transform this photograph into a ${styleDesc}. Maintain the person's facial features, expression, and likeness exactly${accessoriesText}${locationText}. Professional illustration, high quality, detailed, true to the original image.`
-
-    // Attempt FLUX Depth first
-    const primaryTask = {
-      taskType: 'imageInference',
+    // Construct PhotoMaker task
+    const photoMakerTask = {
+      taskType: "photoMaker",
       taskUUID: randomUUID(),
-      positivePrompt: prompt,
-      model: 'runware:103@1', // FLUX Depth 
-      seedImage: image, // data URI from client
-      width: 1024,
+      model: "civitai:139562@344487",
+      inputImages: [image], // Input is data URI from client
+      style: "No style", // Always use "No style" as instructed
+      strength: 40, // As recommended, in the 35-45 range
+      positivePrompt: `Transform this portrait into a stylized illustration${jobTitleText}${accessoriesText}${locationText}. ${styleDesc}. Preserve original face and identity. High-quality artistic rendering.`,
       height: 1024,
-      steps: 28,
+      width: 1024,
+      steps: 25,
       numberResults: 1,
-      outputType: 'URL',
-      outputFormat: 'JPG',
-      includeCost: true,
+      outputType: "URL",
+      outputFormat: "JPG",
+      includeCost: true
     }
 
-    // Fallback to Schnell img2img
-    const fallbackTask = {
-      taskType: 'imageInference',
-      taskUUID: randomUUID(),
-      positivePrompt: prompt,
-      model: 'runware:100@1', // FLUX Schnell
-      seedImage: image,
-      strength: 0.85, // Fallback if primary model fails
-      width: 1024,
-      height: 1024,
-      steps: 4,
-      numberResults: 1,
-      outputType: 'URL',
-      outputFormat: 'JPG',
-      includeCost: true,
-    }
-
-    // First try the primary (FLUX Depth) model
-    let runwareRes = await fetch('https://api.runware.ai/v1', {
+    // Send to Runware API
+    const runwareRes = await fetch('https://api.runware.ai/v1', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`,
       },
-      body: JSON.stringify([primaryTask]),
+      body: JSON.stringify([photoMakerTask]),
     })
-
-    let data
-    if (!runwareRes.ok) {
-      console.warn('FLUX Depth failed, trying fallback...')
-      // If primary model fails, use fallback
-      runwareRes = await fetch('https://api.runware.ai/v1', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify([fallbackTask]),
-      })
-    }
 
     if (!runwareRes.ok) {
       const errText = await runwareRes.text()
@@ -104,7 +73,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Image generation failed' }, { status: 502 })
     }
 
-    data = await runwareRes.json()
+    const data = await runwareRes.json()
     const imageUrl = data?.data?.[0]?.imageURL
     const cost = data?.data?.[0]?.cost
 
@@ -116,7 +85,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ 
       imageUrl,
       cost: cost ? `$${cost.toFixed(4)}` : undefined,
-      prompt,
+      prompt: photoMakerTask.positivePrompt,
     })
   } catch (error) {
     console.error('Generate API error:', error)

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { loadingPhrases } from './LoadingPhrases'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 
@@ -13,6 +14,7 @@ export default function CreatePage() {
   const [location, setLocation] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [currentPhrase, setCurrentPhrase] = useState(loadingPhrases[0])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const styles = [
@@ -92,6 +94,19 @@ export default function CreatePage() {
       setLoading(false)
     }
   }
+
+  // Cycle loading phrases when loading
+  useEffect(() => {
+    if (!loading) return
+
+    const interval = setInterval(() => {
+      const currentIndex = loadingPhrases.indexOf(currentPhrase)
+      const nextIndex = (currentIndex + 1) % loadingPhrases.length
+      setCurrentPhrase(loadingPhrases[nextIndex])
+    }, 3000)
+
+    return () => clearInterval(interval)
+  }, [loading, currentPhrase])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-[#FFF5E1] py-12">
@@ -228,6 +243,31 @@ export default function CreatePage() {
           </button>
           {!loading && <p className="text-sm text-gray-400 mt-3">Free • No account needed • 10 seconds</p>}
         </div>
+
+        {/* Fun Loading Overlay */}
+        {loading && (
+          <div className="fixed inset-0 z-[1000] bg-white bg-opacity-90 flex flex-col items-center justify-center">
+            <div className="text-7xl mb-8 animate-spin-slow" style={{ 
+              animationDuration: '3s', 
+              animationTimingFunction: 'ease-in-out' 
+            }}>
+              🎨
+            </div>
+            <div className="text-2xl font-bold text-center text-[#1A1A2E] mb-4 h-16">
+              <div 
+                key={currentPhrase}
+                className="transition-all duration-1000 ease-in-out"
+                style={{
+                  opacity: 1,
+                  transform: 'translateY(0)',
+                  transitionProperty: 'opacity, transform'
+                }}
+              >
+                {currentPhrase}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
