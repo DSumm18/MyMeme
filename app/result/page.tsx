@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -16,6 +16,12 @@ export default function ResultPage() {
   const [result, setResult] = useState<MemeResult | null>(null)
   const [originalImage, setOriginalImage] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
+  
+  // Meme overlay state
+  const [showMemeEditor, setShowMemeEditor] = useState(false)
+  const [topText, setTopText] = useState('')
+  const [bottomText, setBottomText] = useState('')
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('mymeme_result')
@@ -28,6 +34,7 @@ export default function ResultPage() {
     }
   }, [])
 
+  // Download image
   const handleDownload = async () => {
     if (!result?.imageUrl) return
     setDownloading(true)
@@ -46,6 +53,77 @@ export default function ResultPage() {
     setDownloading(false)
   }
 
+  // Meme canvas drawing
+  const drawMemeCanvas = () => {
+    const canvas = canvasRef.current
+    if (!canvas || !result) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Load image onto canvas
+    const img = new Image()
+    img.onload = () => {
+      // Set canvas size to match image
+      canvas.width = img.width
+      canvas.height = img.height
+
+      // Draw base image
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+
+      // Meme text styling
+      ctx.font = `bold ${Math.floor(canvas.width * 0.1)}px Impact, sans-serif`
+      ctx.textAlign = 'center'
+      ctx.fillStyle = 'white'
+      ctx.strokeStyle = 'black'
+      ctx.lineWidth = Math.floor(canvas.width * 0.004)
+
+      // Top text
+      if (topText) {
+        const topTextUpper = topText.toUpperCase()
+        // Draw outline
+        ctx.strokeText(topTextUpper, canvas.width / 2, canvas.height * 0.1)
+        // Draw fill
+        ctx.fillText(topTextUpper, canvas.width / 2, canvas.height * 0.1)
+      }
+
+      // Bottom text
+      if (bottomText) {
+        const bottomTextUpper = bottomText.toUpperCase()
+        // Draw outline
+        ctx.strokeText(bottomTextUpper, canvas.width / 2, canvas.height * 0.9)
+        // Draw fill
+        ctx.fillText(bottomTextUpper, canvas.width / 2, canvas.height * 0.9)
+      }
+    }
+    img.src = result.imageUrl
+  }
+
+  // Download meme canvas
+  const downloadMemeCanvas = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    // Redraw canvas to ensure latest text
+    drawMemeCanvas()
+
+    // Short timeout to ensure image is drawn
+    setTimeout(() => {
+      const url = canvas.toDataURL('image/jpeg')
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `meme-${Date.now()}.jpg`
+      a.click()
+    }, 100)
+  }
+
+  // Update canvas when meme text changes
+  useEffect(() => {
+    if (showMemeEditor) {
+      drawMemeCanvas()
+    }
+  }, [showMemeEditor, topText, bottomText, result])
+
   if (!result) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-[#FFF5E1]">
@@ -62,7 +140,7 @@ export default function ResultPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF5E1] to-white py-12">
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF5E1] to-white py-12 relative">
       <div className="max-w-4xl mx-auto px-4 text-center">
         <h1 className="text-4xl md:text-5xl font-black mb-2" style={{ color: '#1A1A2E' }}>
           Your Meme is Ready! 🎉
@@ -130,6 +208,12 @@ export default function ResultPage() {
           <Link href="/create" className="bg-[#FFD93D] text-[#1A1A2E] px-8 py-3 rounded-full font-bold hover:scale-105 transition-all">
             🔄 Make Another
           </Link>
+          <button 
+            onClick={() => setShowMemeEditor(true)}
+            className="bg-[#4D96FF] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all"
+          >
+            😂 Make it a Meme
+          </button>
         </div>
 
         {/* Try Another Style Button */}
@@ -142,6 +226,57 @@ export default function ResultPage() {
           </Link>
         </div>
       </div>
+
+      {/* Meme Text Overlay */}
+      {showMemeEditor && result && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4 text-center">😂 Make it a Meme</h2>
+            
+            {/* Input Fields */}
+            <div className="space-y-4 mb-4">
+              <input 
+                type="text" 
+                placeholder="TOP TEXT" 
+                value={topText}
+                onChange={(e) => setTopText(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B9D]"
+              />
+              <input 
+                type="text" 
+                placeholder="BOTTOM TEXT" 
+                value={bottomText}
+                onChange={(e) => setBottomText(e.target.value)}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF6B9D]"
+              />
+            </div>
+
+            {/* Canvas Preview */}
+            <div className="mb-4 max-h-[50vh] overflow-auto">
+              <canvas 
+                ref={canvasRef} 
+                className="w-full rounded-lg shadow-lg"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-between space-x-4">
+              <button 
+                onClick={() => setShowMemeEditor(false)}
+                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition"
+              >
+                Close
+              </button>
+              <button 
+                onClick={downloadMemeCanvas}
+                className="flex-1 bg-[#FF6B9D] text-white px-4 py-2 rounded-lg hover:scale-105 transition"
+              >
+                Download Meme
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
