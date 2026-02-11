@@ -2,9 +2,12 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useAuth } from '@/lib/auth-context'
+import Image from 'next/image'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const { user, loading, signIn, signOut } = useAuth()
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
@@ -15,7 +18,12 @@ export default function Navbar() {
           </Link>
           
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-4">
+            {user ? (
+              <Link href="/gallery" className="text-dark-blue hover:text-primary-pink">
+                My Gallery 🖼️
+              </Link>
+            ) : null}
             <button 
               onClick={() => setIsOpen(!isOpen)}
               className="text-dark-blue hover:text-primary-pink focus:outline-none"
@@ -25,7 +33,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
             <Link href="/create" className="text-dark-blue hover:text-primary-pink transition-colors">
               Create 🖌️
             </Link>
@@ -35,6 +43,39 @@ export default function Navbar() {
             <Link href="/#how-it-works" className="text-dark-blue hover:text-primary-pink transition-colors">
               How It Works 🤔
             </Link>
+
+            {user ? (
+              <>
+                <Link href="/gallery" className="text-dark-blue hover:text-primary-pink transition-colors">
+                  My Gallery 🖼️
+                </Link>
+                <div className="flex items-center space-x-2">
+                  {user.user_metadata?.avatar_url && (
+                    <Image 
+                      src={user.user_metadata.avatar_url} 
+                      alt="User Avatar" 
+                      width={32} 
+                      height={32} 
+                      className="rounded-full"
+                    />
+                  )}
+                  <button 
+                    onClick={signOut} 
+                    className="bg-primary-pink text-white px-3 py-1 rounded-lg hover:bg-pink-600 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button 
+                onClick={signIn} 
+                disabled={loading}
+                className="bg-primary-pink text-white px-3 py-1 rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50"
+              >
+                {loading ? 'Loading...' : 'Sign In'}
+              </button>
+            )}
           </div>
         </div>
 
@@ -63,6 +104,25 @@ export default function Navbar() {
               >
                 How It Works 🤔
               </Link>
+              
+              {user ? (
+                <>
+                  <button 
+                    onClick={() => { signOut(); setIsOpen(false) }} 
+                    className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg w-full text-left"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <button 
+                  onClick={() => { signIn(); setIsOpen(false) }} 
+                  disabled={loading}
+                  className="bg-primary-pink text-white px-3 py-2 rounded-lg w-full hover:bg-pink-600 transition-colors disabled:opacity-50"
+                >
+                  {loading ? 'Loading...' : 'Sign In'}
+                </button>
+              )}
             </div>
           </div>
         )}

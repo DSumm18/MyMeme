@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -16,6 +18,7 @@ export default function ResultPage() {
   const [result, setResult] = useState<MemeResult | null>(null)
   const [originalImage, setOriginalImage] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
+  const { user } = useAuth()
   
   // Meme overlay state
   const [showMemeEditor, setShowMemeEditor] = useState(false)
@@ -33,12 +36,37 @@ export default function ResultPage() {
     const stored = sessionStorage.getItem('mymeme_result')
     const storedOriginal = sessionStorage.getItem('mymeme_original')
     if (stored) {
-      setResult(JSON.parse(stored))
+      const parsedResult = JSON.parse(stored)
+      setResult(parsedResult)
+      
+      // Save to Supabase if user is logged in
+      const saveCreation = async () => {
+        if (!user || !parsedResult) return
+
+        const { error } = await supabase
+          .from('creations')
+          .insert({
+            user_id: user.id,
+            original_image_url: storedOriginal || '',
+            generated_image_url: parsedResult.imageUrl,
+            style: parsedResult.style,
+            prompt: parsedResult.prompt || '',
+            job_title: parsedResult.jobTitle,
+            gender: 'Unknown', // Consider adding this to the prompt or result
+            cost: parseFloat(parsedResult.cost?.replace('$', '') || '0')
+          })
+
+        if (error) {
+          console.error('Error saving creation:', error)
+        }
+      }
+
+      saveCreation()
     }
     if (storedOriginal) {
       setOriginalImage(storedOriginal)
     }
-  }, [])
+  }, [user])
 
   // Download image
   const handleDownload = async () => {
