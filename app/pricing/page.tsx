@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 
 interface PricingPlan {
   name: string;
@@ -14,6 +15,7 @@ interface PricingPlan {
 
 export default function PricingPage() {
   const router = useRouter();
+  const { user, signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const plans: PricingPlan[] = [
@@ -51,10 +53,14 @@ export default function PricingPage() {
   const handleBuyCredits = async (plan: PricingPlan) => {
     if (plan.isFree) return;
 
+    if (!user) {
+      signIn();
+      return;
+    }
+
     setIsLoading(true);
     try {
-      // TODO: Replace with actual user ID from authentication
-      const userId = 'user_placeholder';
+      const userId = user.id;
       
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -67,13 +73,18 @@ export default function PricingPage() {
         })
       });
 
-      const { checkoutUrl } = await response.json();
+      const data = await response.json();
       
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        console.error('No checkout URL returned:', data);
+        alert('Payment failed to start. Please try again.');
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Checkout error:', error);
+      alert('Something went wrong. Please try again.');
       setIsLoading(false);
     }
   };
