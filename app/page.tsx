@@ -82,20 +82,20 @@ export default function Home() {
               Turn Your <span className="text-[#FF6B9D]">Selfie</span> Into Art
             </h1>
             <p className="text-xl mb-8 text-gray-600 leading-relaxed">
-              Upload any photo and our AI transforms you into 16 incredible styles — Anime, Pixar, GTA, Superhero and more.
+              Upload any photo and our AI transforms you into 14 incredible styles — Anime, Pixar, GTA, Superhero and more.
               <span className="font-bold"> In seconds.</span>
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/create" className="bg-[#FF6B9D] text-white px-8 py-4 rounded-full text-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 inline-block">
                 Create My Meme 🎨
               </Link>
-              <a href="#how-it-works" className="border-2 border-[#1A1A2E] text-[#1A1A2E] px-8 py-4 rounded-full text-xl font-bold hover:bg-[#1A1A2E] hover:text-white transition-all duration-300 inline-block">
-                See How It Works
-              </a>
+              <Link href="/animate" className="bg-[#7C3AED] text-white px-8 py-4 rounded-full text-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 inline-block">
+                Animate My Photo 🎬
+              </Link>
             </div>
             <div className="mt-8 flex items-center gap-6 text-sm text-gray-500">
               <span>✅ 3 Free Generations</span>
-              <span>✅ No Account Needed</span>
+              <span>✅ Sign Up Free</span>
               <span>✅ Instant Results</span>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function Home() {
       {/* Social Proof Bar */}
       <section className="bg-[#1A1A2E] py-4">
         <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-center gap-8 text-white text-center">
-          <span className="font-bold">🎨 50+ Art Styles</span>
+          <span className="font-bold">🎨 14 Art Styles</span>
           <span className="font-bold">⚡ 10 Second Generation</span>
           <span className="font-bold">📱 Auto-Sized for Social Media</span>
           <span className="font-bold">😂 Meme Maker Built In</span>
@@ -154,7 +154,7 @@ export default function Home() {
         <div className="grid md:grid-cols-3 gap-8">
           {[
             { num: '1', icon: '📸', title: 'Upload Your Photo', desc: 'Take a selfie or upload any photo with a clear face. That\'s all we need.', color: '#FF6B9D' },
-            { num: '2', icon: '🎨', title: 'Pick Your Style', desc: 'Choose from 16 incredible styles — Anime, Pixar, GTA, Superhero, and more.', color: '#FFD93D' },
+            { num: '2', icon: '🎨', title: 'Pick Your Style', desc: 'Choose from 14 incredible styles — Anime, Pixar, GTA, Superhero, and more.', color: '#FFD93D' },
             { num: '3', icon: '⚡', title: 'Get Your Art!', desc: 'AI transforms your photo in seconds. Download, share, go viral!', color: '#6BCB77' },
           ].map((step, i) => (
             <AnimatedSection key={step.num} delay={i * 150}>
