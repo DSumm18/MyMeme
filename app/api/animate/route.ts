@@ -6,7 +6,7 @@ export const maxDuration = 30
 // Step 1: Submit the video generation task and return taskUUID immediately
 export async function POST(req: NextRequest) {
   try {
-    const { imageUrl, duration = 5 } = await req.json()
+    const { imageUrl, duration = 5, style = 'original' } = await req.json()
 
     if (!imageUrl) {
       return NextResponse.json({ error: 'Image URL is required' }, { status: 400 })
@@ -14,6 +14,14 @@ export async function POST(req: NextRequest) {
 
     // Validate duration (5 or 10 seconds)
     const videoDuration = duration === 10 ? 10 : 5
+
+    // Choose prompt based on style type
+    const cartoonStyles = ['caricature', 'anime', 'pixar', 'simpsons', 'clay-3d', 'lego', 'sticker', 'minecraft', 'comic-book', 'gta']
+    const isCartoon = cartoonStyles.includes(style)
+    
+    const animatePrompt = isCartoon
+      ? 'animated cartoon character, keep illustration style, subtle cartoon movement, gentle expression change, smooth 2D animation, do not convert to realistic, maintain art style exactly'
+      : 'subtle natural movement, gentle smile, slight head turn, preserve exact facial features and age, flattering soft warm lighting, cinematic, smooth motion, high quality, beautiful, youthful glow'
 
     const apiKey = process.env.RUNWARE_API_KEY
     if (!apiKey) {
@@ -39,7 +47,7 @@ export async function POST(req: NextRequest) {
         ],
         model: 'klingai:1@1',
         duration: videoDuration,
-        positivePrompt: 'subtle natural movement, gentle smile, slight head turn, preserve exact facial features and age, flattering soft warm lighting, cinematic, smooth motion, high quality, beautiful, youthful glow',
+        positivePrompt: animatePrompt,
         numberResults: 1,
         outputType: 'URL',
         outputFormat: 'mp4',

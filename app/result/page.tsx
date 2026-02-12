@@ -265,11 +265,15 @@ export default function ResultPage() {
     setAnimating(true)
     setAnimateError(null)
     try {
-      // Submit the video task with duration
+      // Determine style: if animating original photo, style is 'original'
+      const isOriginal = targetImage === originalImage
+      const animStyle = isOriginal ? 'original' : (result?.style || 'original')
+
+      // Submit the video task with duration and style
       const submitRes = await fetch('/api/animate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: targetImage, duration }),
+        body: JSON.stringify({ imageUrl: targetImage, duration, style: animStyle }),
       })
       const submitData = await submitRes.json()
       if (!submitRes.ok) throw new Error(submitData.error || 'Animation failed to start')
