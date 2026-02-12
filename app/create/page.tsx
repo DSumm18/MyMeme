@@ -120,22 +120,19 @@ function CreatePage() {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const styles = [
-    { id: 'caricature', name: 'Caricature', emoji: '🎨', bg: 'bg-pink-100', description: 'Big head, big personality!' },
-    { id: 'watercolor', name: 'Watercolor', emoji: '🖌️', bg: 'bg-blue-100', description: 'Soft artistic portrait!' },
-    { id: 'anime', name: 'Anime', emoji: '⚡', bg: 'bg-purple-100', description: 'Kawaii cartoon style!' },
-    { id: 'pop-art', name: 'Pop Art', emoji: '💥', bg: 'bg-yellow-100', description: 'Bold comic book vibes!' },
-    { id: 'clay-3d', name: 'Claymation', emoji: '🧊', bg: 'bg-orange-100', description: 'Sculpted clay figure look!' },
-    { id: 'superhero', name: 'Superhero', emoji: '🦸', bg: 'bg-red-100', description: 'Comic book hero pose!' },
-    { id: 'renaissance', name: 'Oil Painting', emoji: '🖼️', bg: 'bg-brown-100', description: 'Classic masterpiece style!' },
-    { id: 'pencil-sketch', name: 'Pencil Sketch', emoji: '✏️', bg: 'bg-gray-100', description: 'Hand-drawn artistry!' },
-    { id: 'pixar', name: 'Pixar', emoji: '✨', bg: 'bg-teal-100', description: 'Animated character magic!' },
-    { id: 'retro-80s', name: 'Retro 80s', emoji: '🕹️', bg: 'bg-pink-200', description: 'Synthwave nostalgia!' },
-    { id: 'comic-book', name: 'Comic Book', emoji: '💬', bg: 'bg-green-100', description: 'Comic book style!' },
-    { id: 'sticker', name: 'Sticker', emoji: '🏷️', bg: 'bg-mint-100', description: 'Die-cut cool vibes!' },
-    // { id: 'lego', name: 'Lego', emoji: '🧱', bg: 'bg-yellow-100', description: 'Blocky toy character!' },
-    { id: 'gta', name: 'GTA Style', emoji: '🔫', bg: 'bg-purple-200', description: 'Video game loading screen!' },
-    // { id: 'simpsons', name: 'Simpsons', emoji: '🟡', bg: 'bg-yellow-100', description: 'Yellow cartoon character!' },
-    { id: 'minecraft', name: 'Minecraft', emoji: '⛏️', bg: 'bg-brown-100', description: 'Pixelated block world!' }
+    { id: 'caricature', name: 'Caricature', emoji: '🎨', bg: 'bg-pink-100', description: 'Big head, big personality!', image: '/styles/caricature.png' },
+    { id: 'watercolor', name: 'Watercolor', emoji: '🖌️', bg: 'bg-blue-100', description: 'Soft artistic portrait!', image: '/styles/watercolor.png' },
+    { id: 'anime', name: 'Anime', emoji: '⚡', bg: 'bg-purple-100', description: 'Kawaii cartoon style!', image: '/styles/anime.png' },
+    { id: 'pop-art', name: 'Pop Art', emoji: '💥', bg: 'bg-yellow-100', description: 'Bold comic book vibes!', image: '/styles/pop-art.png' },
+    { id: 'clay-3d', name: 'Claymation', emoji: '🧊', bg: 'bg-orange-100', description: 'Sculpted clay figure look!', image: '/styles/clay-3d.png' },
+    { id: 'superhero', name: 'Superhero', emoji: '🦸', bg: 'bg-red-100', description: 'Comic book hero pose!', image: '/styles/superhero.png' },
+    { id: 'renaissance', name: 'Oil Painting', emoji: '🖼️', bg: 'bg-amber-100', description: 'Classic masterpiece style!', image: '/styles/renaissance.png' },
+    { id: 'pencil-sketch', name: 'Pencil Sketch', emoji: '✏️', bg: 'bg-gray-100', description: 'Hand-drawn artistry!', image: '/styles/pencil-sketch.png' },
+    { id: 'pixar', name: 'Pixar', emoji: '✨', bg: 'bg-teal-100', description: 'Animated character magic!', image: '/styles/pixar.png' },
+    { id: 'retro-80s', name: 'Retro 80s', emoji: '🕹️', bg: 'bg-pink-200', description: 'Synthwave nostalgia!', image: '/styles/retro-80s.png' },
+    { id: 'comic-book', name: 'Comic Book', emoji: '💬', bg: 'bg-green-100', description: 'Comic book style!', image: '/styles/comic-book.png' },
+    { id: 'sticker', name: 'Sticker', emoji: '🏷️', bg: 'bg-emerald-100', description: 'Die-cut cool vibes!', image: '/styles/sticker.png' },
+    { id: 'gta', name: 'GTA Style', emoji: '🔫', bg: 'bg-purple-200', description: 'Video game loading screen!', image: '/styles/gta.png' },
   ]
 
   // Manage loading phrase and emoji rotation
@@ -283,8 +280,12 @@ function CreatePage() {
                       : 'hover:shadow-md hover:scale-102'
                   }`}
                 >
-                  <div className={`aspect-square flex items-center justify-center text-6xl ${style.bg}`}>
-                    {style.emoji}
+                  <div className={`aspect-square relative overflow-hidden ${style.bg}`}>
+                    {style.image ? (
+                      <Image src={style.image} alt={style.name} fill className="object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-6xl">{style.emoji}</div>
+                    )}
                   </div>
                   <div className="p-3 bg-white">
                     <h3 className="font-bold text-sm">{style.name}</h3>
@@ -382,7 +383,7 @@ function CreatePage() {
             >
               {loading ? 'Creating Your Meme...' : 'Create My Meme 🎨'}
             </button>
-            {!loading && <p className="text-sm text-gray-400 mt-3">Free • No account needed • 10 seconds</p>}
+            {!loading && <p className="text-sm text-gray-400 mt-3">3 free credits • Sign up to start • ~10 seconds</p>}
           </div>
         </div>
       </div>
