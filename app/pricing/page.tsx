@@ -43,7 +43,7 @@ export default function PricingPage() {
       ]
     },
     {
-      name: 'Weekly',
+      name: 'Creator Pack',
       credits: 50,
       price: 1.49,
       priceId: 'weekly',
@@ -59,7 +59,7 @@ export default function PricingPage() {
       ]
     },
     {
-      name: 'Annual',
+      name: 'Pro Unlimited',
       credits: 1000,
       price: 19.99,
       priceId: 'annual',
@@ -168,7 +168,7 @@ export default function PricingPage() {
                   <span className="text-sm text-gray-400 ml-1">one-time</span>
                 )}
                 {plan.priceId === 'annual' && (
-                  <span className="text-sm text-gray-400 ml-1">/year</span>
+                  <span className="text-sm text-gray-400 ml-1">one-time</span>
                 )}
               </div>
 
