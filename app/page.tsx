@@ -102,13 +102,13 @@ export default function Home() {
             <div className="relative rounded-3xl shadow-2xl overflow-hidden min-h-[400px] bg-white">
               <div className="grid grid-cols-2 h-full min-h-[400px]">
                 <div className="relative">
-                  <Image src="/styles/before.jpg" alt="Original photo" fill className="object-cover" />
+                  <Image src="/styles/before.png" alt="Original photo" fill className="object-cover" />
                   <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-bold">Before</div>
                 </div>
                 <div className="relative">
                   <Image 
                     key={styles[activeStyleIdx].id}
-                    src={`/styles/${styles[activeStyleIdx].id}.jpg`} 
+                    src={`/styles/${styles[activeStyleIdx].id}.png`} 
                     alt={`${styles[activeStyleIdx].name} style`} 
                     fill 
                     className="object-cover transition-opacity duration-500" 
@@ -186,7 +186,7 @@ export default function Home() {
                 >
                   <div className="relative aspect-square overflow-hidden">
                     <Image 
-                      src={`/styles/${style.id}.jpg`}
+                      src={`/styles/${style.id}.png`}
                       alt={`${style.name} style example`}
                       fill 
                       className="object-cover group-hover:scale-110 transition-transform duration-500" 

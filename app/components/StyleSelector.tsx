@@ -7,97 +7,97 @@ const styles = [
   { 
     id: 'caricature', 
     name: 'Caricature', 
-    image: '/styles/caricature.jpg',
+    image: '/styles/caricature.png',
     description: 'Big head, big personality!'
   },
   { 
     id: 'watercolor', 
     name: 'Watercolor', 
-    image: '/styles/watercolor.jpg',
+    image: '/styles/watercolor.png',
     description: 'Soft artistic portrait!'
   },
   { 
     id: 'anime', 
     name: 'Anime', 
-    image: '/styles/anime.jpg',
+    image: '/styles/anime.png',
     description: 'Kawaii cartoon style!'
   },
   { 
     id: 'pop-art', 
     name: 'Pop Art', 
-    image: '/styles/pop-art.jpg',
+    image: '/styles/pop-art.png',
     description: 'Bold comic book vibes!'
   },
   { 
     id: 'clay-3d', 
     name: 'Claymation', 
-    image: '/styles/clay-3d.jpg',
+    image: '/styles/clay-3d.png',
     description: 'Sculpted clay figure look!'
   },
   { 
     id: 'superhero', 
     name: 'Superhero', 
-    image: '/styles/superhero.jpg',
+    image: '/styles/superhero.png',
     description: 'Comic book hero pose!'
   },
   { 
     id: 'renaissance', 
     name: 'Oil Painting', 
-    image: '/styles/renaissance.jpg',
+    image: '/styles/renaissance.png',
     description: 'Classic masterpiece style!'
   },
   { 
     id: 'pencil-sketch', 
     name: 'Pencil Sketch', 
-    image: '/styles/pencil-sketch.jpg',
+    image: '/styles/pencil-sketch.png',
     description: 'Hand-drawn artistry!'
   },
   { 
     id: 'pixar', 
     name: 'Pixar', 
-    image: '/styles/pixar.jpg',
+    image: '/styles/pixar.png',
     description: 'Animated character magic!'
   },
   { 
     id: 'retro-80s', 
     name: 'Retro 80s', 
-    image: '/styles/retro-80s.jpg',
+    image: '/styles/retro-80s.png',
     description: 'Synthwave nostalgia!'
   },
   { 
     id: 'comic-book', 
     name: 'Comic Book', 
-    image: '/styles/comic-book.jpg',
+    image: '/styles/comic-book.png',
     description: 'Superhero comic style!'
   },
   { 
     id: 'sticker', 
     name: 'Sticker', 
-    image: '/styles/sticker.jpg',
+    image: '/styles/sticker.png',
     description: 'Die-cut cool vibes!'
   },
   { 
     id: 'lego', 
     name: 'Lego', 
-    image: '/styles/lego.jpg',
+    image: '/styles/lego.png',
     description: 'Blocky toy character!'
   },
   { 
     id: 'gta', 
     name: 'GTA Style', 
-    image: '/styles/gta.jpg',
+    image: '/styles/gta.png',
     description: 'Video game loading screen!'
   },
   { 
     id: 'simpsons', 
     name: 'Simpsons', 
-    image: '/styles/simpsons.jpg',
+    image: '/styles/simpsons.png',
     description: 'Yellow cartoon character!'
   },
   { 
     id: 'minecraft', 
     name: 'Minecraft', 
-    image: '/styles/minecraft.jpg',
+    image: '/styles/minecraft.png',
     description: 'Pixelated block world!'
   }
 ]

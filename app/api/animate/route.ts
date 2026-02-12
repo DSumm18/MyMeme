@@ -28,7 +28,12 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify([{
         taskType: 'videoInference',
         taskUUID,
-        inputImage: imageUrl,
+        frameImages: [
+          {
+            inputImage: imageUrl,
+            frame: 'first'
+          }
+        ],
         model: 'klingai:1@1',
         duration: 5,
         positivePrompt: 'subtle natural movement, gentle smile, slight head turn, cinematic, smooth motion, high quality',
