@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
+import confetti from 'canvas-confetti'
 
 interface MemeResult {
   imageUrl: string
@@ -28,9 +29,52 @@ export default function ResultPage() {
 
   // Animation state
   const [animating, setAnimating] = useState(false)
+  const [animateProgress, setAnimateProgress] = useState(0)
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [showVideoModal, setShowVideoModal] = useState(false)
   const [animateError, setAnimateError] = useState<string | null>(null)
+
+  // 🎉 Celebration confetti on page load
+  const fireCelebration = () => {
+    // First burst - center
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#FF6B9D', '#FFD93D', '#6BCB77', '#4D96FF', '#9B59B6'],
+    })
+    // Left side
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ['#FF6B9D', '#FFD93D', '#6BCB77'],
+      })
+    }, 200)
+    // Right side
+    setTimeout(() => {
+      confetti({
+        particleCount: 50,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ['#4D96FF', '#9B59B6', '#FF6B9D'],
+      })
+    }, 400)
+  }
+
+  // Fire confetti when video completes too
+  const fireVideoCelebration = () => {
+    confetti({
+      particleCount: 150,
+      spread: 100,
+      origin: { y: 0.5 },
+      colors: ['#9B59B6', '#FF6B9D', '#FFD93D', '#6BCB77'],
+      shapes: ['star', 'circle'],
+    })
+  }
 
   useEffect(() => {
     const stored = sessionStorage.getItem('mymeme_result')
@@ -38,6 +82,8 @@ export default function ResultPage() {
     if (stored) {
       const parsedResult = JSON.parse(stored)
       setResult(parsedResult)
+      // 🎉 Fire confetti when result loads!
+      setTimeout(fireCelebration, 500)
       
       // Save to Supabase if user is logged in
       const saveCreation = async () => {
@@ -164,6 +210,7 @@ export default function ResultPage() {
     if (!result?.imageUrl) return
     setAnimating(true)
     setAnimateError(null)
+    setAnimateProgress(0)
     try {
       // Step 1: Submit the video task
       const submitRes = await fetch('/api/animate', {
@@ -180,6 +227,7 @@ export default function ResultPage() {
       const maxAttempts = 48
       for (let i = 0; i < maxAttempts; i++) {
         await new Promise(resolve => setTimeout(resolve, 5000))
+        setAnimateProgress(Math.min(95, Math.round(((i + 1) / 24) * 100)))
         
         const pollRes = await fetch('/api/animate/poll', {
           method: 'POST',
@@ -191,6 +239,7 @@ export default function ResultPage() {
         if (pollData.status === 'complete') {
           setVideoUrl(pollData.videoUrl)
           setShowVideoModal(true)
+          fireVideoCelebration()
           return
         }
         if (pollData.status === 'error') {
@@ -299,9 +348,18 @@ export default function ResultPage() {
           <button
             onClick={handleAnimate}
             disabled={animating}
-            className="bg-[#9B59B6] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all disabled:opacity-50 disabled:scale-100"
+            className={`text-white px-8 py-3 rounded-full font-bold transition-all ${
+              animating 
+                ? 'bg-gradient-to-r from-[#9B59B6] via-[#FF6B9D] to-[#9B59B6] bg-[length:200%_100%] animate-shimmer' 
+                : 'bg-[#9B59B6] hover:scale-105'
+            }`}
           >
-            {animating ? '⏳ Animating (~2 min)...' : '🎬 Animate it'}
+            {animating ? (
+              <span className="flex items-center gap-2">
+                <span className="animate-spin">🎬</span>
+                Creating magic... {animateProgress > 0 ? `${animateProgress}%` : ''}
+              </span>
+            ) : '🎬 Animate it'}
           </button>
         </div>
 
