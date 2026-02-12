@@ -55,8 +55,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       provider: 'google',
       options: {
         redirectTo: typeof window !== 'undefined' 
-          ? `${window.location.origin}/auth/callback`
-          : 'https://my-meme-eta.vercel.app/auth/callback'
+          ? window.location.origin
+          : 'https://my-meme-eta.vercel.app'
       }
     })
     if (error) {
