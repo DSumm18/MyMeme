@@ -65,6 +65,7 @@ export async function POST(req: NextRequest) {
       accessories ? `with ${accessories}` : '',
     ].filter(Boolean).join(', ')
     const sceneText = sceneDetails ? `, ${sceneDetails}` : ''
+    const clothingHint = ', wearing same clothing and outfit as the reference photo'
 
     // Image upload task
     const uploadTask = {
@@ -120,7 +121,7 @@ export async function POST(req: NextRequest) {
       taskType: "imageInference",
       taskUUID: randomUUID(),
       model: "runware:101@1",
-      positivePrompt: `${styleDesc}${sceneText}`.substring(0, 295),
+      positivePrompt: `${styleDesc}${sceneText}${clothingHint}`.substring(0, 500),
       negativePrompt: "text, words, letters, numbers, watermark, signature, writing, caption, subtitle, logo text, misspelled text, garbled text",
       height: 1024,
       width: 1024,
