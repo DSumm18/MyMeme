@@ -5,6 +5,7 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'im.runware.ai' },
       { protocol: 'https', hostname: '*.runware.ai' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
     ],
   },
   env: {
