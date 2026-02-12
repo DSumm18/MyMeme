@@ -6,11 +6,14 @@ export const maxDuration = 30
 // Step 1: Submit the video generation task and return taskUUID immediately
 export async function POST(req: NextRequest) {
   try {
-    const { imageUrl } = await req.json()
+    const { imageUrl, duration = 5 } = await req.json()
 
     if (!imageUrl) {
       return NextResponse.json({ error: 'Image URL is required' }, { status: 400 })
     }
+
+    // Validate duration (5 or 10 seconds)
+    const videoDuration = duration === 10 ? 10 : 5
 
     const apiKey = process.env.RUNWARE_API_KEY
     if (!apiKey) {
@@ -35,7 +38,7 @@ export async function POST(req: NextRequest) {
           }
         ],
         model: 'klingai:1@1',
-        duration: 5,
+        duration: videoDuration,
         positivePrompt: 'subtle natural movement, gentle smile, slight head turn, preserve exact facial features and age, flattering soft warm lighting, cinematic, smooth motion, high quality, beautiful, youthful glow',
         numberResults: 1,
         outputType: 'URL',

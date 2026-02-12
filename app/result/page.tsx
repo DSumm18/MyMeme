@@ -34,6 +34,11 @@ export default function ResultPage() {
   const [videoUrl, setVideoUrl] = useState<string | null>(null)
   const [showVideoModal, setShowVideoModal] = useState(false)
   const [animateError, setAnimateError] = useState<string | null>(null)
+  
+  // Duration picker state
+  const [showDurationPicker, setShowDurationPicker] = useState(false)
+  const [pendingAnimateImage, setPendingAnimateImage] = useState<string | null>(null)
+  const [selectedDuration, setSelectedDuration] = useState<5 | 10>(5)
 
   // 🎉 Celebration confetti on page load
   const fireCelebration = () => {
@@ -245,18 +250,26 @@ export default function ResultPage() {
     return () => window.removeEventListener('jobqueue-updated', handleJobUpdate)
   }, [])
 
+  // Show duration picker before animating
+  const promptAnimate = (imageUrl?: string) => {
+    setPendingAnimateImage(imageUrl || result?.imageUrl || null)
+    setSelectedDuration(5)
+    setShowDurationPicker(true)
+  }
+
   // Animate handler - submits to background job queue
-  const handleAnimate = async (imageUrl?: string) => {
-    const targetImage = imageUrl || result?.imageUrl
+  const handleAnimate = async (duration: 5 | 10 = 5) => {
+    const targetImage = pendingAnimateImage || result?.imageUrl
     if (!targetImage) return
+    setShowDurationPicker(false)
     setAnimating(true)
     setAnimateError(null)
     try {
-      // Submit the video task
+      // Submit the video task with duration
       const submitRes = await fetch('/api/animate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: targetImage }),
+        body: JSON.stringify({ imageUrl: targetImage, duration }),
       })
       const submitData = await submitRes.json()
       if (!submitRes.ok) throw new Error(submitData.error || 'Animation failed to start')
@@ -274,7 +287,7 @@ export default function ResultPage() {
         taskUUID,
         sourceImageUrl: targetImage,
         thumbnailUrl: targetImage,
-        style: result?.style || 'original',
+        style: `${result?.style || 'original'} (${duration}s)`,
         status: 'processing',
         startedAt: Date.now(),
       })
@@ -379,7 +392,7 @@ export default function ResultPage() {
             😂 Make it a Meme
           </button>
           <button
-            onClick={() => handleAnimate()}
+            onClick={() => promptAnimate()}
             disabled={animating}
             className="bg-[#9B59B6] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all disabled:opacity-50"
           >
@@ -387,7 +400,7 @@ export default function ResultPage() {
           </button>
           {originalImage && (
             <button
-              onClick={() => handleAnimate(originalImage)}
+              onClick={() => promptAnimate(originalImage)}
               disabled={animating}
               className="bg-[#E67E22] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all disabled:opacity-50"
             >
@@ -441,6 +454,71 @@ export default function ResultPage() {
               >
                 💾 Download Video
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Duration Picker Modal */}
+      {showDurationPicker && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
+            <h2 className="text-2xl font-bold mb-2 text-center">⏱️ Animation Length</h2>
+            <p className="text-gray-500 text-center mb-6 text-sm">Choose how long your animation will be</p>
+            
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={() => setSelectedDuration(5)}
+                className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                  selectedDuration === 5 
+                    ? 'border-[#9B59B6] bg-purple-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="font-bold text-lg">5 seconds</div>
+                    <div className="text-gray-500 text-sm">Quick & fun — perfect for sharing</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-[#9B59B6]">5 credits</div>
+                  </div>
+                </div>
+              </button>
+              
+              <button
+                onClick={() => setSelectedDuration(10)}
+                className={`w-full p-4 rounded-xl border-2 text-left transition-all ${
+                  selectedDuration === 10 
+                    ? 'border-[#9B59B6] bg-purple-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="font-bold text-lg">10 seconds ✨</div>
+                    <div className="text-gray-500 text-sm">Cinematic — great for gifts & memories</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-[#9B59B6]">10 credits</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDurationPicker(false)}
+                className="flex-1 bg-gray-200 text-gray-800 px-4 py-3 rounded-xl font-bold hover:bg-gray-300 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleAnimate(selectedDuration)}
+                className="flex-1 bg-[#9B59B6] text-white px-4 py-3 rounded-xl font-bold hover:scale-105 transition-all"
+              >
+                🎬 Create Animation
+              </button>
             </div>
           </div>
         </div>
