@@ -268,10 +268,19 @@ export default function ResultPage() {
   const handleAnimate = async (duration: 5 | 10 = 5) => {
     const targetImage = pendingAnimateImage || result?.imageUrl
     if (!targetImage) return
+    
+    const cost = duration === 10 ? 10 : 5
     setShowDurationPicker(false)
     setAnimating(true)
     setAnimateError(null)
+    
     try {
+      // First check credits
+      const hasCredits = await deductCredits(cost)
+      if (!hasCredits) {
+        throw new Error('Not enough credits to animate')
+      }
+
       // Determine style: if animating original photo, style is 'original'
       const isOriginal = targetImage === originalImage
       const animStyle = isOriginal ? 'original' : (result?.style || 'original')

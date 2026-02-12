@@ -4,6 +4,9 @@ import { useState, useRef, useEffect, Suspense } from 'react'
 import { loadingPhrases } from './LoadingPhrases'
 import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useAuth } from '@/lib/auth-context'
+import { useCredits } from '@/lib/credits-context'
+import Link from 'next/link'
 
 // Loading emojis for animation
 const LOADING_EMOJIS = ['🎨', '🖌️', '✨', '🎭', '🖼️']
@@ -106,6 +109,8 @@ export default function CreatePageWrapper() {
 function CreatePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { user, signIn, loading: authLoading } = useAuth()
+  const { credits, deductCredits, loading: creditsLoading } = useCredits()
   const initialStyle = searchParams.get('style') || 'caricature'
   const [selectedStyle, setSelectedStyle] = useState(initialStyle)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -118,6 +123,37 @@ function CreatePage() {
   const [currentPhrase, setCurrentPhrase] = useState(loadingPhrases[0])
   const [currentEmoji, setCurrentEmoji] = useState(LOADING_EMOJIS[0])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // Authentication and Credit Gates
+  if (!user && !authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md text-center">
+          <div className="text-6xl mb-4">🎨</div>
+          <h2 className="text-2xl font-bold mb-4">Sign in to Start Creating</h2>
+          <p className="text-gray-600 mb-6">Create an account to get 3 free credits and start transforming your photos!</p>
+          <button onClick={signIn} className="bg-[#FF6B9D] text-white px-8 py-3 rounded-full text-lg font-bold hover:scale-105 transition-all">
+            Sign in with Google 🚀
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (user && credits < 1 && !creditsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md text-center">
+          <div className="text-6xl mb-4">😢</div>
+          <h2 className="text-2xl font-bold mb-4">Out of Credits!</h2>
+          <p className="text-gray-600 mb-6">You need at least 1 credit to transform your photo. Get more credits to keep creating!</p>
+          <Link href="/pricing" className="bg-[#FF6B9D] text-white px-8 py-3 rounded-full text-lg font-bold hover:scale-105 transition-all inline-block">
+            Get More Credits 💰
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   const styles = [
     { id: 'caricature', name: 'Caricature', emoji: '🎨', bg: 'bg-pink-100', description: 'Big head, big personality!', image: '/styles/caricature.png' },
@@ -203,6 +239,12 @@ function CreatePage() {
 
       if (!res.ok) {
         throw new Error(data.error || 'Generation failed')
+      }
+
+      // Deduct 1 credit
+      const creditResult = await deductCredits(1)
+      if (!creditResult) {
+        throw new Error('Failed to deduct credits')
       }
 
       // Store result in sessionStorage and the original image

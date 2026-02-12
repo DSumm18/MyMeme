@@ -4,6 +4,8 @@ import React, { useState, useRef, ChangeEvent, DragEvent } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { addJob } from '@/lib/job-queue'
+import { useAuth } from '@/lib/auth-context'
+import { useCredits } from '@/lib/credits-context'
 
 const USE_CASES = [
   {
@@ -33,11 +35,44 @@ const USE_CASES = [
 ]
 
 export default function AnimatePage() {
+  const { user, signIn, loading: authLoading } = useAuth()
+  const { credits, deductCredits, loading: creditsLoading } = useCredits()
   const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [duration, setDuration] = useState<5 | 10>(5)
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  // Authentication and Credit Gates
+  if (!user && !authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md text-center">
+          <div className="text-6xl mb-4">🎬</div>
+          <h2 className="text-2xl font-bold mb-4">Sign in to Animate</h2>
+          <p className="text-gray-600 mb-6">Create an account to start animating your photos!</p>
+          <button onClick={signIn} className="bg-[#FF6B9D] text-white px-8 py-3 rounded-full text-lg font-bold hover:scale-105 transition-all">
+            Sign in with Google 🚀
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  if (user && credits < 5 && !creditsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-pink-50 to-white flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md text-center">
+          <div className="text-6xl mb-4">😢</div>
+          <h2 className="text-2xl font-bold mb-4">Out of Credits!</h2>
+          <p className="text-gray-600 mb-6">You need at least 5 credits to animate a photo. Get more credits to bring your memories to life!</p>
+          <Link href="/pricing" className="bg-[#FF6B9D] text-white px-8 py-3 rounded-full text-lg font-bold hover:scale-105 transition-all inline-block">
+            Get More Credits 💰
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   const handleFileUpload = async (file: File | null) => {
     if (!file) return
@@ -88,9 +123,16 @@ export default function AnimatePage() {
       return
     }
 
+    const cost = duration === 10 ? 10 : 5
     setIsUploading(true)
 
     try {
+      // Deduct credits first
+      const hasCredits = await deductCredits(cost)
+      if (!hasCredits) {
+        throw new Error('Not enough credits')
+      }
+
       // First upload image to Runware
       const formData = new FormData()
       formData.append('file', imageFile)
@@ -114,7 +156,8 @@ export default function AnimatePage() {
         thumbnailUrl: previewImage || '',
         style: 'original',
         status: 'processing' as const,
-        startedAt: Date.now()
+        startedAt: Date.now(),
+        duration: duration
       }
 
       addJob(newJob)
