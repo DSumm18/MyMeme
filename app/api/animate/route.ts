@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
         ],
         model: 'klingai:1@1',
         duration: 5,
-        positivePrompt: 'subtle natural movement, gentle smile, slight head turn, cinematic, smooth motion, high quality',
+        positivePrompt: 'subtle natural movement, gentle smile, slight head turn, preserve exact facial features and age, flattering soft warm lighting, cinematic, smooth motion, high quality, beautiful, youthful glow',
         numberResults: 1,
         outputType: 'URL',
         outputFormat: 'mp4',
