@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
-import supabase from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 interface Creation {
   id: string
@@ -34,7 +34,7 @@ export default function GalleryPage() {
         const { data, error } = await supabase
           .from('creations')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', user!.id)
           .order('created_at', { ascending: false })
 
         if (error) throw error
@@ -170,7 +170,7 @@ export default function GalleryPage() {
             <div className="grid md:grid-cols-2">
               <div className="relative aspect-square">
                 <Image 
-                  src={creation.original_image_url} 
+                  src={selectedImage.original_image_url} 
                   alt="Original photo" 
                   fill 
                   className="object-contain" 
@@ -181,36 +181,36 @@ export default function GalleryPage() {
               </div>
               <div className="relative aspect-square">
                 <Image 
-                  src={creation.generated_image_url} 
-                  alt={`${creation.style} style meme`} 
+                  src={selectedImage.generated_image_url} 
+                  alt={`${selectedImage.style} style meme`} 
                   fill 
                   className="object-contain" 
                 />
                 <div 
                   className="absolute bottom-4 right-4 px-3 py-1 rounded-full text-sm text-white"
                   style={{ 
-                    backgroundColor: creation.style === 'anime' ? '#9E7BFF' 
-                      : creation.style === 'pixar' ? '#00D8FF'
-                      : creation.style === 'superhero' ? '#FF3D7A'
+                    backgroundColor: selectedImage.style === 'anime' ? '#9E7BFF' 
+                      : selectedImage.style === 'pixar' ? '#00D8FF'
+                      : selectedImage.style === 'superhero' ? '#FF3D7A'
                       : '#FF6B9D'
                   }}
                 >
-                  {creation.style}
+                  {selectedImage.style}
                 </div>
               </div>
             </div>
             <div className="p-6 bg-gray-50">
-              {creation.job_title && (
+              {selectedImage.job_title && (
                 <p className="text-xl font-bold mb-2" style={{ color: '#1A1A2E' }}>
-                  {creation.job_title}
+                  {selectedImage.job_title}
                 </p>
               )}
-              {creation.prompt && (
-                <p className="text-gray-600 italic">{creation.prompt}</p>
+              {selectedImage.prompt && (
+                <p className="text-gray-600 italic">{selectedImage.prompt}</p>
               )}
               <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
-                <span>Created on {new Date(creation.created_at).toLocaleString()}</span>
-                <span>Cost: £{creation.cost.toFixed(2)}</span>
+                <span>Created on {new Date(selectedImage.created_at).toLocaleString()}</span>
+                <span>Cost: £{selectedImage.cost.toFixed(2)}</span>
               </div>
             </div>
           </div>

@@ -1,56 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
+import { randomUUID } from 'crypto'
+
+export const maxDuration = 30
 
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
-    const file = formData.get('file') as File | null
+    const { image } = await request.json()
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
+    if (!image) {
+      return NextResponse.json({ error: 'No image provided' }, { status: 400 })
     }
 
-    // Optional: file type validation
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp']
-    if (!validTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type' }, { status: 400 })
+    const apiKey = process.env.RUNWARE_API_KEY
+    if (!apiKey) {
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
-    // Optional: file size validation
-    const maxSize = 10 * 1024 * 1024 // 10MB
-    if (file.size > maxSize) {
-      return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
-    }
-
-    // Use a package like uuid to generate unique filenames in production
-    const uniqueFilename = `upload_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
-    
-    // Convert File to Blob/ArrayBuffer to upload
-    const fileArrayBuffer = await file.arrayBuffer()
-    const fileBlob = new Blob([fileArrayBuffer], { type: file.type })
-
-    // Mock Runware upload - replace with actual upload logic
-    // This would typically involve sending to S3/Cloud Storage
-    const uploadResponse = await fetch('https://runware-upload-service.com/upload', {
+    // Upload to Runware
+    const uploadRes = await fetch('https://api.runware.ai/v1', {
       method: 'POST',
-      body: fileBlob,
       headers: {
-        'Content-Type': file.type,
-        'X-Filename': uniqueFilename
-      }
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify([{
+        taskType: "imageUpload",
+        taskUUID: randomUUID(),
+        image: image,
+      }]),
     })
 
-    if (!uploadResponse.ok) {
-      return NextResponse.json({ error: 'Upload to storage failed' }, { status: 500 })
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text()
+      console.error('Runware upload error:', errText)
+      return NextResponse.json({ error: 'Image upload failed' }, { status: 502 })
     }
 
-    const responseData = await uploadResponse.json()
-    const imageUrl = responseData.url || `https://runware-upload-service.com/images/${uniqueFilename}`
+    const uploadData = await uploadRes.json()
+    const imageUUID = uploadData?.data?.[0]?.imageUUID
+    const imageUrl = uploadData?.data?.[0]?.imageURL
 
-    return NextResponse.json({ 
-      imageUrl, 
-      originalFilename: file.name 
-    }, { status: 200 })
+    if (!imageUrl) {
+      return NextResponse.json({ error: 'Upload failed - no URL received' }, { status: 502 })
+    }
+
+    return NextResponse.json({ imageUrl, imageUUID })
 
   } catch (error) {
     console.error('Upload API error:', error)
