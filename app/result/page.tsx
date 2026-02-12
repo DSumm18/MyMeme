@@ -74,6 +74,25 @@ export default function ResultPage() {
       colors: ['#9B59B6', '#FF6B9D', '#FFD93D', '#6BCB77'],
       shapes: ['star', 'circle'],
     })
+    // Play a celebration ding sound
+    try {
+      const actx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+      const playTone = (freq: number, start: number, dur: number) => {
+        const osc = actx.createOscillator()
+        const gain = actx.createGain()
+        osc.connect(gain)
+        gain.connect(actx.destination)
+        osc.frequency.value = freq
+        osc.type = 'sine'
+        gain.gain.setValueAtTime(0.3, actx.currentTime + start)
+        gain.gain.exponentialRampToValueAtTime(0.01, actx.currentTime + start + dur)
+        osc.start(actx.currentTime + start)
+        osc.stop(actx.currentTime + start + dur)
+      }
+      playTone(523, 0, 0.15)    // C5
+      playTone(659, 0.1, 0.15)  // E5
+      playTone(784, 0.2, 0.3)   // G5 - triumphant ding!
+    } catch {}
   }
 
   useEffect(() => {
@@ -206,8 +225,9 @@ export default function ResultPage() {
   }, [showMemeEditor, topText, bottomText, result])
 
   // Animate handler - two-step: submit task, then poll from client
-  const handleAnimate = async () => {
-    if (!result?.imageUrl) return
+  const handleAnimate = async (imageUrl?: string) => {
+    const targetImage = imageUrl || result?.imageUrl
+    if (!targetImage) return
     setAnimating(true)
     setAnimateError(null)
     setAnimateProgress(0)
@@ -216,18 +236,18 @@ export default function ResultPage() {
       const submitRes = await fetch('/api/animate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageUrl: result.imageUrl }),
+        body: JSON.stringify({ imageUrl: targetImage }),
       })
       const submitData = await submitRes.json()
       if (!submitRes.ok) throw new Error(submitData.error || 'Animation failed to start')
 
       const { taskUUID } = submitData
 
-      // Step 2: Poll from client every 5s for up to 4 minutes
-      const maxAttempts = 48
+      // Step 2: Poll from client every 5s for up to 8 minutes (Kling takes ~6 min)
+      const maxAttempts = 96
       for (let i = 0; i < maxAttempts; i++) {
         await new Promise(resolve => setTimeout(resolve, 5000))
-        setAnimateProgress(Math.min(95, Math.round(((i + 1) / 24) * 100)))
+        setAnimateProgress(Math.min(95, Math.round(((i + 1) / 72) * 100)))
         
         const pollRes = await fetch('/api/animate/poll', {
           method: 'POST',
@@ -346,7 +366,7 @@ export default function ResultPage() {
             😂 Make it a Meme
           </button>
           <button
-            onClick={handleAnimate}
+            onClick={() => handleAnimate()}
             disabled={animating}
             className={`text-white px-8 py-3 rounded-full font-bold transition-all ${
               animating 
@@ -361,6 +381,15 @@ export default function ResultPage() {
               </span>
             ) : '🎬 Animate it'}
           </button>
+          {originalImage && (
+            <button
+              onClick={() => handleAnimate(originalImage)}
+              disabled={animating}
+              className="bg-[#E67E22] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all disabled:opacity-50"
+            >
+              {animating ? '⏳' : '📸 Animate Original'}
+            </button>
+          )}
         </div>
 
         {/* Try Another Style Button */}
