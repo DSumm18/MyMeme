@@ -260,6 +260,21 @@ export default function ResultPage() {
           setVideoUrl(pollData.videoUrl)
           setShowVideoModal(true)
           fireVideoCelebration()
+          // Play a completion sound
+          try {
+            const audioCtx = new AudioContext()
+            const osc = audioCtx.createOscillator()
+            const gain = audioCtx.createGain()
+            osc.connect(gain)
+            gain.connect(audioCtx.destination)
+            osc.frequency.value = 800
+            gain.gain.value = 0.3
+            osc.start()
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1)
+            osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.2)
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5)
+            osc.stop(audioCtx.currentTime + 0.5)
+          } catch {}
           return
         }
         if (pollData.status === 'error') {
