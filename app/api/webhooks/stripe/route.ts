@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2026-01-28.clover',
 });
 
 const supabase = createClient(
@@ -24,8 +24,8 @@ export async function POST(request: NextRequest) {
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
-      const userId = session.metadata.userId;
-      const credits = parseInt(session.metadata.credits || '0', 10);
+      const userId = session.metadata?.userId;
+      const credits = parseInt(session.metadata?.credits || '0', 10);
 
       console.log(`Processing payment for user ${userId}. Credits: ${credits}`);
 
