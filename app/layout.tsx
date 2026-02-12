@@ -4,6 +4,8 @@ import './globals.css'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { AuthProvider } from '@/lib/auth-context'
+import JobPoller from '@/components/JobPoller'
+import JobTray from '@/components/JobTray'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -26,6 +28,8 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <JobPoller />
+          <JobTray />
         </AuthProvider>
       </body>
     </html>

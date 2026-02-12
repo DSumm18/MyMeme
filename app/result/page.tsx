@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth-context'
 import Image from 'next/image'
 import Link from 'next/link'
 import confetti from 'canvas-confetti'
+import { addJob, getJobs } from '@/lib/job-queue'
 
 interface MemeResult {
   imageUrl: string
@@ -224,15 +225,34 @@ export default function ResultPage() {
     }
   }, [showMemeEditor, topText, bottomText, result])
 
-  // Animate handler - two-step: submit task, then poll from client
+  // Listen for job completions to show video modal
+  useEffect(() => {
+    const handleJobUpdate = () => {
+      const jobs = getJobs()
+      const justCompleted = jobs.find(j => 
+        j.status === 'complete' && 
+        j.videoUrl && 
+        j.completedAt && 
+        Date.now() - j.completedAt < 5000
+      )
+      if (justCompleted && justCompleted.videoUrl) {
+        setVideoUrl(justCompleted.videoUrl)
+        setShowVideoModal(true)
+        fireVideoCelebration()
+      }
+    }
+    window.addEventListener('jobqueue-updated', handleJobUpdate)
+    return () => window.removeEventListener('jobqueue-updated', handleJobUpdate)
+  }, [])
+
+  // Animate handler - submits to background job queue
   const handleAnimate = async (imageUrl?: string) => {
     const targetImage = imageUrl || result?.imageUrl
     if (!targetImage) return
     setAnimating(true)
     setAnimateError(null)
-    setAnimateProgress(0)
     try {
-      // Step 1: Submit the video task
+      // Submit the video task
       const submitRes = await fetch('/api/animate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -243,46 +263,24 @@ export default function ResultPage() {
 
       const { taskUUID } = submitData
 
-      // Step 2: Poll from client every 5s for up to 8 minutes (Kling takes ~6 min)
-      const maxAttempts = 96
-      for (let i = 0; i < maxAttempts; i++) {
-        await new Promise(resolve => setTimeout(resolve, 5000))
-        setAnimateProgress(Math.min(95, Math.round(((i + 1) / 72) * 100)))
-        
-        const pollRes = await fetch('/api/animate/poll', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ taskUUID }),
-        })
-        const pollData = await pollRes.json()
-
-        if (pollData.status === 'complete') {
-          setVideoUrl(pollData.videoUrl)
-          setShowVideoModal(true)
-          fireVideoCelebration()
-          // Play a completion sound
-          try {
-            const audioCtx = new AudioContext()
-            const osc = audioCtx.createOscillator()
-            const gain = audioCtx.createGain()
-            osc.connect(gain)
-            gain.connect(audioCtx.destination)
-            osc.frequency.value = 800
-            gain.gain.value = 0.3
-            osc.start()
-            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1)
-            osc.frequency.exponentialRampToValueAtTime(1600, audioCtx.currentTime + 0.2)
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5)
-            osc.stop(audioCtx.currentTime + 0.5)
-          } catch {}
-          return
-        }
-        if (pollData.status === 'error') {
-          throw new Error(pollData.error || 'Video generation failed')
-        }
-        // else 'processing' - continue polling
+      // Request notification permission
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission()
       }
-      throw new Error('Video generation timed out. Please try again.')
+
+      // Add to background job queue — JobPoller handles the rest
+      addJob({
+        id: taskUUID,
+        taskUUID,
+        sourceImageUrl: targetImage,
+        thumbnailUrl: targetImage,
+        style: result?.style || 'original',
+        status: 'processing',
+        startedAt: Date.now(),
+      })
+
+      // Show confirmation
+      setAnimateError(null)
     } catch (err) {
       setAnimateError(err instanceof Error ? err.message : 'Animation failed')
     } finally {
@@ -383,18 +381,9 @@ export default function ResultPage() {
           <button
             onClick={() => handleAnimate()}
             disabled={animating}
-            className={`text-white px-8 py-3 rounded-full font-bold transition-all ${
-              animating 
-                ? 'bg-gradient-to-r from-[#9B59B6] via-[#FF6B9D] to-[#9B59B6] bg-[length:200%_100%] animate-shimmer' 
-                : 'bg-[#9B59B6] hover:scale-105'
-            }`}
+            className="bg-[#9B59B6] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all disabled:opacity-50"
           >
-            {animating ? (
-              <span className="flex items-center gap-2">
-                <span className="animate-spin">🎬</span>
-                Creating magic... {animateProgress > 0 ? `${animateProgress}%` : ''}
-              </span>
-            ) : '🎬 Animate it'}
+            {animating ? '⏳ Submitting...' : '🎬 Animate it'}
           </button>
           {originalImage && (
             <button
