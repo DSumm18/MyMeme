@@ -29,6 +29,7 @@ function AnimatedSection({ children, className = '', delay = 0 }: { children: Re
 }
 
 export default function Home() {
+  const { user } = useAuth()
   const [activeStyleIdx, setActiveStyleIdx] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   
