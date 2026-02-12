@@ -4,6 +4,7 @@ import './globals.css'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { AuthProvider } from '@/lib/auth-context'
+import { CreditsProvider } from '@/lib/credits-context'
 import JobPoller from '@/components/JobPoller'
 import JobTray from '@/components/JobTray'
 
@@ -23,13 +24,15 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} bg-white text-dark-blue`}>
         <AuthProvider>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <JobPoller />
-          <JobTray />
+          <CreditsProvider>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+            <JobPoller />
+            <JobTray />
+          </CreditsProvider>
         </AuthProvider>
       </body>
     </html>

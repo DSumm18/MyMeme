@@ -1,26 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2026-01-28.clover',
 });
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: NextRequest) {
-  const signature = request.headers.get('stripe-signature');
   const body = await request.text();
 
+  // If webhook secret is set, verify signature
+  const signature = request.headers.get('stripe-signature');
+  let event: Stripe.Event;
+
   try {
-    const event = stripe.webhooks.constructEvent(
-      body,
-      signature!,
-      process.env.STRIPE_WEBHOOK_SECRET!
-    );
+    if (process.env.STRIPE_WEBHOOK_SECRET && signature) {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_WEBHOOK_SECRET
+      );
+    } else {
+      // For development/testing without webhook secret
+      event = JSON.parse(body) as Stripe.Event;
+    }
 
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
@@ -29,9 +32,29 @@ export async function POST(request: NextRequest) {
 
       console.log(`Processing payment for user ${userId}. Credits: ${credits}`);
 
-      // TODO: Implement credit addition to user's account
-      // For now, just log the successful payment
-      console.log('Payment successful. Future implementation will add credits.');
+      if (userId && credits > 0) {
+        // Get current credits
+        const { data: existing } = await supabase
+          .from('user_credits')
+          .select('credits')
+          .eq('user_id', userId)
+          .single();
+
+        if (existing) {
+          // Update existing
+          await supabase
+            .from('user_credits')
+            .update({ credits: existing.credits + credits, updated_at: new Date().toISOString() })
+            .eq('user_id', userId);
+        } else {
+          // Insert new
+          await supabase
+            .from('user_credits')
+            .insert({ user_id: userId, credits: credits });
+        }
+
+        console.log(`Successfully added ${credits} credits to user ${userId}`);
+      }
     }
 
     return NextResponse.json({ received: true });

@@ -3,11 +3,13 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useAuth } from '@/lib/auth-context'
+import { useCredits } from '@/lib/credits-context'
 import Image from 'next/image'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const { user, loading, signIn, signOut } = useAuth()
+  const { credits } = useCredits()
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
@@ -20,9 +22,12 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-4">
             {user ? (
-              <Link href="/gallery" className="text-dark-blue hover:text-primary-pink">
-                My Gallery 🖼️
-              </Link>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">✨ {credits} credits</span>
+                <Link href="/gallery" className="text-dark-blue hover:text-primary-pink">
+                  My Gallery 🖼️
+                </Link>
+              </div>
             ) : null}
             <button 
               onClick={() => setIsOpen(!isOpen)}
@@ -49,10 +54,13 @@ export default function Navbar() {
 
             {user ? (
               <>
-                <Link href="/gallery" className="text-dark-blue hover:text-primary-pink transition-colors">
-                  My Gallery 🖼️
-                </Link>
                 <div className="flex items-center space-x-2">
+                  <span className="text-sm bg-gradient-to-r from-pink-200 to-pink-300 text-pink-900 px-2 py-1 rounded-full">
+                    ✨ {credits} credits
+                  </span>
+                  <Link href="/gallery" className="text-dark-blue hover:text-primary-pink transition-colors">
+                    My Gallery 🖼️
+                  </Link>
                   {user.user_metadata?.avatar_url && (
                     <Image 
                       src={user.user_metadata.avatar_url} 
@@ -117,12 +125,17 @@ export default function Navbar() {
               
               {user ? (
                 <>
-                  <button 
-                    onClick={() => { signOut(); setIsOpen(false) }} 
-                    className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg w-full text-left"
-                  >
-                    Sign Out
-                  </button>
+                  <div className="flex justify-between items-center px-3 py-2">
+                    <span className="text-sm bg-gradient-to-r from-pink-200 to-pink-300 text-pink-900 px-2 py-1 rounded-full">
+                      ✨ {credits} credits
+                    </span>
+                    <button 
+                      onClick={() => { signOut(); setIsOpen(false) }} 
+                      className="text-dark-blue hover:bg-bright-yellow px-3 py-2 rounded-lg"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
                 </>
               ) : (
                 <button 
