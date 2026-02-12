@@ -132,9 +132,9 @@ function CreatePage() {
     { id: 'retro-80s', name: 'Retro 80s', emoji: '🕹️', bg: 'bg-pink-200', description: 'Synthwave nostalgia!' },
     { id: 'comic-book', name: 'Comic Book', emoji: '💬', bg: 'bg-green-100', description: 'Comic book style!' },
     { id: 'sticker', name: 'Sticker', emoji: '🏷️', bg: 'bg-mint-100', description: 'Die-cut cool vibes!' },
-    { id: 'lego', name: 'Lego', emoji: '🧱', bg: 'bg-yellow-100', description: 'Blocky toy character!' },
+    // { id: 'lego', name: 'Lego', emoji: '🧱', bg: 'bg-yellow-100', description: 'Blocky toy character!' },
     { id: 'gta', name: 'GTA Style', emoji: '🔫', bg: 'bg-purple-200', description: 'Video game loading screen!' },
-    { id: 'simpsons', name: 'Simpsons', emoji: '🟡', bg: 'bg-yellow-100', description: 'Yellow cartoon character!' },
+    // { id: 'simpsons', name: 'Simpsons', emoji: '🟡', bg: 'bg-yellow-100', description: 'Yellow cartoon character!' },
     { id: 'minecraft', name: 'Minecraft', emoji: '⛏️', bg: 'bg-brown-100', description: 'Pixelated block world!' }
   ]
 
