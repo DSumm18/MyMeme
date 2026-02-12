@@ -250,11 +250,18 @@ export default function ResultPage() {
     return () => window.removeEventListener('jobqueue-updated', handleJobUpdate)
   }, [])
 
-  // Show duration picker before animating
+  // Show duration picker before animating (only for original photos — styled = 5s always)
   const promptAnimate = (imageUrl?: string) => {
+    const isOriginalPhoto = imageUrl === originalImage
     setPendingAnimateImage(imageUrl || result?.imageUrl || null)
     setSelectedDuration(5)
-    setShowDurationPicker(true)
+    if (isOriginalPhoto) {
+      // Original photo — let user choose 5s or 10s
+      setShowDurationPicker(true)
+    } else {
+      // Styled image — 5s only, skip picker and go straight
+      handleAnimate(5)
+    }
   }
 
   // Animate handler - submits to background job queue
