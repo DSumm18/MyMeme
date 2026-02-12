@@ -16,12 +16,12 @@ export async function POST(req: NextRequest) {
     const videoDuration = duration === 10 ? 10 : 5
 
     // Choose prompt based on style type
-    const cartoonStyles = ['caricature', 'anime', 'pixar', 'simpsons', 'clay-3d', 'lego', 'sticker', 'minecraft', 'comic-book', 'gta']
-    const isCartoon = cartoonStyles.includes(style)
+    // ALL styled images should keep their art style when animated — only 'original' photos get the realistic prompt
+    const isOriginal = style === 'original'
     
-    const animatePrompt = isCartoon
-      ? 'animated cartoon character, keep illustration style, subtle cartoon movement, gentle expression change, smooth 2D animation, do not convert to realistic, maintain art style exactly'
-      : 'subtle natural movement, gentle smile, slight head turn, preserve exact facial features and age, flattering soft warm lighting, cinematic, smooth motion, high quality, beautiful, youthful glow'
+    const animatePrompt = isOriginal
+      ? 'subtle natural movement, gentle smile, slight head turn, preserve exact facial features and age, flattering soft warm lighting, cinematic, smooth motion, high quality, beautiful, youthful glow'
+      : 'maintain exact art style, keep illustration style, subtle movement, gentle expression change, smooth animation, do not convert to realistic photo, preserve the artistic medium exactly as shown'
 
     const apiKey = process.env.RUNWARE_API_KEY
     if (!apiKey) {
