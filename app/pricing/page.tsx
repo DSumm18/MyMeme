@@ -115,6 +115,9 @@ export default function PricingPage() {
             </div>
           ))}
         </div>
+        <p className="text-center text-sm text-gray-400 mt-8">
+          🔒 Payments are securely processed by Stripe. Charges will appear as <strong>SCHOOLGLE LTD</strong> on your bank statement.
+        </p>
       </div>
     </div>
   );
