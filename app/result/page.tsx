@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/lib/auth-context'
+import { useCredits } from '@/lib/credits-context'
 import Image from 'next/image'
 import Link from 'next/link'
 import confetti from 'canvas-confetti'
@@ -21,6 +22,7 @@ export default function ResultPage() {
   const [originalImage, setOriginalImage] = useState<string | null>(null)
   const [downloading, setDownloading] = useState(false)
   const { user } = useAuth()
+  const { credits, deductCredits } = useCredits()
   
   // Meme overlay state
   const [showMemeEditor, setShowMemeEditor] = useState(false)
