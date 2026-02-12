@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { randomUUID } from 'crypto'
 
-export const maxDuration = 300 // 5 minutes max for video generation
+export const maxDuration = 30
 
+// Step 1: Submit the video generation task and return taskUUID immediately
 export async function POST(req: NextRequest) {
   try {
     const { imageUrl } = await req.json()
@@ -18,7 +19,6 @@ export async function POST(req: NextRequest) {
 
     const taskUUID = randomUUID()
 
-    // Submit async video generation task
     const submitRes = await fetch('https://api.runware.ai/v1', {
       method: 'POST',
       headers: {
@@ -53,56 +53,13 @@ export async function POST(req: NextRequest) {
 
     const submitData = await submitRes.json()
     
-    // Check for errors in submit response
     if (submitData?.errors?.length > 0) {
       console.error('Runware video submit errors:', submitData.errors)
       return NextResponse.json({ error: submitData.errors[0]?.message || 'Video generation failed' }, { status: 502 })
     }
 
-    console.log('Video task submitted, polling for result...')
-
-    // Poll for completion (every 5 seconds, max 3 minutes)
-    const maxAttempts = 36
-    
-    for (let attempt = 0; attempt < maxAttempts; attempt++) {
-      await new Promise(resolve => setTimeout(resolve, 5000))
-
-      const pollRes = await fetch('https://api.runware.ai/v1', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify([{
-          taskType: 'getResponse',
-          taskUUID: randomUUID(),
-          responseTaskUUID: taskUUID
-        }]),
-      })
-
-      if (!pollRes.ok) continue
-
-      const pollData = await pollRes.json()
-      
-      // Check for errors
-      if (pollData?.errors?.length > 0) {
-        console.error('Video poll error:', pollData.errors)
-        return NextResponse.json({ error: pollData.errors[0]?.message || 'Video generation failed' }, { status: 502 })
-      }
-
-      // Check for video result in data array
-      const result = pollData?.data?.[0]
-      if (result?.videoURL || result?.videoUrl) {
-        const videoUrl = result.videoURL || result.videoUrl
-        console.log(`Video ready after ${(attempt + 1) * 5}s, cost: ${result.cost}`)
-        return NextResponse.json({
-          videoUrl,
-          cost: result.cost ? `$${result.cost.toFixed(4)}` : undefined
-        })
-      }
-    }
-
-    return NextResponse.json({ error: 'Video generation timed out. Please try again.' }, { status: 408 })
+    // Return taskUUID immediately - client will poll separately
+    return NextResponse.json({ taskUUID })
 
   } catch (error) {
     console.error('Animate API error:', error)

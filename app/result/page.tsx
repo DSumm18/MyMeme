@@ -159,21 +159,46 @@ export default function ResultPage() {
     }
   }, [showMemeEditor, topText, bottomText, result])
 
-  // Animate handler
+  // Animate handler - two-step: submit task, then poll from client
   const handleAnimate = async () => {
     if (!result?.imageUrl) return
     setAnimating(true)
     setAnimateError(null)
     try {
-      const res = await fetch('/api/animate', {
+      // Step 1: Submit the video task
+      const submitRes = await fetch('/api/animate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ imageUrl: result.imageUrl }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Animation failed')
-      setVideoUrl(data.videoUrl)
-      setShowVideoModal(true)
+      const submitData = await submitRes.json()
+      if (!submitRes.ok) throw new Error(submitData.error || 'Animation failed to start')
+
+      const { taskUUID } = submitData
+
+      // Step 2: Poll from client every 5s for up to 4 minutes
+      const maxAttempts = 48
+      for (let i = 0; i < maxAttempts; i++) {
+        await new Promise(resolve => setTimeout(resolve, 5000))
+        
+        const pollRes = await fetch('/api/animate/poll', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ taskUUID }),
+        })
+        const pollData = await pollRes.json()
+
+        if (pollData.status === 'complete') {
+          setVideoUrl(pollData.videoUrl)
+          setShowVideoModal(true)
+          return
+        }
+        if (pollData.status === 'error') {
+          throw new Error(pollData.error || 'Video generation failed')
+        }
+        // else 'processing' - continue polling
+      }
+      throw new Error('Video generation timed out. Please try again.')
     } catch (err) {
       setAnimateError(err instanceof Error ? err.message : 'Animation failed')
     } finally {
@@ -276,7 +301,7 @@ export default function ResultPage() {
             disabled={animating}
             className="bg-[#9B59B6] text-white px-8 py-3 rounded-full font-bold hover:scale-105 transition-all disabled:opacity-50 disabled:scale-100"
           >
-            {animating ? '⏳ Animating (~60s)...' : '🎬 Animate it'}
+            {animating ? '⏳ Animating (~2 min)...' : '🎬 Animate it'}
           </button>
         </div>
 
