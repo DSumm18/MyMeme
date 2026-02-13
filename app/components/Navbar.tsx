@@ -49,6 +49,9 @@ export default function Navbar() {
             <Link href="/animate" className="text-dark-blue hover:text-primary-pink transition-colors">
               Animate 🎬
             </Link>
+            <Link href="/album" className="text-dark-blue hover:text-primary-pink transition-colors">
+              Album 📸
+            </Link>
             <Link href="/#pricing" className="text-dark-blue hover:text-primary-pink transition-colors">
               Pricing 💰
             </Link>
@@ -118,6 +121,13 @@ export default function Navbar() {
                 onClick={() => setIsOpen(false)}
               >
                 Animate 🎬
+              </Link>
+              <Link 
+                href="/album" 
+                className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg"
+                onClick={() => setIsOpen(false)}
+              >
+                Album 📸
               </Link>
               <Link 
                 href="/#pricing" 

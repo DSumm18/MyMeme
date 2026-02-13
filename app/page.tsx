@@ -242,6 +242,62 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Album Feature */}
+      <section className="py-20 bg-gradient-to-r from-pink-100 to-purple-100">
+        <div className="max-w-6xl mx-auto px-4">
+          <AnimatedSection>
+            <h2 className="text-4xl md:text-5xl font-black text-center mb-6" style={{ color: '#1A1A2E' }}>
+              Create Your Animated Album 📸
+            </h2>
+            <p className="text-center text-gray-500 text-xl mb-10">
+              Turn your collection of photos into a dynamic, personalized animated showcase
+            </p>
+          </AnimatedSection>
+          
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <AnimatedSection>
+              <div className="bg-white p-8 rounded-3xl shadow-xl">
+                <h3 className="text-2xl font-bold mb-4 text-[#FF6B9D]">How It Works</h3>
+                <ul className="space-y-4 text-gray-600">
+                  <li className="flex items-center gap-3">
+                    <span className="text-2xl">1️⃣</span> Upload 9 photos from your collection
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="text-2xl">2️⃣</span> Drag and drop to reorder your photos
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="text-2xl">3️⃣</span> Animate individual photos with one click
+                  </li>
+                  <li className="flex items-center gap-3">
+                    <span className="text-2xl">4️⃣</span> Create a shareable, dynamic album
+                  </li>
+                </ul>
+                <div className="mt-8 text-center">
+                  <Link 
+                    href="/album" 
+                    className="bg-[#FF6B9D] text-white px-8 py-4 rounded-full text-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 inline-block"
+                  >
+                    Create Album 🎨
+                  </Link>
+                </div>
+              </div>
+            </AnimatedSection>
+            
+            <AnimatedSection delay={150}>
+              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
+                <Image 
+                  src="/album-preview.png"  // You'll need to create this placeholder image
+                  alt="Album creation preview" 
+                  width={600} 
+                  height={400} 
+                  className="w-full h-auto object-cover" 
+                />
+              </div>
+            </AnimatedSection>
+          </div>
+        </div>
+      </section>
+
       {/* Big CTA */}
       <section className="py-20 bg-[#FF6B9D]">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
