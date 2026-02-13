@@ -11,6 +11,14 @@ export default function Navbar() {
   const { user, loading, signIn, signOut } = useAuth()
   const { credits } = useCredits()
 
+  const navLinks = [
+    { href: "/create", label: "Transform", emoji: "🎨" },
+    { href: "/animate", label: "Animate", emoji: "🎬" },
+    { href: "/album", label: "Albums", emoji: "📸" },
+    { href: "/#pricing", label: "Pricing", emoji: "💰" },
+    { href: "/gallery", label: "Gallery", emoji: "🖼️" },
+  ]
+
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,29 +51,20 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/create" className="text-dark-blue hover:text-primary-pink transition-colors">
-              Create 🖌️
-            </Link>
-            <Link href="/animate" className="text-dark-blue hover:text-primary-pink transition-colors">
-              Animate 🎬
-            </Link>
-            <Link href="/album" className="text-dark-blue hover:text-primary-pink transition-colors">
-              Album 📸
-            </Link>
-            <Link href="/#pricing" className="text-dark-blue hover:text-primary-pink transition-colors">
-              Pricing 💰
-            </Link>
-            <Link href="/#how-it-works" className="text-dark-blue hover:text-primary-pink transition-colors">
-              How It Works 🤔
-            </Link>
+            {navLinks.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href} 
+                className="text-dark-blue hover:text-primary-pink transition-colors flex items-center gap-1"
+              >
+                {link.emoji} {link.label}
+              </Link>
+            ))}
 
             {user ? (
               <div className="flex items-center space-x-3">
                 <Link href="/pricing" className="text-sm bg-gradient-to-r from-pink-200 to-pink-300 text-pink-900 px-3 py-1 rounded-full hover:scale-105 transition-transform">
                   ✨ {credits} credits
-                </Link>
-                <Link href="/gallery" className="text-dark-blue hover:text-primary-pink transition-colors">
-                  My Gallery 🖼️
                 </Link>
                 <div className="flex items-center space-x-2 bg-gray-50 rounded-full pl-3 pr-1 py-1">
                   <span className="text-sm font-medium text-gray-700">
@@ -108,41 +107,16 @@ export default function Navbar() {
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <Link 
-                href="/create" 
-                className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                Create 🖌️
-              </Link>
-              <Link 
-                href="/animate" 
-                className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                Animate 🎬
-              </Link>
-              <Link 
-                href="/album" 
-                className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                Album 📸
-              </Link>
-              <Link 
-                href="/#pricing" 
-                className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                Pricing 💰
-              </Link>
-              <Link 
-                href="/#how-it-works" 
-                className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg"
-                onClick={() => setIsOpen(false)}
-              >
-                How It Works 🤔
-              </Link>
+              {navLinks.map((link) => (
+                <Link 
+                  key={link.href}
+                  href={link.href} 
+                  className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.emoji} {link.label}
+                </Link>
+              ))}
               
               {user ? (
                 <>
@@ -153,9 +127,6 @@ export default function Navbar() {
                     <span className="text-sm bg-gradient-to-r from-pink-200 to-pink-300 text-pink-900 px-2 py-1 rounded-full">
                       ✨ {credits} credits — Get More
                     </span>
-                  </Link>
-                  <Link href="/gallery" className="text-dark-blue hover:bg-bright-yellow block px-3 py-2 rounded-lg" onClick={() => setIsOpen(false)}>
-                    My Gallery 🖼️
                   </Link>
                   <button 
                     onClick={() => { signOut(); setIsOpen(false) }} 

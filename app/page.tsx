@@ -30,375 +30,253 @@ function AnimatedSection({ children, className = '', delay = 0 }: { children: Re
 
 export default function Home() {
   const { user } = useAuth()
-  const [activeStyleIdx, setActiveStyleIdx] = useState(0)
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-  
-  const styles = [
-    { id: 'caricature', name: 'Caricature', emoji: '🎨', color: 'from-pink-400 to-rose-500', description: 'Big head, big personality!' },
-    { id: 'anime', name: 'Anime', emoji: '⚡', color: 'from-purple-400 to-indigo-500', description: 'Japanese anime style!' },
-    { id: 'pixar', name: 'Pixar', emoji: '✨', color: 'from-teal-400 to-cyan-500', description: '3D animated character!' },
-    { id: 'gta', name: 'GTA Style', emoji: '🔫', color: 'from-violet-500 to-purple-700', description: 'Loading screen vibes!' },
-    { id: 'superhero', name: 'Superhero', emoji: '🦸', color: 'from-red-400 to-red-600', description: 'Comic book hero!' },
-    { id: 'clay-3d', name: 'Claymation', emoji: '🧊', color: 'from-orange-400 to-amber-500', description: 'Sculpted clay figure!' },
-    // { id: 'simpsons', name: 'Simpsons', emoji: '🟡', color: 'from-yellow-300 to-yellow-500', description: 'Yellow cartoon character!' },
-    { id: 'watercolor', name: 'Watercolor', emoji: '🖌️', color: 'from-blue-300 to-blue-500', description: 'Soft artistic portrait!' },
-    { id: 'pop-art', name: 'Pop Art', emoji: '💥', color: 'from-yellow-400 to-pink-500', description: 'Bold comic book vibes!' },
-    { id: 'renaissance', name: 'Oil Painting', emoji: '🖼️', color: 'from-amber-600 to-amber-800', description: 'Classic masterpiece!' },
-    { id: 'pencil-sketch', name: 'Pencil Sketch', emoji: '✏️', color: 'from-gray-400 to-gray-600', description: 'Hand-drawn artistry!' },
-    { id: 'comic-book', name: 'Comic Book', emoji: '💬', color: 'from-green-400 to-emerald-500', description: 'Bold ink outlines!' },
-    // { id: 'lego', name: 'Lego', emoji: '🧱', color: 'from-yellow-400 to-red-500', description: 'Blocky toy character!' },
-    { id: 'sticker', name: 'Sticker', emoji: '🏷️', color: 'from-emerald-300 to-teal-400', description: 'Die-cut cool vibes!' },
-    { id: 'retro-80s', name: 'Retro 80s', emoji: '🕹️', color: 'from-fuchsia-500 to-pink-600', description: 'Synthwave nostalgia!' },
-    { id: 'minecraft', name: 'Minecraft', emoji: '⛏️', color: 'from-green-600 to-emerald-800', description: 'Pixelated block world!' },
+
+  const products = [
+    {
+      id: 'transform',
+      title: 'Instant Art Makeover',
+      tagline: '14 Styles. One Click. Pure Magic.',
+      description: 'Transform any photo into stunning artistic styles. From Anime to Renaissance painting, your creativity knows no bounds.',
+      icon: '🎨',
+      useCase: 'Create unique profile pics, social media posts, and personal art.',
+      color: 'bg-gradient-to-r from-pink-400 to-rose-500',
+      cta: '/create'
+    },
+    {
+      id: 'animate',
+      title: 'Memories in Motion',
+      tagline: 'Bring Your Forgotten Moments to Life',
+      description: 'Revive old photos with AI-powered animation. Watch loved ones smile, move, and reconnect with cherished memories.',
+      icon: '🎬',
+      useCase: 'Bring family photos from the 80s and 90s back to life.',
+      color: 'bg-gradient-to-r from-purple-400 to-indigo-500',
+      cta: '/animate'
+    },
+    {
+      id: 'album',
+      title: 'Your Story, Animated',
+      tagline: 'Cinema-Quality Memory Videos',
+      description: 'Create professional, emotionally-rich photo albums with music, transitions, and cinematic flair.',
+      icon: '📸',
+      useCase: 'Transform your photo collection into a stunning narrative.',
+      color: 'bg-gradient-to-r from-teal-400 to-cyan-500',
+      cta: '/album'
+    }
   ]
 
-  // Auto-rotate carousel
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveStyleIdx(prev => (prev + 1) % styles.length)
-    }, 2500)
-    return () => clearInterval(timer)
-  }, [styles.length])
+  const pricing = [
+    { 
+      name: 'Free Trial', 
+      price: '£0', 
+      period: '', 
+      features: ['3 Generations', 'Watermarked', 'Basic Styles'], 
+      color: 'from-green-400 to-emerald-500',
+      popular: false 
+    },
+    { 
+      name: 'Per Image', 
+      price: '£0.49', 
+      period: '/image', 
+      features: ['Single HD Image', 'All Styles', 'No Watermark', 'Social Sizing'], 
+      color: 'from-yellow-400 to-amber-500',
+      popular: false 
+    },
+    { 
+      name: 'Creator Pack', 
+      price: '£1.49', 
+      period: '/50 credits', 
+      features: ['Unlimited Generations', 'All Styles', 'Meme Maker', 'Priority Speed'], 
+      color: 'from-pink-400 to-rose-500',
+      popular: true 
+    },
+    { 
+      name: 'Pro Unlimited', 
+      price: '£19.99', 
+      period: '/year', 
+      features: ['Unlimited Everything', 'Exclusive Styles', 'Early Access', 'Priority Support'], 
+      color: 'from-purple-400 to-indigo-500',
+      popular: false 
+    },
+  ]
 
-  const faqs = [
-    { q: 'How does MyMeme work?', a: 'Upload a selfie, tell us your job, and our AI creates a fun cartoon caricature of you at work — complete with workplace details, accessories, and your personality!' },
-    { q: 'Do I need to write a prompt?', a: 'Nope! Just fill in simple fields — your job, accessories you want, and location. We handle the AI magic behind the scenes.' },
-    { q: 'Can I use my caricature on social media?', a: 'Absolutely! We auto-resize for Instagram, Facebook, WhatsApp, TikTok and more. One click and you\'re ready to share.' },
-    { q: 'Is my photo safe?', a: 'Yes. We don\'t store your photos after generation. Your selfie is processed and immediately deleted. Privacy first.' },
-    { q: 'What about the meme maker?', a: 'After generating your caricature, tap "Make it a Meme" to put your cartoon face into famous meme templates. Add your own text and share!' },
-    { q: 'How much does it cost?', a: 'Try 3 free generations (watermarked). Then just £0.49 per image, or £1.49/week for unlimited. Our costs are ~£0.002 per image so we pass the savings to you!' },
+  const howItWorks = [
+    {
+      product: 'Style Transform',
+      steps: [
+        { icon: '📸', title: 'Upload Photo', description: 'Any photo works — selfie, portrait, group shot.' },
+        { icon: '🎨', title: 'Pick Style', description: 'Choose from 14 incredible art styles.' },
+        { icon: '⚡', title: 'Get Your Art', description: 'AI transforms your photo in seconds.' }
+      ]
+    },
+    {
+      product: 'Photo Animation',
+      steps: [
+        { icon: '🖼️', title: 'Select Photo', description: 'Choose a memorable old photo.' },
+        { icon: '🎬', title: 'Set Animation', description: 'Choose subtle motion effects.' },
+        { icon: '📱', title: 'Bring to Life', description: 'Watch your photo come alive.' }
+      ]
+    },
+    {
+      product: 'Animated Album',
+      steps: [
+        { icon: '📂', title: 'Upload Collection', description: 'Select 9-12 meaningful photos.' },
+        { icon: '🎵', title: 'Add Music', description: 'Choose a soundtrack that fits your story.' },
+        { icon: '🎥', title: 'Create Album', description: 'Generate a cinema-quality video.' }
+      ]
+    }
   ]
 
   return (
     <div className="bg-white overflow-hidden">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-[#FFF5E1] via-[#FFE8F0] to-[#E8F5E9] py-16 md:py-24">
-        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <div className="inline-block bg-[#FF6B9D] text-white text-sm font-bold px-4 py-1 rounded-full mb-6">
-              🔥 #1 Viral Trend 2026
-            </div>
-            <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6" style={{ color: '#1A1A2E' }}>
-              Turn Your <span className="text-[#FF6B9D]">Selfie</span> Into Art
+        <div className="max-w-6xl mx-auto px-4">
+          <AnimatedSection>
+            <h1 className="text-5xl md:text-7xl font-black text-center leading-tight mb-6" style={{ color: '#1A1A2E' }}>
+              Transform, Animate & Relive <br />
+              <span className="text-[#FF6B9D]">Your Memories</span>
             </h1>
-            <p className="text-xl mb-8 text-gray-600 leading-relaxed">
-              Upload any photo and our AI transforms you into 14 incredible styles — Anime, Pixar, GTA, Superhero and more.
-              <span className="font-bold"> In seconds.</span>
+            <p className="text-xl text-center mb-10 text-gray-600 max-w-3xl mx-auto">
+              Turn any photo into art, breathe life into forgotten moments, and create cinematic story albums — all with AI magic.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/create" className="bg-[#FF6B9D] text-white px-8 py-4 rounded-full text-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 inline-block">
-                Create My Meme 🎨
-              </Link>
-              <Link href="/animate" className="bg-[#7C3AED] text-white px-8 py-4 rounded-full text-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 inline-block">
-                Animate My Photo 🎬
-              </Link>
-            </div>
-            <div className="mt-8 flex items-center gap-6 text-sm text-gray-500">
-              <span>✅ 3 Free Generations</span>
-              <span>✅ Sign Up Free</span>
-              <span>✅ Instant Results</span>
-            </div>
-          </div>
-          {/* Style Carousel */}
-          <div className="relative">
-            <div className="relative rounded-3xl shadow-2xl overflow-hidden min-h-[400px] bg-white">
-              <div className="grid grid-cols-2 h-full min-h-[400px]">
-                <div className="relative">
-                  <Image src="/styles/before.png" alt="Original photo" fill className="object-cover" />
-                  <div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-sm font-bold">Before</div>
-                </div>
-                <div className="relative">
-                  <Image 
-                    key={styles[activeStyleIdx].id}
-                    src={`/styles/${styles[activeStyleIdx].id}.png`} 
-                    alt={`${styles[activeStyleIdx].name} style`} 
-                    fill 
-                    className="object-cover transition-opacity duration-500" 
-                  />
-                  <div className="absolute bottom-4 right-4 bg-[#FF6B9D] text-white px-3 py-1 rounded-full text-sm font-bold">{styles[activeStyleIdx].name}</div>
-                </div>
-              </div>
-            </div>
-            {/* Carousel dots */}
-            <div className="flex justify-center gap-2 mt-4">
-              {styles.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => setActiveStyleIdx(i)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${i === activeStyleIdx ? 'bg-[#FF6B9D] scale-125' : 'bg-gray-300 hover:bg-gray-400'}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Bar */}
-      <section className="bg-[#1A1A2E] py-4">
-        <div className="max-w-6xl mx-auto px-4 flex flex-wrap justify-center gap-8 text-white text-center">
-          <span className="font-bold">🎨 14 Art Styles</span>
-          <span className="font-bold">⚡ 10 Second Generation</span>
-          <span className="font-bold">📱 Auto-Sized for Social Media</span>
-          <span className="font-bold">😂 Meme Maker Built In</span>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 max-w-6xl mx-auto px-4">
-        <AnimatedSection>
-          <h2 className="text-4xl md:text-5xl font-black text-center mb-4" style={{ color: '#1A1A2E' }}>
-            How It Works
-          </h2>
-          <p className="text-center text-gray-500 text-lg mb-16 max-w-2xl mx-auto">Three steps. No prompts. No AI knowledge needed.</p>
-        </AnimatedSection>
-        <div className="grid md:grid-cols-3 gap-8">
-          {[
-            { num: '1', icon: '📸', title: 'Upload Your Photo', desc: 'Take a selfie or upload any photo with a clear face. That\'s all we need.', color: '#FF6B9D' },
-            { num: '2', icon: '🎨', title: 'Pick Your Style', desc: 'Choose from 14 incredible styles — Anime, Pixar, GTA, Superhero, and more.', color: '#FFD93D' },
-            { num: '3', icon: '⚡', title: 'Get Your Art!', desc: 'AI transforms your photo in seconds. Download, share, go viral!', color: '#6BCB77' },
-          ].map((step, i) => (
-            <AnimatedSection key={step.num} delay={i * 150}>
-              <div className="text-center p-8 rounded-3xl border-2 border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 group">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center text-3xl mx-auto mb-6 group-hover:scale-110 transition-transform" style={{ backgroundColor: step.color + '20' }}>
-                  {step.icon}
-                </div>
-                <div className="text-6xl font-black mb-4" style={{ color: step.color + '40' }}>{step.num}</div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: '#1A1A2E' }}>{step.title}</h3>
-                <p className="text-gray-500">{step.desc}</p>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
-      </section>
-
-      {/* Style Gallery */}
-      <section className="py-20 bg-gradient-to-b from-[#FFF5E1] to-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <AnimatedSection>
-            <h2 className="text-4xl md:text-5xl font-black text-center mb-4" style={{ color: '#1A1A2E' }}>
-              Pick Your Style 🎨
-            </h2>
-            <p className="text-center text-gray-500 text-lg mb-16">Every style is AI-generated. Every one looks incredible.</p>
           </AnimatedSection>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {styles.map((style, i) => (
-              <AnimatedSection key={style.id} delay={i * 100}>
-                <Link href={`/create?style=${style.id}`}
-                  className={`cursor-pointer rounded-3xl overflow-hidden transition-all duration-300 group block hover:scale-105 hover:shadow-lg`}
-                >
-                  <div className="relative aspect-square overflow-hidden">
-                    <Image 
-                      src={`/styles/${style.id}.png`}
-                      alt={`${style.name} style example`}
-                      fill 
-                      className="object-cover group-hover:scale-110 transition-transform duration-500" 
-                    />
+
+          {/* Product Preview Grid */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {products.map((product, idx) => (
+              <AnimatedSection key={product.id} delay={idx * 150}>
+                <div className={`p-6 rounded-3xl text-white ${product.color} hover:scale-105 transition-transform duration-300`}>
+                  <div className="text-4xl mb-4">{product.icon}</div>
+                  <h2 className="text-2xl font-bold mb-2">{product.title}</h2>
+                  <p className="text-sm opacity-80 mb-4">{product.tagline}</p>
+                  <p className="mb-6 text-white/90">{product.description}</p>
+                  <div className="flex items-center justify-between">
+                    <Link 
+                      href={product.cta} 
+                      className="bg-white text-[#1A1A2E] px-6 py-3 rounded-full font-bold hover:scale-105 transition-transform"
+                    >
+                      {product.id === 'album' ? 'Create Album' : `Try ${product.title}`}
+                    </Link>
+                    <span className="text-sm bg-white/20 px-3 py-1 rounded-full">
+                      {product.useCase}
+                    </span>
                   </div>
-                  <div className="p-4 bg-white">
-                    <h3 className="font-bold text-lg" style={{ color: '#1A1A2E' }}>{style.name}</h3>
-                    <p className="text-sm text-gray-500">{style.description}</p>
-                  </div>
-                </Link>
+                </div>
               </AnimatedSection>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Animation Feature */}
-      <section className="py-20 bg-[#1A1A2E] text-white">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <AnimatedSection>
-            <div className="inline-block bg-[#FF6B9D] text-white text-sm font-bold px-4 py-1 rounded-full mb-6">
-              ✨ NEW FEATURE
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black mb-6">
-              Bring Your Photos to Life 🎬
-            </h2>
-            <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-              Turn any photo into a stunning 5-second animation. Watch faces smile, heads turn, and images come alive with AI magic.
-            </p>
-          </AnimatedSection>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              { icon: '👨‍👩‍👧‍👦', title: 'Family Photos', desc: 'Bring old family photos to life — watch loved ones smile and look at each other' },
-              { icon: '🖼️', title: 'Art & Portraits', desc: 'Animate paintings, caricatures, and artistic portraits for stunning effects' },
-              { icon: '📱', title: 'Profile Pics', desc: 'Create animated profile pictures and live wallpapers that stand out' },
-            ].map((item, i) => (
-              <AnimatedSection key={i} delay={i * 150}>
-                <div className="p-6 rounded-2xl bg-white/5 border border-white/10 hover:border-[#FF6B9D]/50 transition-all">
-                  <div className="text-5xl mb-4">{item.icon}</div>
-                  <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                  <p className="text-gray-400">{item.desc}</p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-          <AnimatedSection delay={300}>
-            <Link href="/create" className="inline-block mt-12 bg-[#FF6B9D] text-white px-10 py-5 rounded-full text-xl font-black hover:scale-105 hover:shadow-xl transition-all duration-300">
-              Try Animation Free 🎬
-            </Link>
-          </AnimatedSection>
-        </div>
-      </section>
-
-      {/* Album Feature */}
-      <section className="py-20 bg-gradient-to-r from-pink-100 to-purple-100">
+      {/* How It Works Section */}
+      <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <AnimatedSection>
-            <h2 className="text-4xl md:text-5xl font-black text-center mb-6" style={{ color: '#1A1A2E' }}>
-              Create Your Animated Album 📸
+            <h2 className="text-4xl md:text-5xl font-black text-center mb-16" style={{ color: '#1A1A2E' }}>
+              How Each Product Works
             </h2>
-            <p className="text-center text-gray-500 text-xl mb-10">
-              Turn your collection of photos into a dynamic, personalized animated showcase
-            </p>
           </AnimatedSection>
           
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-            <AnimatedSection>
-              <div className="bg-white p-8 rounded-3xl shadow-xl">
-                <h3 className="text-2xl font-bold mb-4 text-[#FF6B9D]">How It Works</h3>
-                <ul className="space-y-4 text-gray-600">
-                  <li className="flex items-center gap-3">
-                    <span className="text-2xl">1️⃣</span> Upload 9 photos from your collection
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-2xl">2️⃣</span> Drag and drop to reorder your photos
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-2xl">3️⃣</span> Animate individual photos with one click
-                  </li>
-                  <li className="flex items-center gap-3">
-                    <span className="text-2xl">4️⃣</span> Create a shareable, dynamic album
-                  </li>
-                </ul>
-                <div className="mt-8 text-center">
-                  <Link 
-                    href="/album" 
-                    className="bg-[#FF6B9D] text-white px-8 py-4 rounded-full text-xl font-bold hover:scale-105 hover:shadow-xl transition-all duration-300 inline-block"
-                  >
-                    Create Album 🎨
-                  </Link>
+          <div className="grid md:grid-cols-3 gap-8">
+            {howItWorks.map((product, idx) => (
+              <AnimatedSection key={product.product} delay={idx * 150}>
+                <div className="bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl transition-shadow">
+                  <h3 className="text-2xl font-bold mb-6 text-[#FF6B9D]">{product.product}</h3>
+                  {product.steps.map((step, stepIdx) => (
+                    <div key={step.title} className="flex items-center mb-4 last:mb-0">
+                      <div className="text-3xl mr-4 opacity-70">{step.icon}</div>
+                      <div>
+                        <h4 className="font-bold">{step.title}</h4>
+                        <p className="text-sm text-gray-600">{step.description}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </AnimatedSection>
-            
-            <AnimatedSection delay={150}>
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <Image 
-                  src="/album-preview.png"  // You'll need to create this placeholder image
-                  alt="Album creation preview" 
-                  width={600} 
-                  height={400} 
-                  className="w-full h-auto object-cover" 
-                />
-              </div>
-            </AnimatedSection>
+              </AnimatedSection>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Big CTA */}
-      <section className="py-20 bg-[#FF6B9D]">
-        <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">Ready to See Yourself as a Cartoon?</h2>
-          <p className="text-xl mb-10 opacity-90">Join thousands of nurses, teachers, and office workers who&apos;ve gone viral with their AI caricatures.</p>
-          <Link href="/create" className="bg-white text-[#FF6B9D] px-10 py-5 rounded-full text-2xl font-black hover:scale-105 hover:shadow-2xl transition-all duration-300 inline-block">
-            Try It Free — No Sign Up 🚀
-          </Link>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-20">
+      {/* Pricing Section */}
+      <section id="pricing" className="py-20 bg-gradient-to-b from-[#FFF5E1] to-white">
         <div className="max-w-6xl mx-auto px-4">
           <AnimatedSection>
             <h2 className="text-4xl md:text-5xl font-black text-center mb-4" style={{ color: '#1A1A2E' }}>
-              Simple Pricing 💰
+              Simple, Flexible Pricing
             </h2>
-            <p className="text-center text-gray-500 text-lg mb-16">Start free. Upgrade when you&apos;re addicted.</p>
+            <p className="text-center text-gray-500 text-lg mb-16">Start free. Create magic. No commitment.</p>
           </AnimatedSection>
+
           <div className="grid md:grid-cols-4 gap-6">
-            {[
-              { name: 'Free Trial', price: '£0', period: '', features: ['3 Generations', 'Watermarked', 'Basic Styles'], color: '#6BCB77', popular: false },
-              { name: 'Per Image', price: '£0.49', period: '/image', features: ['Single HD Image', 'All Styles', 'No Watermark', 'Social Sizing'], color: '#FFD93D', popular: false },
-              { name: 'Weekly', price: '£1.49', period: '/week', features: ['Unlimited Generations', 'All Styles', 'Meme Maker', 'Priority Speed', 'Social Sizing'], color: '#FF6B9D', popular: true },
-              { name: 'Annual', price: '£19.99', period: '/year', features: ['Unlimited Everything', 'Exclusive Styles', 'Early Access', 'Priority Support'], color: '#FF8C42', popular: false },
-            ].map((plan, i) => (
+            {pricing.map((plan, i) => (
               <AnimatedSection key={plan.name} delay={i * 100}>
-                <div className={`relative p-8 rounded-3xl transition-all duration-300 hover:shadow-xl ${
-                  plan.popular 
-                    ? 'bg-[#FF6B9D] text-white shadow-2xl scale-105 border-0' 
-                    : 'bg-white border-2 border-gray-100 hover:border-gray-200'
+                <div className={`relative p-8 rounded-3xl transition-all duration-300 hover:shadow-xl bg-gradient-to-br ${plan.color} ${
+                  plan.popular ? 'scale-105 shadow-2xl' : ''
                 }`}>
                   {plan.popular && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#FFD93D] text-[#1A1A2E] text-sm font-black px-4 py-1 rounded-full">
                       ⭐ MOST POPULAR
                     </div>
                   )}
-                  <h3 className={`text-xl font-bold mb-2 ${plan.popular ? '' : ''}`} style={plan.popular ? {} : { color: '#1A1A2E' }}>{plan.name}</h3>
+                  <h3 className="text-xl font-bold mb-2 text-white">{plan.name}</h3>
                   <div className="mb-6">
-                    <span className="text-4xl font-black">{plan.price}</span>
-                    <span className={`text-sm ${plan.popular ? 'opacity-80' : 'text-gray-400'}`}>{plan.period}</span>
+                    <span className="text-4xl font-black text-white">{plan.price}</span>
+                    <span className="text-sm text-white/80">{plan.period}</span>
                   </div>
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-8 text-white/90">
                     {plan.features.map((f) => (
-                      <li key={f} className="flex items-center gap-2 text-sm">
-                        <span>{plan.popular ? '✅' : '✓'}</span> {f}
+                      <li key={f} className="flex items-center gap-2">
+                        ✅ {f}
                       </li>
                     ))}
                   </ul>
-                  <Link href="/create" className={`block text-center py-3 rounded-full font-bold transition-all duration-300 hover:scale-105 ${
-                    plan.popular 
-                      ? 'bg-white text-[#FF6B9D]' 
-                      : 'text-white'
-                  }`} style={plan.popular ? {} : { backgroundColor: plan.color }}>
-                    {plan.price === '£0' ? 'Start Free' : 'Get Started'}
+                  <Link 
+                    href="/pricing" 
+                    className={`block text-center py-3 rounded-full font-bold transition-all duration-300 hover:scale-105 ${
+                      plan.popular 
+                        ? 'bg-white text-[#FF6B9D]' 
+                        : 'text-white bg-white/20'
+                    }`}
+                  >
+                    {plan.price === '£0' ? 'Start Free' : 'Choose Plan'}
                   </Link>
                 </div>
               </AnimatedSection>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* FAQ */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4">
-          <AnimatedSection>
-            <h2 className="text-4xl md:text-5xl font-black text-center mb-16" style={{ color: '#1A1A2E' }}>
-              Questions? 🤔
-            </h2>
+          {/* Album Pricing */}
+          <AnimatedSection delay={400} className="mt-12">
+            <div className="bg-[#1A1A2E] text-white p-8 rounded-3xl text-center">
+              <h3 className="text-3xl font-black mb-4">Animated Photo Album</h3>
+              <p className="text-xl mb-6 text-white/80">Professional memory videos that tell your story</p>
+              <div>
+                <span className="text-4xl font-black">£29.99</span>
+                <span className="text-sm text-white/80"> per album</span>
+              </div>
+              <p className="mt-4 text-white/70">Cinema-quality video. Personalized music. Unforgettable memories.</p>
+              <Link 
+                href="/album" 
+                className="mt-6 inline-block bg-[#FF6B9D] text-white px-10 py-4 rounded-full text-xl font-black hover:scale-105 hover:shadow-xl transition-all duration-300"
+              >
+                Create Premium Album
+              </Link>
+            </div>
           </AnimatedSection>
-          <div className="space-y-3">
-            {faqs.map((faq, i) => (
-              <AnimatedSection key={i} delay={i * 50}>
-                <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                  <button 
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full text-left p-6 font-bold text-lg flex justify-between items-center"
-                    style={{ color: '#1A1A2E' }}
-                  >
-                    {faq.q}
-                    <span className={`text-2xl transition-transform duration-300 ${openFaq === i ? 'rotate-45' : ''}`}>+</span>
-                  </button>
-                  <div className={`overflow-hidden transition-all duration-300 ${openFaq === i ? 'max-h-40 pb-6 px-6' : 'max-h-0'}`}>
-                    <p className="text-gray-500">{faq.a}</p>
-                  </div>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* Final CTA */}
       <section className="py-20 bg-gradient-to-r from-[#FF6B9D] via-[#FF8C42] to-[#FFD93D]">
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">Your Meme is Waiting 🎨</h2>
-          <p className="text-xl mb-10 opacity-90">3 free generations. No account needed. Takes 10 seconds.</p>
-          <Link href="/create" className="bg-white text-[#FF6B9D] px-10 py-5 rounded-full text-2xl font-black hover:scale-105 hover:shadow-2xl transition-all duration-300 inline-block">
-            Create My Meme — Free ✨
+          <h2 className="text-4xl md:text-5xl font-black mb-6">Your Memories Are Waiting</h2>
+          <p className="text-xl mb-10 opacity-90">Transform, animate, and relive. 3 free generations to start.</p>
+          <Link 
+            href="/create" 
+            className="bg-white text-[#FF6B9D] px-10 py-5 rounded-full text-2xl font-black hover:scale-105 hover:shadow-2xl transition-all duration-300 inline-block"
+          >
+            Start Creating Free ✨
           </Link>
         </div>
       </section>
