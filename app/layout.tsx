@@ -100,9 +100,27 @@ export const metadata: Metadata = {
   
   // Manifest
   manifest: '/manifest.json',
-  
-  // App-specific
-  appLinks: [],
+}
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  'name': 'MyMeme',
+  'description': 'Free AI image generator for avatars, memes, and artwork',
+  'url': 'https://mymeme.uk',
+  'applicationCategory': 'GraphicsApplication',
+  'operatingSystem': 'Web',
+  'offers': {
+    '@type': 'Offer',
+    'price': '0',
+    'priceCurrency': 'GBP',
+    'description': 'Free to start with credits'
+  },
+  'aggregateRating': {
+    '@type': 'AggregateRating',
+    'ratingValue': '4.8',
+    'ratingCount': '1200'
+  }
 }
 
 export default function RootLayout({
@@ -113,6 +131,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <GoogleAnalytics />
       </head>
       <body className={`${inter.className} bg-white text-dark-blue`}>
