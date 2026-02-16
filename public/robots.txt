@@ -1,0 +1,28 @@
+# MyMeme - Allow all crawlers
+User-agent: *
+Allow: /
+Allow: /api/
+Disallow: /api/webhooks/
+
+# Specific crawlers get priority
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: CCBot
+Allow: /api/
+
+# Block bad bots
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+# Sitemap location
+Sitemap: https://mymeme.uk/sitemap.xml
+Sitemap: https://mymeme.uk/sitemap-images.xml

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Gallery page with sample images -->
+  <url>
+    <loc>https://mymeme.uk/gallery</loc>
+    <image:image>
+      <image:loc>https://mymeme.uk/og-image.png</image:loc>
+      <image:title>MyMeme AI Image Gallery</image:title>
+      <image:caption>AI-generated images in various styles</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mymeme.uk/gallery-cartoon.png</image:loc>
+      <image:title>Cartoon Style AI Images</image:title>
+      <image:caption>Turn your photos into cartoon art</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mymeme.uk/gallery-anime.png</image:loc>
+      <image:title>Anime Style AI Images</image:title>
+      <image:caption>Generate anime-style avatars and characters</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mymeme.uk/gallery-oil.png</image:loc>
+      <image:title>Oil Painting Style AI Images</image:title>
+      <image:caption>Create oil painting style artwork from photos</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://mymeme.uk/gallery-watercolor.png</image:loc>
+      <image:title>Watercolor Style AI Images</image:title>
+      <image:caption>Convert photos to watercolor paintings</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Homepage with featured images -->
+  <url>
+    <loc>https://mymeme.uk</loc>
+    <image:image>
+      <image:loc>https://mymeme.uk/hero-image.png</image:loc>
+      <image:title>AI Image Generator - MyMeme</image:title>
+      <image:caption>Create stunning AI art from your photos</image:caption>
+    </image:image>
+  </url>
+
+</urlset>
