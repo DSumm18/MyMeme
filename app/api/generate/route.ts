@@ -94,27 +94,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Image upload failed - no UUID received' }, { status: 502 })
     }
 
-    // Generate with GPT Image model
+    // Generate with FLUX.1 Dev + puLID for face-preserving style transfer
+    // puLID maintains facial identity while applying artistic styles
+    // Cost: ~$0.0032/image
     const generateTask = {
       taskType: "imageInference",
       taskUUID: randomUUID(),
-      model: "openai:4@1",
-      positivePrompt: `${styleDesc}${sceneText}${clothingHint}`.substring(0, 500),
-      negativePrompt: "text, words, letters, numbers, watermark, signature, writing, caption, subtitle, logo text, misspelled text, garbled text, low quality, blurry, deformed, ugly",
+      model: "runware:101@1",
+      positivePrompt: `${styleDesc}${sceneText}${clothingHint}`.substring(0, 1000),
+      negativePrompt: "blurry, low quality, distorted face, extra fingers, bad anatomy, watermark, text, logo",
       height: 1024,
       width: 1024,
-      steps: 25,
+      steps: 20,
       numberResults: 1,
       outputType: "URL",
       outputFormat: "JPG",
       includeCost: true,
       puLID: {
         inputImages: [imageUUID],
-        weight: 0.8
-      }
+        idWeight: 1,
+      },
     }
 
-    console.log('Generate task:', JSON.stringify({ ...generateTask, puLID: { inputImages: ['[REDACTED]'], weight: 0.8 } }))
+    console.log('Generate task:', JSON.stringify({ ...generateTask, inputImages: ['[REDACTED]'] }))
 
     let data = null
     let lastError = ''
