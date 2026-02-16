@@ -64,7 +64,7 @@ function compressImage(file: File, maxWidth: number, quality: number): Promise<s
 
 export default function CreatePageWrapper() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-white/50">Loading...</div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-gray-400">Loading...</div>}>
       <CreatePage />
     </Suspense>
   )
@@ -111,10 +111,10 @@ function CreatePage() {
   if (isOutOfCredits) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 pt-20">
-        <div className="glass-card p-8 max-w-md text-center">
+        <div className="bg-white border-2 border-gray-100 rounded-2xl p-8 max-w-md text-center">
           <div className="text-6xl mb-4">😢</div>
-          <h2 className="text-2xl font-bold text-white mb-4">Out of Credits!</h2>
-          <p className="text-white/50 mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Out of Credits!</h2>
+          <p className="text-gray-500 mb-6">
             {user
               ? 'Get more credits to keep creating amazing transformations!'
               : 'Sign in to get 3 more free credits, or purchase a pack!'}
@@ -209,24 +209,24 @@ function CreatePage() {
       <div className="min-h-screen pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-black text-white mb-2">Transform Your Photo</h1>
-            <p className="text-white/40">Choose a style and watch the magic happen</p>
+            <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-2">Transform Your Photo</h1>
+            <p className="text-gray-400">Choose a style and watch the magic happen</p>
           </motion.div>
 
           {/* Step 1: Upload */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-10">
-            <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-black">1</span>
+            <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-black text-white">1</span>
               Upload Your Photo
             </h2>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className={`upload-zone rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition-all duration-300 ${
-                selectedImage ? 'border-purple-500/50 bg-purple-500/5' : 'border-white/20 hover:border-purple-400/50 hover:bg-white/[0.02]'
+              className={`rounded-2xl border-2 border-dashed p-8 text-center cursor-pointer transition-all duration-300 ${
+                selectedImage ? 'border-[#FF90E8] bg-[#FF90E8]/5' : 'border-gray-300 hover:border-[#FF90E8] hover:bg-[#FFF0FB]'
               }`}
             >
               {selectedImage ? (
-                <div className="relative w-48 h-48 mx-auto rounded-xl overflow-hidden ring-2 ring-purple-500/30">
+                <div className="relative w-48 h-48 mx-auto rounded-xl overflow-hidden ring-2 ring-[#FF90E8]/30">
                   <Image src={selectedImage} alt="Your photo" fill className="object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
                     <span className="text-white text-sm font-medium">Change Photo</span>
@@ -234,13 +234,13 @@ function CreatePage() {
                 </div>
               ) : (
                 <>
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 flex items-center justify-center">
-                    <svg className="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FF90E8]/20 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-[#FF90E8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <p className="text-white/70 font-medium mb-1">Click to upload or drag & drop</p>
-                  <p className="text-white/30 text-sm">JPG, PNG — max 10MB</p>
+                  <p className="text-gray-900 font-semibold mb-1">Drop your photo here</p>
+                  <p className="text-gray-400 text-sm">or click to browse · JPG, PNG up to 10MB</p>
                 </>
               )}
               <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
@@ -249,8 +249,8 @@ function CreatePage() {
 
           {/* Step 2: Style */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-10">
-            <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-black">2</span>
+            <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-black text-white">2</span>
               Pick Your Style
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -260,8 +260,8 @@ function CreatePage() {
                   onClick={() => setSelectedStyle(style.id)}
                   className={`relative rounded-xl overflow-hidden cursor-pointer transition-all duration-300 ${
                     selectedStyle === style.id
-                      ? 'ring-2 ring-purple-500 scale-[1.02] shadow-lg shadow-purple-500/20'
-                      : 'ring-1 ring-white/10 hover:ring-white/20 hover:scale-[1.01]'
+                      ? 'ring-2 ring-[#FF90E8] scale-[1.02] shadow-lg shadow-[#FF90E8]/20'
+                      : 'ring-1 ring-gray-200 hover:ring-gray-300 hover:scale-[1.01]'
                   }`}
                 >
                   {style.hot && (
@@ -269,11 +269,11 @@ function CreatePage() {
                       🔥 NEW
                     </div>
                   )}
-                  <div className="aspect-square relative overflow-hidden bg-surface">
+                  <div className="aspect-square relative overflow-hidden bg-gray-100">
                     <Image src={style.image} alt={style.name} fill className="object-cover" />
                     {selectedStyle === style.id && (
-                      <div className="absolute inset-0 bg-purple-500/20 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
+                      <div className="absolute inset-0 bg-[#FF90E8]/20 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-[#FF90E8] flex items-center justify-center">
                           <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
@@ -281,9 +281,9 @@ function CreatePage() {
                       </div>
                     )}
                   </div>
-                  <div className="p-2.5 bg-surface">
-                    <h3 className="font-bold text-sm text-white">{style.name}</h3>
-                    <p className="text-xs text-white/40">{style.description}</p>
+                  <div className="p-2.5 bg-white">
+                    <h3 className="font-bold text-sm text-gray-900">{style.name}</h3>
+                    <p className="text-xs text-gray-400">{style.description}</p>
                   </div>
                 </div>
               ))}
@@ -292,12 +292,12 @@ function CreatePage() {
 
           {/* Step 3: Optional Details */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mb-10">
-            <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-black">3</span>
+            <h2 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <span className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-xs font-black text-white">3</span>
               Optional Details
-              <span className="text-sm font-normal text-white/30">(improves accuracy)</span>
+              <span className="text-sm font-normal text-gray-400">(improves accuracy)</span>
             </h2>
-            <div className="glass-card p-5 space-y-4">
+            <div className="bg-gray-50 border-2 border-gray-100 rounded-2xl p-5 space-y-4">
               <div className="flex gap-2">
                 {['Male', 'Female', 'Other'].map((g) => (
                   <button
@@ -305,8 +305,8 @@ function CreatePage() {
                     onClick={() => setGender(g.toLowerCase())}
                     className={`px-5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                       gender === g.toLowerCase()
-                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                        : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10'
+                        ? 'bg-[#FF90E8]/20 text-[#FF90E8] border border-[#FF90E8]/30'
+                        : 'bg-white text-gray-500 border border-gray-200 hover:bg-gray-50'
                     }`}
                   >
                     {g}
@@ -318,7 +318,7 @@ function CreatePage() {
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
                 placeholder="Job title (e.g. Nurse, Chef, Engineer)"
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:outline-none focus:border-purple-500/50 transition-colors text-sm"
+                className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#FF90E8]/50 transition-colors text-sm"
               />
               <div className="grid grid-cols-2 gap-3">
                 <input
@@ -326,14 +326,14 @@ function CreatePage() {
                   value={accessories}
                   onChange={(e) => setAccessories(e.target.value)}
                   placeholder="Accessories (e.g. stethoscope)"
-                  className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:outline-none focus:border-purple-500/50 text-sm"
+                  className="px-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#FF90E8]/50 text-sm"
                 />
                 <input
                   type="text"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   placeholder="Scene (e.g. hospital, office)"
-                  className="px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/25 focus:outline-none focus:border-purple-500/50 text-sm"
+                  className="px-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#FF90E8]/50 text-sm"
                 />
               </div>
             </div>
@@ -342,7 +342,7 @@ function CreatePage() {
           {/* Error */}
           <AnimatePresence>
             {error && (
-              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-center text-sm">
+              <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-center text-sm">
                 {error}
               </motion.div>
             )}
@@ -355,15 +355,15 @@ function CreatePage() {
               disabled={loading || !selectedImage}
               className={`px-12 py-4 text-lg rounded-full font-bold transition-all duration-300 ${
                 loading
-                  ? 'bg-white/10 text-white/30 cursor-wait'
+                  ? 'bg-gray-200 text-gray-400 cursor-wait'
                   : selectedImage
-                  ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 hover:scale-105 shadow-lg shadow-purple-500/25'
-                  : 'bg-white/5 text-white/20 cursor-not-allowed border border-white/10'
+                  ? 'bg-gray-900 text-white hover:bg-gray-800 hover:scale-105 shadow-lg'
+                  : 'bg-gray-100 text-gray-300 cursor-not-allowed border border-gray-200'
               }`}
             >
               {loading ? 'Creating...' : 'Transform Photo ✨'}
             </button>
-            {!loading && <p className="text-sm text-white/30 mt-3">Uses 1 credit · ~10 seconds</p>}
+            {!loading && <p className="text-sm text-gray-400 mt-3">Uses 1 credit · ~10 seconds</p>}
           </div>
         </div>
       </div>
