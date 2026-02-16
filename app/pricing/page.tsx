@@ -1,89 +1,37 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useCredits } from '@/lib/credits-context';
+import { motion } from 'framer-motion';
 
 export default function PricingPage() {
-  const router = useRouter();
   const { user, signIn } = useAuth();
   const { credits } = useCredits();
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
 
   const plans = [
     {
-      name: 'Free',
-      credits: 3,
-      price: 0,
-      priceId: 'free',
-      isFree: true,
-      color: 'from-gray-100 to-gray-50',
-      accent: 'text-gray-600',
-      badge: null,
-      features: [
-        '3 style transforms',
-        'All 14 art styles',
-        'Instant download',
-      ]
+      name: 'Free', credits: 3, price: 0, priceId: 'free', isFree: true,
+      features: ['3 style transforms', 'All 15+ art styles', 'Instant download'],
     },
     {
-      name: 'Starter',
-      credits: 10,
-      price: 0.49,
-      priceId: 'starter',
-      color: 'from-blue-50 to-indigo-50',
-      accent: 'text-indigo-600',
-      badge: null,
-      features: [
-        '10 style transforms',
-        'OR 2 animations (5s)',
-        'OR 1 animation (10s)',
-        'All 14 art styles',
-      ]
+      name: 'Starter', credits: 10, price: 0.49, priceId: 'starter',
+      features: ['10 style transforms', 'OR 2 animations (5s)', 'All 15+ art styles'],
     },
     {
-      name: 'Creator Pack',
-      credits: 50,
-      price: 1.49,
-      priceId: 'weekly',
-      color: 'from-purple-50 to-pink-50',
-      accent: 'text-purple-600',
-      badge: '⭐ Most Popular',
-      features: [
-        '50 style transforms',
-        'OR 10 animations (5s)',
-        'OR 5 animations (10s)',
-        'Mix & match styles + animations',
-        'Best value per credit',
-      ]
+      name: 'Creator Pack', credits: 50, price: 1.49, priceId: 'weekly', badge: 'MOST POPULAR',
+      features: ['50 style transforms', 'OR 10 animations (5s)', 'Mix & match styles + animations', 'Best value per credit'],
     },
     {
-      name: 'Pro Unlimited',
-      credits: 1000,
-      price: 19.99,
-      priceId: 'annual',
-      color: 'from-amber-50 to-orange-50',
-      accent: 'text-amber-600',
-      badge: '👑 Best Deal',
-      features: [
-        'Unlimited style transforms',
-        '20 animations per month',
-        'Priority processing',
-        'Early access to new features',
-        'Album builder (coming soon)',
-      ]
+      name: 'Pro Unlimited', credits: 1000, price: 19.99, priceId: 'annual',
+      features: ['Unlimited style transforms', '20 animations per month', 'Priority processing', 'Early access to new features'],
     }
   ];
 
   const handleBuyCredits = async (plan: typeof plans[0]) => {
     if (plan.isFree) return;
-
-    if (!user) {
-      signIn();
-      return;
-    }
-
+    if (!user) { signIn(); return; }
     setLoadingPlan(plan.priceId);
     try {
       const response = await fetch('/api/checkout', {
@@ -91,138 +39,100 @@ export default function PricingPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ priceId: plan.priceId, userId: user.id })
       });
-
       const data = await response.json();
-      
-      if (data.checkoutUrl) {
-        window.location.href = data.checkoutUrl;
-      } else {
-        console.error('No checkout URL:', data);
-        alert('Payment failed to start. Please try again.');
-        setLoadingPlan(null);
-      }
-    } catch (error) {
-      console.error('Checkout error:', error);
-      alert('Something went wrong. Please try again.');
-      setLoadingPlan(null);
-    }
+      if (data.checkoutUrl) window.location.href = data.checkoutUrl;
+      else { alert('Payment failed to start.'); setLoadingPlan(null); }
+    } catch { alert('Something went wrong.'); setLoadingPlan(null); }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-24 pb-16 px-4">
+    <div className="min-h-screen pt-24 pb-16 px-4">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3">
-            Choose Your Plan
-          </h1>
-          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-            Start free with 3 credits. Upgrade anytime to unlock more styles and animations.
-          </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-black text-white mb-3">Choose Your Plan</h1>
+          <p className="text-lg text-white/40 max-w-2xl mx-auto">Start free with 3 credits. Upgrade anytime.</p>
           {user && (
-            <div className="mt-4 inline-flex items-center gap-2 bg-gradient-to-r from-pink-100 to-purple-100 px-4 py-2 rounded-full">
-              <span className="text-sm font-medium text-gray-700">Your balance:</span>
-              <span className="text-lg font-bold text-purple-700">✨ {credits} credits</span>
+            <div className="mt-4 inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 px-4 py-2 rounded-full">
+              <span className="text-sm text-white/60">Your balance:</span>
+              <span className="text-lg font-bold text-purple-300">✨ {credits} credits</span>
             </div>
           )}
+        </motion.div>
+
+        <div className="flex flex-wrap justify-center gap-3 mb-10 text-sm">
+          {[
+            { icon: '🎨', text: '1 credit = 1 transform' },
+            { icon: '🎬', text: '5 credits = 5s animation' },
+            { icon: '🎥', text: '10 credits = 10s animation' },
+          ].map(item => (
+            <div key={item.text} className="flex items-center gap-2 glass-card px-4 py-2 rounded-full">
+              <span>{item.icon}</span>
+              <span className="text-white/60">{item.text}</span>
+            </div>
+          ))}
         </div>
 
-        {/* Credit Explainer */}
-        <div className="flex flex-wrap justify-center gap-4 mb-10 text-sm">
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border">
-            <span className="text-lg">🎨</span>
-            <span className="text-gray-600"><strong>1 credit</strong> = 1 style transform</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border">
-            <span className="text-lg">🎬</span>
-            <span className="text-gray-600"><strong>5 credits</strong> = 5s animation</span>
-          </div>
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border">
-            <span className="text-lg">🎥</span>
-            <span className="text-gray-600"><strong>10 credits</strong> = 10s animation</span>
-          </div>
-        </div>
-
-        {/* Pricing Cards */}
         <div className="grid md:grid-cols-4 gap-5">
-          {plans.map((plan) => (
-            <div 
-              key={plan.name} 
-              className={`relative bg-gradient-to-b ${plan.color} rounded-2xl p-6 border transition-all duration-300 hover:shadow-lg
-                ${plan.badge === '⭐ Most Popular' ? 'border-purple-300 shadow-lg ring-2 ring-purple-200 scale-[1.02]' : 'border-gray-200'}`}
+          {plans.map((plan, i) => (
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className={`relative rounded-2xl p-6 transition-all duration-300 ${
+                plan.badge
+                  ? 'bg-gradient-to-b from-purple-600/20 to-purple-900/10 border border-purple-500/30 scale-[1.02] glow-purple'
+                  : 'glass-card'
+              }`}
             >
               {plan.badge && (
-                <div className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-bold text-white
-                  ${plan.badge.includes('Popular') ? 'bg-purple-500' : 'bg-amber-500'}`}>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full">
                   {plan.badge}
                 </div>
               )}
-              
-              <h2 className={`text-xl font-bold ${plan.accent} mb-1`}>{plan.name}</h2>
-              
+              <h2 className="text-lg font-bold text-white mb-1">{plan.name}</h2>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-gray-900">
+                <span className="text-3xl font-black text-white">
                   {plan.price === 0 ? 'Free' : `£${plan.price.toFixed(2)}`}
                 </span>
-                {plan.price > 0 && plan.priceId !== 'annual' && (
-                  <span className="text-sm text-gray-400 ml-1">one-time</span>
-                )}
-                {plan.priceId === 'annual' && (
-                  <span className="text-sm text-gray-400 ml-1">one-time</span>
-                )}
+                {plan.price > 0 && <span className="text-sm text-white/30 ml-1">one-time</span>}
               </div>
-
-              <div className="text-sm font-semibold text-gray-700 mb-4 pb-4 border-b border-gray-200">
+              <div className="text-sm font-semibold text-white/70 mb-4 pb-4 border-b border-white/[0.06]">
                 {plan.credits.toLocaleString()} Credits
-                {plan.price > 0 && (
-                  <span className="text-gray-400 font-normal ml-1">
-                    (£{(plan.price / plan.credits).toFixed(3)}/credit)
-                  </span>
-                )}
+                {plan.price > 0 && <span className="text-white/30 font-normal ml-1">(£{(plan.price / plan.credits).toFixed(3)}/cr)</span>}
               </div>
-
               <ul className="space-y-2 mb-6">
-                {plan.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="text-green-500 mt-0.5">✓</span>
-                    {feature}
+                {plan.features.map((f, j) => (
+                  <li key={j} className="flex items-start gap-2 text-sm text-white/50">
+                    <span className="text-purple-400 mt-0.5">✓</span>{f}
                   </li>
                 ))}
               </ul>
-
               {plan.isFree ? (
-                <div className="w-full py-3 rounded-xl text-center text-sm font-medium text-gray-400 bg-gray-100">
+                <div className="w-full py-3 rounded-xl text-center text-sm text-white/30 bg-white/5">
                   {user ? 'Current Plan' : 'Sign up to start'}
                 </div>
               ) : (
                 <button
                   onClick={() => handleBuyCredits(plan)}
                   disabled={loadingPlan !== null}
-                  className={`w-full py-3 rounded-xl text-white font-bold transition-all duration-200
-                    ${loadingPlan === plan.priceId
-                      ? 'bg-gray-300 cursor-not-allowed'
-                      : plan.badge === '⭐ Most Popular'
-                        ? 'bg-purple-600 hover:bg-purple-700 shadow-md hover:shadow-lg'
-                        : plan.priceId === 'annual'
-                          ? 'bg-amber-500 hover:bg-amber-600 shadow-md hover:shadow-lg'
-                          : 'bg-indigo-500 hover:bg-indigo-600'
-                    }`}
+                  className={`w-full py-3 rounded-xl font-bold transition-all ${
+                    loadingPlan === plan.priceId
+                      ? 'bg-white/10 text-white/30 cursor-wait'
+                      : plan.badge
+                        ? 'bg-white text-[#0a0a0f] hover:bg-gray-100'
+                        : 'bg-purple-600 text-white hover:bg-purple-500'
+                  }`}
                 >
-                  {loadingPlan === plan.priceId ? 'Redirecting to Stripe...' : 'Buy Now'}
+                  {loadingPlan === plan.priceId ? 'Redirecting...' : 'Buy Now'}
                 </button>
               )}
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Footer */}
         <div className="mt-10 text-center space-y-2">
-          <p className="text-sm text-gray-400">
-            🔒 Secure payments by Stripe. Charges appear as <strong>SCHOOLGLE LTD</strong>.
-          </p>
-          <p className="text-xs text-gray-300">
-            Credits never expire. Animations use more credits because they cost more to generate.
-          </p>
+          <p className="text-sm text-white/30">🔒 Secure payments by Stripe · Credits never expire</p>
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import CookieConsent from './components/CookieConsent'
 import GoogleAnalytics from './components/GoogleAnalytics'
 import { AuthProvider } from '@/lib/auth-context'
 import { CreditsProvider } from '@/lib/credits-context'
@@ -137,7 +138,7 @@ export default function RootLayout({
         />
         <GoogleAnalytics />
       </head>
-      <body className={`${inter.className} bg-white text-dark-blue`}>
+      <body className={`${inter.className} bg-[#0a0a0f] text-white`}>
         <AuthProvider>
           <CreditsProvider>
             <Navbar />
@@ -147,6 +148,7 @@ export default function RootLayout({
             <Footer />
             <JobPoller />
             <JobTray />
+            <CookieConsent />
           </CreditsProvider>
         </AuthProvider>
       </body>

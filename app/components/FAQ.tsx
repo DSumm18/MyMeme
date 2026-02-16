@@ -1,60 +1,46 @@
 'use client'
 
 import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function FAQ() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
 
   const faqs = [
-    {
-      question: 'How does MyMeme work?',
-      answer: 'Simply upload a selfie, enter your job title, and choose an art style. Our AI will generate a fun cartoon caricature of you at work in seconds!'
-    },
-    {
-      question: 'What styles are available?',
-      answer: 'We offer multiple styles including Caricature (default), Watercolour, Anime, and Pop Art. More styles are coming soon!'
-    },
-    {
-      question: 'Can I use the image on social media?',
-      answer: 'Absolutely! We provide easy-to-use sharing options for Facebook, Instagram, WhatsApp, and more. You can also download your image in various formats.'
-    },
-    {
-      question: 'Is my photo safe?',
-      answer: 'Yes! We take your privacy seriously. Your photos are processed securely and are not stored or shared without your consent.'
-    }
+    { question: 'How does MyMeme work?', answer: 'Upload any photo, choose from 15+ AI art styles, and get a stunning transformation in under 10 seconds. Our AI preserves your facial features while applying the artistic style.' },
+    { question: 'What styles are available?', answer: 'We offer Ghibli, Cyberpunk Neon, Renaissance, Oil Painting, Italian Brainrot, Anime, Pixar, GTA V, Caricature, Pop Art, Watercolor, Superhero, Comic Book, Pencil Sketch, Sticker, Retro 80s, Claymation, and more.' },
+    { question: 'Is it free to try?', answer: 'Yes! You get 3 free generations when you sign up. No credit card required.' },
+    { question: 'Can I use the images commercially?', answer: 'Yes! All generated images are yours to use for personal or commercial purposes.' },
+    { question: 'Is my photo safe?', answer: 'Your photos are processed securely, never stored permanently, and never shared with third parties.' },
   ]
 
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-2xl mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-purple-600">
+    <section id="faq" className="py-20">
+      <div className="max-w-3xl mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-black text-white text-center mb-12">
           Frequently Asked Questions
         </h2>
-        <div className="space-y-4">
+        <div>
           {faqs.map((faq, index) => (
-            <div 
-              key={faq.question} 
-              className="border-b border-gray-200 pb-4"
-            >
-              <button 
+            <div key={faq.question} className="border-b border-white/[0.06]">
+              <button
                 onClick={() => setActiveIndex(activeIndex === index ? null : index)}
-                className="w-full text-left flex justify-between items-center py-4 focus:outline-none"
+                className="w-full text-left py-5 flex items-center justify-between group"
               >
-                <span className={`
-                  text-lg font-semibold 
-                  ${activeIndex === index ? 'text-purple-600' : 'text-gray-800'}
-                `}>
+                <span className={`text-lg font-medium transition-colors ${activeIndex === index ? 'text-purple-400' : 'text-white/80 group-hover:text-white'}`}>
                   {faq.question}
                 </span>
-                <span className="text-purple-600 text-2xl">
-                  {activeIndex === index ? '−' : '+'}
-                </span>
+                <motion.span animate={{ rotate: activeIndex === index ? 45 : 0 }} className="text-white/40 text-2xl flex-shrink-0 ml-4">
+                  +
+                </motion.span>
               </button>
-              {activeIndex === index && (
-                <p className="text-gray-600 mt-2 animate-fadeIn">
-                  {faq.answer}
-                </p>
-              )}
+              <AnimatePresence>
+                {activeIndex === index && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+                    <p className="pb-5 text-white/50 leading-relaxed">{faq.answer}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ))}
         </div>
