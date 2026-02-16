@@ -97,29 +97,33 @@ function CreatePage() {
     }
   }, [])
 
-  // Auth gate
-  if (!user && !authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4 pt-20">
-        <div className="glass-card p-8 max-w-md text-center glow-purple">
-          <div className="text-6xl mb-4">🎨</div>
-          <h2 className="text-2xl font-bold text-white mb-4">Sign in to Start Creating</h2>
-          <p className="text-white/50 mb-6">Create an account to get 3 free credits and start transforming your photos!</p>
-          <button onClick={signIn} className="px-8 py-3 rounded-full text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 hover:scale-105 transition-all">
-            Sign in with Google 🚀
-          </button>
-        </div>
-      </div>
-    )
+  // Check anonymous free credits
+  const getAnonCredits = () => {
+    if (typeof window === 'undefined') return 3
+    const used = parseInt(localStorage.getItem('mymeme_anon_used') || '0', 10)
+    return Math.max(0, 3 - used)
   }
 
-  if (user && credits < 1 && !creditsLoading) {
+  const anonCredits = getAnonCredits()
+  const effectiveCredits = user ? credits : anonCredits
+  const isOutOfCredits = user ? (credits < 1 && !creditsLoading) : (anonCredits < 1)
+
+  if (isOutOfCredits) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 pt-20">
         <div className="glass-card p-8 max-w-md text-center">
           <div className="text-6xl mb-4">😢</div>
           <h2 className="text-2xl font-bold text-white mb-4">Out of Credits!</h2>
-          <p className="text-white/50 mb-6">Get more credits to keep creating amazing transformations!</p>
+          <p className="text-white/50 mb-6">
+            {user
+              ? 'Get more credits to keep creating amazing transformations!'
+              : 'Sign in to get 3 more free credits, or purchase a pack!'}
+          </p>
+          {!user && (
+            <button onClick={signIn} className="mb-3 px-8 py-3 rounded-full text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 hover:scale-105 transition-all block mx-auto">
+              Sign in for 3 Free Credits 🚀
+            </button>
+          )}
           <Link href="/pricing" className="inline-block px-8 py-3 rounded-full text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 hover:scale-105 transition-all">
             Get More Credits 💰
           </Link>
@@ -172,8 +176,15 @@ function CreatePage() {
     if (!selectedImage) { setError('Please upload a photo!'); return }
     setLoading(true); setError('')
     try {
-      const creditResult = await deductCredits(1)
-      if (!creditResult) throw new Error('Not enough credits.')
+      if (user) {
+        const creditResult = await deductCredits(1)
+        if (!creditResult) throw new Error('Not enough credits.')
+      } else {
+        // Anonymous user — deduct from localStorage
+        const used = parseInt(localStorage.getItem('mymeme_anon_used') || '0', 10)
+        if (used >= 3) throw new Error('No free credits left. Sign in for more!')
+        localStorage.setItem('mymeme_anon_used', String(used + 1))
+      }
 
       const res = await fetch('/api/generate', {
         method: 'POST',

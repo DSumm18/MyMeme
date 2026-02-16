@@ -9,22 +9,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 const dropdowns: Record<string, { label: string; href: string; desc: string }[]> = {
   Styles: [
-    { label: 'Ghibli', href: '/create?style=ghibli', desc: 'Studio Ghibli anime' },
-    { label: 'Cyberpunk Neon', href: '/create?style=cyberpunk-neon', desc: 'Futuristic neon vibes' },
-    { label: 'Renaissance', href: '/create?style=renaissance', desc: 'Classical master painting' },
-    { label: 'Oil Painting', href: '/create?style=oil-painting', desc: 'Rich textured oils' },
-    { label: 'Anime', href: '/create?style=anime', desc: 'Japanese anime style' },
-    { label: 'Pixar 3D', href: '/create?style=pixar', desc: 'Animated character' },
-    { label: 'GTA V', href: '/create?style=gta', desc: 'Game loading screen' },
-    { label: 'Italian Brainrot', href: '/create?style=italian-brainrot', desc: 'Viral meme style' },
+    { label: '🌸 Ghibli', href: '/styles/ghibli', desc: 'Studio Ghibli anime' },
+    { label: '🌃 Cyberpunk Neon', href: '/styles/cyberpunk-neon', desc: 'Futuristic neon vibes' },
+    { label: '🏛️ Renaissance', href: '/styles/renaissance', desc: 'Classical master painting' },
+    { label: '🖼️ Oil Painting', href: '/styles/oil-painting', desc: 'Rich textured oils' },
+    { label: '⚡ Anime', href: '/styles/anime', desc: 'Japanese anime style' },
+    { label: '✨ Pixar 3D', href: '/styles/pixar', desc: 'Animated character' },
+    { label: '🔫 GTA V', href: '/styles/gta', desc: 'Game loading screen' },
+    { label: '🤌 Italian Brainrot', href: '/styles/italian-brainrot', desc: 'Viral meme style' },
     { label: 'View All Styles →', href: '/create', desc: '' },
   ],
-  'Use Cases': [
-    { label: 'Profile Pictures', href: '/create', desc: 'Stand out on social media' },
-    { label: 'Gifts & Prints', href: '/create', desc: 'Custom art for loved ones' },
-    { label: 'Content Creation', href: '/create', desc: 'Unique visuals for posts' },
-    { label: 'Photo Animation', href: '/animate', desc: 'Bring photos to life' },
-    { label: 'Photo Albums', href: '/album', desc: 'Cinematic video albums' },
+  Products: [
+    { label: '🎨 Photo Styles', href: '/create', desc: '15+ AI art transformations' },
+    { label: '🎬 Photo Animation', href: '/animate', desc: 'Bring photos to life' },
+    { label: '📸 Photo Albums', href: '/album', desc: 'Cinematic video albums' },
   ],
   Learn: [
     { label: 'FAQ', href: '/#faq', desc: 'Common questions' },
