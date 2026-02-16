@@ -236,13 +236,11 @@ export default function Home() {
 
   const beforeAfters = [
     { before: '/examples/before.png', after: '/examples/ghibli.jpg', label: 'Studio Ghibli' },
-    { before: '/examples/male-before.jpg', after: '/examples/male-cyberpunk-neon.jpg', label: 'Cyberpunk Neon' },
+    { before: '/examples/before.png', after: '/examples/cyberpunk-neon.jpg', label: 'Cyberpunk Neon' },
     { before: '/examples/before.png', after: '/examples/oil-painting.jpg', label: 'Oil Painting' },
-    { before: '/examples/male-before.jpg', after: '/examples/male-anime.jpg', label: 'Anime' },
     { before: '/examples/before.png', after: '/examples/renaissance.jpg', label: 'Renaissance' },
-    { before: '/examples/male-before.jpg', after: '/examples/male-gta.jpg', label: 'GTA V' },
-    { before: '/examples/before.png', after: '/examples/pixar.jpg', label: 'Pixar 3D' },
-    { before: '/examples/male-before.jpg', after: '/examples/male-ghibli.jpg', label: 'Studio Ghibli' },
+    { before: '/examples/before.png', after: '/examples/pop-art.jpg', label: 'Pop Art' },
+    { before: '/examples/before.png', after: '/examples/anime.jpg', label: 'Anime' },
   ]
 
   const reviews = [
@@ -363,7 +361,7 @@ export default function Home() {
               <p className="text-gray-500 text-lg max-w-2xl mx-auto">Every transformation starts from the same original photo. See the AI magic side by side.</p>
             </div>
           </Reveal>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
             {beforeAfters.map((ex, i) => (
               <Reveal key={i} delay={i * 80}>
                 <BeforeAfterPair {...ex} />
