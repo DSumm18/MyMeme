@@ -4,12 +4,15 @@
 
 @layer base {
   :root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
-    --accent-pink: #FF90E8;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-    --text-muted: #9ca3af;
+    --bg-primary: #0A0A0A;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1A1A1A;
+    --accent-gold: #C8A24E;
+    --accent-gold-light: #D4B366;
+    --accent-gold-dark: #A8873A;
+    --text-primary: #F5F0E8;
+    --text-secondary: #A0998C;
+    --text-muted: #6B6560;
   }
 
   body {
@@ -18,38 +21,30 @@
   }
 
   ::selection {
-    background-color: rgba(255, 144, 232, 0.3);
-    color: #111827;
+    background-color: rgba(200, 162, 78, 0.3);
+    color: #F5F0E8;
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#FF90E8] to-[#FFC900];
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[#C8A24E] to-[#E8D5A0];
   }
 
   .glass-card {
-    @apply bg-white border-2 border-gray-100 rounded-2xl;
+    @apply bg-[#111111] border border-[#2A2A2A] rounded-2xl;
   }
 
   .hover-glow {
     @apply transition-all duration-300;
   }
   .hover-glow:hover {
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 40px rgba(200, 162, 78, 0.1);
     transform: translateY(-2px);
   }
 
   .animate-float {
     animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-float-delayed {
-    animation: float 6s ease-in-out infinite 2s;
-  }
-
-  .animate-float-slow {
-    animation: float 8s ease-in-out infinite 1s;
   }
 
   .carousel-track {
@@ -91,12 +86,12 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #f9fafb;
+  background: #0A0A0A;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #333;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #555;
 }

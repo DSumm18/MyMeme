@@ -138,7 +138,7 @@ export default function RootLayout({
         />
         <GoogleAnalytics />
       </head>
-      <body className={`${inter.className} bg-white text-gray-900`}>
+      <body className={`${inter.className} bg-[#0A0A0A] text-[#F5F0E8]`}>
         <AuthProvider>
           <CreditsProvider>
             <Navbar />

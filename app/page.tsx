@@ -5,6 +5,20 @@ import Image from 'next/image'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 
+/* ─── Colours ─── */
+const C = {
+  bg: '#0A0A0A',
+  bgAlt: '#111111',
+  bgCard: '#1A1A1A',
+  gold: '#C8A24E',
+  goldLight: '#D4B366',
+  goldDark: '#A8873A',
+  text: '#F5F0E8',
+  textSec: '#A0998C',
+  textMuted: '#6B6560',
+  border: '#2A2A2A',
+}
+
 /* ─── Animated Section Wrapper ─── */
 function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null)
@@ -26,7 +40,7 @@ function Reveal({ children, className = '', delay = 0 }: { children: React.React
 function CountUp({ target, suffix = '', prefix = '' }: { target: number; suffix?: string; prefix?: string }) {
   const [count, setCount] = useState(0)
   const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref as any, { once: true })
+  const inView = useInView(ref as React.RefObject<Element>, { once: true })
 
   useEffect(() => {
     if (!inView) return
@@ -44,22 +58,51 @@ function CountUp({ target, suffix = '', prefix = '' }: { target: number; suffix?
   return <span ref={ref}>{prefix}{count.toLocaleString()}{suffix}</span>
 }
 
-/* ─── Inline Upload Tool ─── */
+/* ─── Style Thumbnail for Hero ─── */
+function StyleThumb({ src, label, active, onClick }: { src: string; label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative w-full aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+        active ? 'border-[#C8A24E] ring-2 ring-[#C8A24E]/30 scale-105' : 'border-[#2A2A2A] hover:border-[#6B6560]'
+      }`}
+    >
+      <Image src={src} alt={label} fill className="object-cover" />
+      <div className={`absolute inset-0 transition-opacity ${active ? 'bg-[#C8A24E]/10' : 'bg-black/20 hover:bg-black/10'}`} />
+      <span className="absolute bottom-1 left-1 right-1 text-[9px] font-bold text-white truncate bg-black/60 px-1 py-0.5 rounded text-center">
+        {label}
+      </span>
+    </button>
+  )
+}
+
+/* ─── Inline Upload Tool (dark premium) ─── */
 function UploadTool() {
   const [isDragging, setIsDragging] = useState(false)
-  const [preview, setPreview] = useState<string | null>(null)
+  const [selectedStyle, setSelectedStyle] = useState('ghibli')
   const fileRef = useRef<HTMLInputElement>(null)
+
+  const styles = [
+    { id: 'ghibli', src: '/examples/ghibli.jpg', label: 'Ghibli' },
+    { id: 'cyberpunk-neon', src: '/examples/cyberpunk-neon.jpg', label: 'Cyberpunk' },
+    { id: 'renaissance', src: '/examples/renaissance.jpg', label: 'Renaissance' },
+    { id: 'oil-painting', src: '/examples/oil-painting.jpg', label: 'Oil Painting' },
+    { id: 'anime', src: '/examples/anime.jpg', label: 'Anime' },
+    { id: 'pixar', src: '/examples/pixar.jpg', label: 'Pixar 3D' },
+    { id: 'gta', src: '/examples/gta.jpg', label: 'GTA V' },
+    { id: 'pop-art', src: '/examples/pop-art.jpg', label: 'Pop Art' },
+    { id: 'watercolor', src: '/examples/watercolor.jpg', label: 'Watercolor' },
+  ]
 
   const handleFile = useCallback((file: File) => {
     if (!file.type.startsWith('image/')) return
     const reader = new FileReader()
     reader.onload = (e) => {
-      setPreview(e.target?.result as string)
       sessionStorage.setItem('mymeme_upload', e.target?.result as string)
-      window.location.href = '/create'
+      window.location.href = `/create?style=${selectedStyle}`
     }
     reader.readAsDataURL(file)
-  }, [])
+  }, [selectedStyle])
 
   const onDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()
@@ -69,33 +112,92 @@ function UploadTool() {
   }, [handleFile])
 
   return (
-    <div
-      onClick={() => fileRef.current?.click()}
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
-      onDragLeave={() => setIsDragging(false)}
-      onDrop={onDrop}
-      className={`relative cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-300 p-8 text-center ${
-        isDragging
-          ? 'border-[#FF90E8] bg-[#FF90E8]/10 scale-[1.02]'
-          : 'border-gray-300 hover:border-[#FF90E8] hover:bg-[#FFF0FB]'
-      }`}
-    >
-      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-      {preview ? (
-        <div className="relative w-32 h-32 mx-auto rounded-xl overflow-hidden">
-          <Image src={preview} alt="Preview" fill className="object-cover" />
-        </div>
-      ) : (
-        <>
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FF90E8]/20 flex items-center justify-center">
-            <svg className="w-8 h-8 text-[#FF90E8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+    <div className="bg-[#111111] rounded-2xl border border-[#2A2A2A] overflow-hidden">
+      {/* Header bar */}
+      <div className="flex items-center gap-2 px-5 py-3 border-b border-[#2A2A2A]">
+        <div className="w-3 h-3 rounded-full bg-[#FF5F57]" />
+        <div className="w-3 h-3 rounded-full bg-[#FEBC2E]" />
+        <div className="w-3 h-3 rounded-full bg-[#28C840]" />
+        <span className="text-xs text-[#6B6560] ml-2">Transform your photo</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-[140px_1fr_140px] gap-0">
+        {/* Left: Style picker */}
+        <div className="hidden md:block p-3 border-r border-[#2A2A2A] max-h-[340px] overflow-y-auto">
+          <p className="text-[10px] font-bold text-[#6B6560] uppercase tracking-wider mb-2 px-1">Styles</p>
+          <div className="grid grid-cols-2 gap-1.5">
+            {styles.map(s => (
+              <StyleThumb
+                key={s.id}
+                src={s.src}
+                label={s.label}
+                active={selectedStyle === s.id}
+                onClick={() => setSelectedStyle(s.id)}
+              />
+            ))}
           </div>
-          <p className="text-gray-900 font-semibold mb-1">Drop your photo here</p>
-          <p className="text-gray-400 text-sm">or click to browse · JPG, PNG up to 10MB</p>
-        </>
-      )}
+        </div>
+
+        {/* Centre: Upload area */}
+        <div className="p-6">
+          <div
+            onClick={() => fileRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={onDrop}
+            className={`relative cursor-pointer rounded-xl border-2 border-dashed transition-all duration-300 p-10 text-center min-h-[220px] flex flex-col items-center justify-center ${
+              isDragging
+                ? 'border-[#C8A24E] bg-[#C8A24E]/5 scale-[1.01]'
+                : 'border-[#2A2A2A] hover:border-[#C8A24E]/50 hover:bg-[#1A1A1A]'
+            }`}
+          >
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#C8A24E]/10 flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#C8A24E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <p className="text-[#F5F0E8] font-semibold mb-1">Drop your photo here</p>
+            <p className="text-[#6B6560] text-sm">or click to browse · JPG, PNG up to 10MB</p>
+          </div>
+
+          {/* Mobile style chips */}
+          <div className="mt-4 flex flex-wrap gap-2 md:hidden">
+            {styles.slice(0, 5).map(s => (
+              <button
+                key={s.id}
+                onClick={() => setSelectedStyle(s.id)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-all ${
+                  selectedStyle === s.id
+                    ? 'border-[#C8A24E] bg-[#C8A24E]/10 text-[#C8A24E]'
+                    : 'border-[#2A2A2A] text-[#6B6560] hover:text-[#A0998C]'
+                }`}
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Preview */}
+        <div className="hidden md:flex flex-col p-3 border-l border-[#2A2A2A]">
+          <p className="text-[10px] font-bold text-[#6B6560] uppercase tracking-wider mb-2 px-1">Preview</p>
+          <div className="relative flex-1 rounded-xl overflow-hidden min-h-[180px]">
+            <Image
+              src={styles.find(s => s.id === selectedStyle)?.src || '/examples/ghibli.jpg'}
+              alt="Style preview"
+              fill
+              className="object-cover"
+            />
+          </div>
+          <button
+            onClick={() => fileRef.current?.click()}
+            className="mt-2 w-full py-2 rounded-lg bg-[#C8A24E] text-[#0A0A0A] text-xs font-bold hover:bg-[#D4B366] transition-colors"
+          >
+            Generate · 1 Credit
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -120,15 +222,15 @@ function StyleCarousel({ images, reverse = false }: { images: { src: string; lab
   )
 }
 
-/* ─── Before/After Pair (side by side) ─── */
+/* ─── Before/After Pair ─── */
 function BeforeAfterPair({ before, after, label }: { before: string; after: string; label: string }) {
   return (
     <div className="group">
-      <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden">
+      <div className="grid grid-cols-2 gap-1 rounded-2xl overflow-hidden">
         <div className="relative aspect-square">
           <Image src={before} alt="Original photo" fill className="object-cover" />
           <div className="absolute top-2 left-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-white/90 text-gray-600">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-black/70 text-[#A0998C] backdrop-blur-sm">
               Before
             </span>
           </div>
@@ -136,14 +238,41 @@ function BeforeAfterPair({ before, after, label }: { before: string; after: stri
         <div className="relative aspect-square">
           <Image src={after} alt={`${label} style`} fill className="object-cover" />
           <div className="absolute top-2 left-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-[#FF90E8] text-white">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-[#C8A24E] text-[#0A0A0A]">
               After
             </span>
           </div>
         </div>
       </div>
-      <p className="mt-3 text-center font-bold text-gray-900 text-sm">{label}</p>
+      <p className="mt-3 text-center font-bold text-[#F5F0E8] text-sm">{label}</p>
     </div>
+  )
+}
+
+/* ─── Feature Section (alternating) ─── */
+function FeatureSection({ title, description, image, reverse, badge }: { title: string; description: string; image: string; reverse?: boolean; badge?: string }) {
+  return (
+    <Reveal>
+      <div className={`grid md:grid-cols-2 gap-12 items-center ${reverse ? 'md:direction-rtl' : ''}`}>
+        <div className={`${reverse ? 'md:order-2' : ''} space-y-4`}>
+          {badge && (
+            <span className="inline-block text-xs font-bold text-[#C8A24E] uppercase tracking-widest">{badge}</span>
+          )}
+          <h3 className="text-3xl md:text-4xl font-black text-[#F5F0E8] leading-tight">{title}</h3>
+          <p className="text-[#A0998C] text-lg leading-relaxed">{description}</p>
+          <Link href="/create" className="inline-flex items-center gap-2 text-[#C8A24E] font-bold hover:text-[#D4B366] transition-colors group">
+            Try it now
+            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </Link>
+        </div>
+        <div className={`${reverse ? 'md:order-1' : ''} relative aspect-square rounded-2xl overflow-hidden`}>
+          <Image src={image} alt={title} fill className="object-cover" />
+          <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/10" />
+        </div>
+      </div>
+    </Reveal>
   )
 }
 
@@ -161,17 +290,17 @@ function EmailCapture() {
   }
 
   return (
-    <div className="bg-[#FF90E8] rounded-3xl p-8 md:p-12 text-center max-w-2xl mx-auto">
+    <div className="bg-gradient-to-br from-[#C8A24E] to-[#A8873A] rounded-3xl p-8 md:p-12 text-center max-w-2xl mx-auto">
       {submitted ? (
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
           <div className="text-5xl mb-4">🎉</div>
-          <h3 className="text-2xl font-black text-gray-900 mb-2">You&apos;re in!</h3>
-          <p className="text-gray-800/70">Check your inbox for your 3 free credits.</p>
+          <h3 className="text-2xl font-black text-[#0A0A0A] mb-2">You&apos;re in!</h3>
+          <p className="text-[#0A0A0A]/70">Check your inbox for your 3 free credits.</p>
         </motion.div>
       ) : (
         <>
-          <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">Get 3 Free Credits</h3>
-          <p className="text-gray-800/70 mb-8">Sign up and instantly receive 3 free credits to transform any photo.</p>
+          <h3 className="text-3xl md:text-4xl font-black text-[#0A0A0A] mb-3">Get 3 Free Credits</h3>
+          <p className="text-[#0A0A0A]/70 mb-8">Sign up and instantly receive 3 free credits to transform any photo.</p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input
               type="email"
@@ -179,9 +308,9 @@ function EmailCapture() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-900/10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900/30 transition-colors"
+              className="flex-1 px-4 py-3 rounded-xl bg-[#0A0A0A]/10 border-2 border-[#0A0A0A]/20 text-[#0A0A0A] placeholder:text-[#0A0A0A]/40 focus:outline-none focus:border-[#0A0A0A]/40 transition-colors"
             />
-            <button type="submit" className="px-6 py-3 rounded-xl bg-gray-900 text-white font-bold hover:bg-gray-800 transition-colors whitespace-nowrap">
+            <button type="submit" className="px-6 py-3 rounded-xl bg-[#0A0A0A] text-[#C8A24E] font-bold hover:bg-[#1A1A1A] transition-colors whitespace-nowrap">
               Claim Free Credits →
             </button>
           </form>
@@ -194,15 +323,15 @@ function EmailCapture() {
 /* ─── FAQ ─── */
 function FAQItem({ q, a, open, onClick }: { q: string; a: string; open: boolean; onClick: () => void }) {
   return (
-    <div className="border-b border-gray-200">
+    <div className="border-b border-[#2A2A2A]">
       <button onClick={onClick} className="w-full text-left py-5 flex items-center justify-between group">
-        <span className={`text-lg font-semibold transition-colors ${open ? 'text-[#FF90E8]' : 'text-gray-900 group-hover:text-gray-600'}`}>{q}</span>
-        <motion.span animate={{ rotate: open ? 45 : 0 }} className="text-gray-400 text-2xl flex-shrink-0 ml-4">+</motion.span>
+        <span className={`text-lg font-semibold transition-colors ${open ? 'text-[#C8A24E]' : 'text-[#F5F0E8] group-hover:text-[#A0998C]'}`}>{q}</span>
+        <motion.span animate={{ rotate: open ? 45 : 0 }} className="text-[#6B6560] text-2xl flex-shrink-0 ml-4">+</motion.span>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <p className="pb-5 text-gray-500 leading-relaxed">{a}</p>
+            <p className="pb-5 text-[#A0998C] leading-relaxed">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -262,79 +391,81 @@ export default function Home() {
     { q: 'What file formats are supported?', a: 'Upload JPG, PNG, or WebP images up to 10MB. Results are delivered as high-quality JPGs.' },
   ]
 
-  return (
-    <div className="bg-white text-gray-900 overflow-hidden">
-      {/* ═══ HERO SECTION ═══ */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20 pb-12">
-        <div className="relative max-w-6xl mx-auto px-4 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left: Copy */}
-            <div className="text-center lg:text-left">
-              <Reveal>
-                <div className="inline-flex items-center gap-2 bg-[#FF90E8]/10 text-[#FF90E8] px-4 py-2 rounded-full text-sm font-bold mb-8">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                  Over 127,000 photos transformed
-                </div>
-              </Reveal>
-              <Reveal delay={100}>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] mb-6 tracking-tight text-gray-900">
-                  Your Photo.
-                  <br />
-                  <span className="text-[#FF90E8]">Any Style.</span>
-                  <br />
-                  Instantly.
-                </h1>
-              </Reveal>
-              <Reveal delay={200}>
-                <p className="text-lg text-gray-500 max-w-lg mb-8 leading-relaxed mx-auto lg:mx-0">
-                  Upload a photo. Choose from 15+ AI art styles — Ghibli, Cyberpunk, Renaissance and more. Get a stunning transformation in seconds.
-                </p>
-              </Reveal>
-              <Reveal delay={300}>
-                <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-4">
-                  <Link
-                    href="/create"
-                    className="px-8 py-4 rounded-full text-lg font-black bg-gray-900 text-white hover:bg-gray-800 transition-all duration-300 shadow-lg"
-                  >
-                    Start Creating — Free ✨
-                  </Link>
-                  <a href="#examples" className="px-6 py-4 rounded-full text-lg text-gray-500 hover:text-gray-900 border-2 border-gray-200 hover:border-gray-900 transition-all">
-                    See Examples ↓
-                  </a>
-                </div>
-                <p className="text-gray-400 text-sm">3 free credits · No sign-up required</p>
-              </Reveal>
-            </div>
+  const features = [
+    {
+      badge: 'Style Transfer',
+      title: '15+ Artistic Styles at Your Fingertips',
+      description: 'From Studio Ghibli to Renaissance masterworks, from Cyberpunk Neon to Italian Brainrot — every style is crafted to produce gallery-worthy results.',
+      image: '/examples/ghibli.jpg',
+    },
+    {
+      badge: 'Face Preservation',
+      title: 'Your Face. Perfectly Preserved.',
+      description: 'Our AI doesn\'t just slap a filter on. It understands facial structure, expressions, and features — then rebuilds them in the chosen artistic style.',
+      image: '/examples/pixar.jpg',
+      reverse: true,
+    },
+    {
+      badge: 'Lightning Fast',
+      title: 'Results in Under 10 Seconds',
+      description: 'No waiting around. Upload, pick a style, and watch the magic happen in real time. High-resolution 1024×1024 output, every time.',
+      image: '/examples/cyberpunk-neon.jpg',
+    },
+    {
+      badge: 'Versatile',
+      title: 'Selfies, Pets, Group Shots — Anything Goes',
+      description: 'Portraits, pet photos, family shots, landscapes — our AI handles them all. If it\'s a photo, we can transform it.',
+      image: '/examples/anime.jpg',
+      reverse: true,
+    },
+  ]
 
-            {/* Right: Upload Tool */}
-            <Reveal delay={400}>
-              <div className="bg-gray-50 rounded-3xl p-6 border-2 border-gray-100">
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
-                  <span className="text-xs text-gray-400 ml-2">Transform your photo</span>
-                </div>
-                <UploadTool />
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {['Ghibli', 'Cyberpunk', 'Renaissance', 'Oil Painting', 'Anime'].map(s => (
-                    <Link
-                      key={s}
-                      href={`/create?style=${s.toLowerCase().replace(' ', '-')}`}
-                      className="text-xs px-3 py-1.5 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-[#FF90E8] transition-all"
-                    >
-                      {s}
-                    </Link>
-                  ))}
-                </div>
+  return (
+    <div className="bg-[#0A0A0A] text-[#F5F0E8] overflow-hidden">
+      {/* ═══ HERO SECTION ═══ */}
+      <section className="relative min-h-screen flex items-center justify-center pt-24 pb-16">
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#C8A24E]/5 via-transparent to-transparent" />
+
+        <div className="relative max-w-6xl mx-auto px-4 w-full">
+          {/* Headline */}
+          <div className="text-center mb-12">
+            <Reveal>
+              <div className="inline-flex items-center gap-2 bg-[#C8A24E]/10 text-[#C8A24E] px-4 py-2 rounded-full text-sm font-bold mb-8 border border-[#C8A24E]/20">
+                <span className="w-2 h-2 bg-[#C8A24E] rounded-full animate-pulse" />
+                Over 127,000 photos transformed
               </div>
             </Reveal>
+            <Reveal delay={100}>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] mb-6 tracking-tight">
+                Your Photo.{' '}
+                <span className="text-gradient-gold">Any Style.</span>
+                <br />
+                Instantly.
+              </h1>
+            </Reveal>
+            <Reveal delay={200}>
+              <p className="text-lg text-[#A0998C] max-w-2xl mb-8 leading-relaxed mx-auto">
+                Upload a photo. Choose from 15+ AI art styles — Ghibli, Cyberpunk, Renaissance and more. Get a stunning transformation in seconds.
+              </p>
+            </Reveal>
           </div>
+
+          {/* Embedded Upload Tool */}
+          <Reveal delay={300}>
+            <div className="max-w-4xl mx-auto">
+              <UploadTool />
+            </div>
+          </Reveal>
+
+          <Reveal delay={400}>
+            <p className="text-center text-[#6B6560] text-sm mt-6">3 free credits · No sign-up required</p>
+          </Reveal>
         </div>
       </section>
 
       {/* ═══ SOCIAL PROOF STATS ═══ */}
-      <section className="py-16 border-y-2 border-gray-100">
+      <section className="py-16 border-y border-[#1A1A1A]">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -344,8 +475,8 @@ export default function Home() {
               { target: 10, suffix: 's', label: 'Per Transform', prefix: '<' },
             ].map((stat, i) => (
               <Reveal key={stat.label} delay={i * 100}>
-                <p className="text-3xl md:text-4xl font-black text-gray-900"><CountUp target={stat.target} suffix={stat.suffix} prefix={stat.prefix} /></p>
-                <p className="text-sm text-gray-400 mt-1">{stat.label}</p>
+                <p className="text-3xl md:text-4xl font-black text-[#C8A24E]"><CountUp target={stat.target} suffix={stat.suffix} prefix={stat.prefix} /></p>
+                <p className="text-sm text-[#6B6560] mt-1">{stat.label}</p>
               </Reveal>
             ))}
           </div>
@@ -357,8 +488,9 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Same Photo. Different Worlds.</h2>
-              <p className="text-gray-500 text-lg max-w-2xl mx-auto">Every transformation starts from the same original photo. See the AI magic side by side.</p>
+              <span className="inline-block text-xs font-bold text-[#C8A24E] uppercase tracking-widest mb-4">Transformations</span>
+              <h2 className="text-4xl md:text-5xl font-black text-[#F5F0E8] mb-4">Same Photo. Different Worlds.</h2>
+              <p className="text-[#A0998C] text-lg max-w-2xl mx-auto">Every transformation starts from the same original photo. See the AI magic side by side.</p>
             </div>
           </Reveal>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -369,23 +501,30 @@ export default function Home() {
             ))}
           </div>
           <Reveal delay={500} className="text-center mt-12">
-            <Link href="/create" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-lg font-black bg-gray-900 text-white hover:bg-gray-800 transition-all shadow-lg">
+            <Link href="/create" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-lg font-black bg-[#C8A24E] text-[#0A0A0A] hover:bg-[#D4B366] transition-all shadow-lg shadow-[#C8A24E]/20">
               Transform Your Photo →
             </Link>
           </Reveal>
         </div>
       </section>
 
+      {/* ═══ FEATURE SECTIONS (alternating) ═══ */}
+      <section className="py-20 md:py-28 border-t border-[#1A1A1A]">
+        <div className="max-w-6xl mx-auto px-4 space-y-24 md:space-y-32">
+          {features.map((feat, i) => (
+            <FeatureSection key={i} {...feat} />
+          ))}
+        </div>
+      </section>
+
       {/* ═══ STYLE CAROUSEL ═══ */}
-      <section className="py-20 md:py-28 bg-gray-50">
+      <section className="py-20 md:py-28 bg-[#111111]">
         <div className="max-w-6xl mx-auto px-4 mb-12">
           <Reveal>
             <div className="text-center">
-              <span className="inline-block bg-[#FF90E8]/10 text-[#FF90E8] px-4 py-1.5 rounded-full text-sm font-bold mb-4">
-                🔥 Trending Styles
-              </span>
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Explore Every Style</h2>
-              <p className="text-gray-500 text-lg max-w-xl mx-auto">From Studio Ghibli to Cyberpunk — find the perfect artistic transformation.</p>
+              <span className="inline-block text-xs font-bold text-[#C8A24E] uppercase tracking-widest mb-4">🔥 Trending</span>
+              <h2 className="text-4xl md:text-5xl font-black text-[#F5F0E8] mb-4">Explore Every Style</h2>
+              <p className="text-[#A0998C] text-lg max-w-xl mx-auto">From Studio Ghibli to Cyberpunk — find the perfect artistic transformation.</p>
             </div>
           </Reveal>
         </div>
@@ -400,21 +539,22 @@ export default function Home() {
         <div className="max-w-4xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Three Steps. Ten Seconds.</h2>
+              <span className="inline-block text-xs font-bold text-[#C8A24E] uppercase tracking-widest mb-4">How It Works</span>
+              <h2 className="text-4xl md:text-5xl font-black text-[#F5F0E8] mb-4">Three Steps. Ten Seconds.</h2>
             </div>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { step: '01', icon: '📸', title: 'Upload', desc: 'Drop any photo — selfie, portrait, pet, anything.', bg: 'bg-[#FFF0FB]' },
-              { step: '02', icon: '🎨', title: 'Choose Style', desc: 'Pick from 15+ unique AI art styles.', bg: 'bg-[#F0F7FF]' },
-              { step: '03', icon: '⚡', title: 'Download', desc: 'Get your HD artwork in under 10 seconds.', bg: 'bg-[#F0FFF4]' },
+              { step: '01', icon: '📸', title: 'Upload', desc: 'Drop any photo — selfie, portrait, pet, anything.' },
+              { step: '02', icon: '🎨', title: 'Choose Style', desc: 'Pick from 15+ unique AI art styles.' },
+              { step: '03', icon: '⚡', title: 'Download', desc: 'Get your HD artwork in under 10 seconds.' },
             ].map((item, i) => (
               <Reveal key={item.step} delay={i * 150}>
-                <div className={`${item.bg} rounded-3xl p-8 text-center border-2 border-gray-100 hover:border-gray-200 transition-colors`}>
+                <div className="bg-[#111111] border border-[#2A2A2A] rounded-3xl p-8 text-center hover:border-[#C8A24E]/30 transition-colors">
                   <div className="text-5xl mb-4">{item.icon}</div>
-                  <div className="text-xs font-bold text-gray-400 mb-2 tracking-widest">STEP {item.step}</div>
-                  <h3 className="text-xl font-black text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-500">{item.desc}</p>
+                  <div className="text-xs font-bold text-[#C8A24E] mb-2 tracking-widest">STEP {item.step}</div>
+                  <h3 className="text-xl font-black text-[#F5F0E8] mb-2">{item.title}</h3>
+                  <p className="text-[#A0998C]">{item.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -423,55 +563,27 @@ export default function Home() {
       </section>
 
       {/* ═══ REVIEWS ═══ */}
-      <section className="py-20 md:py-28 bg-gray-50">
+      <section className="py-20 md:py-28 bg-[#111111]">
         <div className="max-w-6xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Loved by Thousands</h2>
-              <div className="flex items-center justify-center gap-1 text-yellow-500 text-2xl mb-2">★★★★★</div>
-              <p className="text-gray-400">4.9 out of 5 from 1,200+ reviews</p>
+              <h2 className="text-4xl md:text-5xl font-black text-[#F5F0E8] mb-4">Loved by Thousands</h2>
+              <div className="flex items-center justify-center gap-1 text-[#C8A24E] text-2xl mb-2">★★★★★</div>
+              <p className="text-[#6B6560]">4.9 out of 5 from 1,200+ reviews</p>
             </div>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6">
             {reviews.map((review, i) => (
               <Reveal key={review.name} delay={i * 100}>
-                <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-gray-200 transition-colors">
+                <div className="bg-[#1A1A1A] rounded-2xl p-6 border border-[#2A2A2A] hover:border-[#C8A24E]/20 transition-colors">
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-2xl">{review.avatar}</span>
                     <div>
-                      <p className="font-bold text-gray-900">{review.name}</p>
-                      <div className="text-yellow-500 text-sm">★★★★★</div>
+                      <p className="font-bold text-[#F5F0E8]">{review.name}</p>
+                      <div className="text-[#C8A24E] text-sm">★★★★★</div>
                     </div>
                   </div>
-                  <p className="text-gray-500 leading-relaxed">&ldquo;{review.text}&rdquo;</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ MORE PRODUCTS ═══ */}
-      <section className="py-20 md:py-28">
-        <div className="max-w-5xl mx-auto px-4">
-          <Reveal>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">More Ways to Create</h2>
-            </div>
-          </Reveal>
-          <div className="grid md:grid-cols-2 gap-6">
-            {[
-              { icon: '🎬', title: 'Photo Animation', desc: 'Bring old photos to life. Watch loved ones smile and move again with AI-powered animation.', href: '/animate', bg: 'bg-[#FFF0FB]' },
-              { icon: '📸', title: 'Cinematic Albums', desc: 'Turn your photo collection into a professional video with music, transitions, and cinematic flair.', href: '/album', bg: 'bg-[#F0F7FF]' },
-            ].map((item, i) => (
-              <Reveal key={item.title} delay={i * 150}>
-                <div className={`${item.bg} rounded-3xl p-8 border-2 border-gray-100 hover:border-gray-200 transition-colors`}>
-                  <span className="text-4xl mb-4 block">{item.icon}</span>
-                  <h3 className="text-2xl font-black text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-500 mb-6">{item.desc}</p>
-                  <Link href={item.href} className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-900 text-gray-900 font-bold hover:bg-gray-900 hover:text-white transition-all">
-                    Try It →
-                  </Link>
+                  <p className="text-[#A0998C] leading-relaxed">&ldquo;{review.text}&rdquo;</p>
                 </div>
               </Reveal>
             ))}
@@ -480,12 +592,13 @@ export default function Home() {
       </section>
 
       {/* ═══ PRICING ═══ */}
-      <section id="pricing" className="py-20 md:py-28 bg-gray-50">
+      <section id="pricing" className="py-20 md:py-28">
         <div className="max-w-5xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Simple Pricing</h2>
-              <p className="text-gray-500 text-lg">Start free. No credit card required.</p>
+              <span className="inline-block text-xs font-bold text-[#C8A24E] uppercase tracking-widest mb-4">Pricing</span>
+              <h2 className="text-4xl md:text-5xl font-black text-[#F5F0E8] mb-4">Simple Pricing</h2>
+              <p className="text-[#A0998C] text-lg">Start free. No credit card required.</p>
             </div>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -497,23 +610,23 @@ export default function Home() {
               <Reveal key={plan.name} delay={i * 150}>
                 <div className={`rounded-3xl p-8 relative ${
                   plan.highlight
-                    ? 'bg-gray-900 text-white scale-105 shadow-2xl'
-                    : 'bg-white border-2 border-gray-100'
+                    ? 'bg-[#C8A24E] text-[#0A0A0A] scale-105 shadow-2xl shadow-[#C8A24E]/20'
+                    : 'bg-[#111111] border border-[#2A2A2A]'
                 }`}>
                   {plan.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FF90E8] text-white text-xs font-bold px-4 py-1 rounded-full">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0A0A0A] text-[#C8A24E] text-xs font-bold px-4 py-1 rounded-full border border-[#C8A24E]">
                       {plan.badge}
                     </div>
                   )}
-                  <h3 className={`text-lg font-bold mb-1 ${plan.highlight ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
+                  <h3 className={`text-lg font-bold mb-1 ${plan.highlight ? 'text-[#0A0A0A]' : 'text-[#F5F0E8]'}`}>{plan.name}</h3>
                   <div className="mb-6">
-                    <span className={`text-4xl font-black ${plan.highlight ? 'text-white' : 'text-gray-900'}`}>{plan.price}</span>
-                    {plan.period && <span className={`text-sm ml-1 ${plan.highlight ? 'text-gray-400' : 'text-gray-400'}`}>{plan.period}</span>}
+                    <span className={`text-4xl font-black ${plan.highlight ? 'text-[#0A0A0A]' : 'text-[#F5F0E8]'}`}>{plan.price}</span>
+                    {plan.period && <span className={`text-sm ml-1 ${plan.highlight ? 'text-[#0A0A0A]/60' : 'text-[#6B6560]'}`}>{plan.period}</span>}
                   </div>
                   <ul className="space-y-3 mb-8 text-sm">
                     {plan.features.map(f => (
-                      <li key={f} className={`flex items-center gap-2 ${plan.highlight ? 'text-gray-300' : 'text-gray-500'}`}>
-                        <span className="text-[#FF90E8]">✓</span> {f}
+                      <li key={f} className={`flex items-center gap-2 ${plan.highlight ? 'text-[#0A0A0A]/80' : 'text-[#A0998C]'}`}>
+                        <span className={plan.highlight ? 'text-[#0A0A0A]' : 'text-[#C8A24E]'}>✓</span> {f}
                       </li>
                     ))}
                   </ul>
@@ -521,8 +634,8 @@ export default function Home() {
                     href={plan.href}
                     className={`block text-center py-3 rounded-full font-bold transition-all ${
                       plan.highlight
-                        ? 'bg-white text-gray-900 hover:bg-gray-100'
-                        : 'border-2 border-gray-200 text-gray-900 hover:border-gray-900'
+                        ? 'bg-[#0A0A0A] text-[#C8A24E] hover:bg-[#1A1A1A]'
+                        : 'border border-[#2A2A2A] text-[#F5F0E8] hover:border-[#C8A24E] hover:text-[#C8A24E]'
                     }`}
                   >
                     {plan.cta}
@@ -544,11 +657,11 @@ export default function Home() {
       </section>
 
       {/* ═══ FAQ ═══ */}
-      <section id="faq" className="py-20 md:py-28 bg-gray-50">
+      <section id="faq" className="py-20 md:py-28 bg-[#111111]">
         <div className="max-w-3xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Frequently Asked Questions</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-[#F5F0E8] mb-4">Frequently Asked Questions</h2>
             </div>
           </Reveal>
           <Reveal delay={200}>
@@ -563,19 +676,20 @@ export default function Home() {
 
       {/* ═══ FINAL CTA ═══ */}
       <section className="py-24 md:py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#C8A24E]/5 via-transparent to-transparent" />
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           <Reveal>
-            <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-[#F5F0E8] mb-6 leading-tight">
               Ready to See Yourself
               <br />
-              <span className="text-[#FF90E8]">Like Never Before?</span>
+              <span className="text-gradient-gold">Like Never Before?</span>
             </h2>
-            <p className="text-gray-400 text-lg mb-10">
+            <p className="text-[#6B6560] text-lg mb-10">
               Join 127,000+ people who&apos;ve already discovered their artistic alter ego.
             </p>
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 px-10 py-5 rounded-full text-xl font-black bg-gray-900 text-white hover:bg-gray-800 transition-all duration-300 shadow-lg"
+              className="inline-flex items-center gap-2 px-10 py-5 rounded-full text-xl font-black bg-[#C8A24E] text-[#0A0A0A] hover:bg-[#D4B366] transition-all duration-300 shadow-lg shadow-[#C8A24E]/20"
             >
               Start Creating — It&apos;s Free ✨
             </Link>
