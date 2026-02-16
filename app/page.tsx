@@ -240,7 +240,7 @@ export default function Home() {
     { before: '/examples/before.png', after: '/examples/oil-painting.jpg', label: 'Oil Painting' },
     { before: '/examples/male-before.jpg', after: '/examples/male-anime.jpg', label: 'Anime' },
     { before: '/examples/before.png', after: '/examples/renaissance.jpg', label: 'Renaissance' },
-    { before: '/examples/male-before.jpg', after: '/examples/male-oil-painting.jpg', label: 'Oil Painting' },
+    { before: '/examples/male-before.jpg', after: '/examples/male-gta.jpg', label: 'GTA V' },
     { before: '/examples/before.png', after: '/examples/pixar.jpg', label: 'Pixar 3D' },
     { before: '/examples/male-before.jpg', after: '/examples/male-ghibli.jpg', label: 'Studio Ghibli' },
   ]
