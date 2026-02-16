@@ -60,15 +60,15 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-50 glass border-b border-white/[0.06]">
+    <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center">
               <span className="text-white font-black text-sm">M</span>
             </div>
-            <span className="text-xl font-bold text-white">MyMeme</span>
+            <span className="text-xl font-black text-gray-900">MyMeme</span>
           </Link>
 
           {/* Desktop Nav */}
@@ -80,7 +80,7 @@ export default function Navbar() {
                 onMouseEnter={() => handleMouseEnter(key)}
                 onMouseLeave={handleMouseLeave}
               >
-                <button className="px-3 py-2 text-sm text-white/70 hover:text-white transition-colors flex items-center gap-1">
+                <button className="px-3 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1 font-medium">
                   {key}
                   <svg className={`w-3 h-3 transition-transform ${activeDropdown === key ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -93,7 +93,7 @@ export default function Navbar() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 8 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-full left-0 mt-1 w-64 glass rounded-xl p-2 shadow-2xl"
+                      className="absolute top-full left-0 mt-1 w-64 bg-white rounded-xl p-2 shadow-xl border border-gray-100"
                       onMouseEnter={() => handleMouseEnter(key)}
                       onMouseLeave={handleMouseLeave}
                     >
@@ -101,11 +101,11 @@ export default function Navbar() {
                         <Link
                           key={item.label}
                           href={item.href}
-                          className="block px-3 py-2.5 rounded-lg hover:bg-white/10 transition-colors group"
+                          className="block px-3 py-2.5 rounded-lg hover:bg-gray-50 transition-colors group"
                           onClick={() => setActiveDropdown(null)}
                         >
-                          <div className="text-sm font-medium text-white group-hover:text-purple-300 transition-colors">{item.label}</div>
-                          {item.desc && <div className="text-xs text-white/40">{item.desc}</div>}
+                          <div className="text-sm font-medium text-gray-900 group-hover:text-[#FF90E8] transition-colors">{item.label}</div>
+                          {item.desc && <div className="text-xs text-gray-400">{item.desc}</div>}
                         </Link>
                       ))}
                     </motion.div>
@@ -114,27 +114,27 @@ export default function Navbar() {
               </div>
             ))}
 
-            <Link href="/pricing" className="px-3 py-2 text-sm text-white/70 hover:text-white transition-colors">
+            <Link href="/pricing" className="px-3 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium">
               Pricing
             </Link>
 
-            <div className="w-px h-6 bg-white/10 mx-2" />
+            <div className="w-px h-6 bg-gray-200 mx-2" />
 
             {user ? (
               <div className="flex items-center gap-3">
-                <Link href="/pricing" className="text-sm bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-full border border-purple-500/30 hover:bg-purple-500/30 transition-colors">
+                <Link href="/pricing" className="text-sm bg-[#FF90E8]/10 text-[#FF90E8] px-3 py-1.5 rounded-full border border-[#FF90E8]/20 hover:bg-[#FF90E8]/20 transition-colors font-bold">
                   ✨ {credits} credits
                 </Link>
                 <div className="flex items-center gap-2">
                   {user.user_metadata?.avatar_url ? (
-                    <Image src={user.user_metadata.avatar_url} alt="Profile" width={32} height={32} className="rounded-full ring-2 ring-purple-500/50" />
+                    <Image src={user.user_metadata.avatar_url} alt="Profile" width={32} height={32} className="rounded-full ring-2 ring-gray-200" />
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-sm font-bold text-white">
+                    <div className="w-8 h-8 rounded-full bg-gray-900 flex items-center justify-center text-sm font-bold text-white">
                       {user.user_metadata?.full_name?.[0] || '?'}
                     </div>
                   )}
                 </div>
-                <button onClick={signOut} className="text-sm text-white/40 hover:text-white transition-colors">
+                <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-900 transition-colors">
                   Sign Out
                 </button>
               </div>
@@ -142,7 +142,7 @@ export default function Navbar() {
               <button
                 onClick={signIn}
                 disabled={loading}
-                className="px-4 py-2 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-500 transition-colors font-medium disabled:opacity-50"
+                className="px-4 py-2 text-sm rounded-lg bg-gray-900 text-white hover:bg-gray-800 transition-colors font-bold disabled:opacity-50"
               >
                 Sign In
               </button>
@@ -152,11 +152,11 @@ export default function Navbar() {
           {/* Mobile */}
           <div className="md:hidden flex items-center gap-3">
             {user && (
-              <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full border border-purple-500/30">
+              <span className="text-xs bg-[#FF90E8]/10 text-[#FF90E8] px-2 py-1 rounded-full border border-[#FF90E8]/20 font-bold">
                 ✨ {credits}
               </span>
             )}
-            <button onClick={() => setIsOpen(!isOpen)} className="text-white/70 hover:text-white p-2">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-500 hover:text-gray-900 p-2">
               {isOpen ? (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               ) : (
@@ -174,17 +174,17 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-white/[0.06] overflow-hidden"
+            className="md:hidden border-t border-gray-100 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-1 bg-[#0a0a0f]/95 backdrop-blur-xl">
+            <div className="px-4 py-4 space-y-1 bg-white/95 backdrop-blur-xl">
               {Object.entries(dropdowns).map(([key, items]) => (
                 <div key={key}>
-                  <div className="text-xs font-semibold text-white/30 uppercase tracking-wider px-3 py-2 mt-2">{key}</div>
+                  <div className="text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-2 mt-2">{key}</div>
                   {items.map((item) => (
                     <Link
                       key={item.label}
                       href={item.href}
-                      className="block px-3 py-2.5 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                      className="block px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       {item.label}
@@ -192,16 +192,16 @@ export default function Navbar() {
                   ))}
                 </div>
               ))}
-              <Link href="/pricing" className="block px-3 py-2.5 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/5" onClick={() => setIsOpen(false)}>
+              <Link href="/pricing" className="block px-3 py-2.5 rounded-lg text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-50" onClick={() => setIsOpen(false)}>
                 Pricing
               </Link>
-              <div className="pt-3 border-t border-white/10">
+              <div className="pt-3 border-t border-gray-100">
                 {user ? (
-                  <button onClick={() => { signOut(); setIsOpen(false) }} className="block w-full text-left px-3 py-2.5 text-sm text-white/50 hover:text-white">
+                  <button onClick={() => { signOut(); setIsOpen(false) }} className="block w-full text-left px-3 py-2.5 text-sm text-gray-400 hover:text-gray-900">
                     Sign Out
                   </button>
                 ) : (
-                  <button onClick={() => { signIn(); setIsOpen(false) }} className="block w-full px-3 py-2.5 text-sm bg-purple-600 text-white rounded-lg text-center font-medium">
+                  <button onClick={() => { signIn(); setIsOpen(false) }} className="block w-full px-3 py-2.5 text-sm bg-gray-900 text-white rounded-lg text-center font-bold">
                     Sign In
                   </button>
                 )}

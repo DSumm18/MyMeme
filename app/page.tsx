@@ -4,7 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { useAuth } from '@/lib/auth-context'
 
 /* ─── Animated Section Wrapper ─── */
 function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -56,7 +55,6 @@ function UploadTool() {
     const reader = new FileReader()
     reader.onload = (e) => {
       setPreview(e.target?.result as string)
-      // Store and redirect
       sessionStorage.setItem('mymeme_upload', e.target?.result as string)
       window.location.href = '/create'
     }
@@ -76,10 +74,10 @@ function UploadTool() {
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={onDrop}
-      className={`upload-zone relative cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-300 p-8 text-center ${
+      className={`relative cursor-pointer rounded-2xl border-2 border-dashed transition-all duration-300 p-8 text-center ${
         isDragging
-          ? 'border-purple-400 bg-purple-500/10 scale-[1.02]'
-          : 'border-white/20 hover:border-purple-400/50 hover:bg-white/[0.02]'
+          ? 'border-[#FF90E8] bg-[#FF90E8]/10 scale-[1.02]'
+          : 'border-gray-300 hover:border-[#FF90E8] hover:bg-[#FFF0FB]'
       }`}
     >
       <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
@@ -89,13 +87,13 @@ function UploadTool() {
         </div>
       ) : (
         <>
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-            <svg className="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#FF90E8]/20 flex items-center justify-center">
+            <svg className="w-8 h-8 text-[#FF90E8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-white/80 font-medium mb-1">Drop your photo here</p>
-          <p className="text-white/40 text-sm">or click to browse · JPG, PNG up to 10MB</p>
+          <p className="text-gray-900 font-semibold mb-1">Drop your photo here</p>
+          <p className="text-gray-400 text-sm">or click to browse · JPG, PNG up to 10MB</p>
         </>
       )}
     </div>
@@ -122,29 +120,29 @@ function StyleCarousel({ images, reverse = false }: { images: { src: string; lab
   )
 }
 
-/* ─── Before/After Card ─── */
-function BeforeAfterCard({ before, after, label }: { before: string; after: string; label: string }) {
-  const [showAfter, setShowAfter] = useState(false)
-  useEffect(() => {
-    const iv = setInterval(() => setShowAfter(p => !p), 2800)
-    return () => clearInterval(iv)
-  }, [])
-
+/* ─── Before/After Pair (side by side) ─── */
+function BeforeAfterPair({ before, after, label }: { before: string; after: string; label: string }) {
   return (
-    <div
-      className="relative aspect-square rounded-2xl overflow-hidden cursor-pointer group hover-glow"
-      onClick={() => setShowAfter(p => !p)}
-    >
-      <Image src={before} alt="Before" fill className={`object-cover transition-opacity duration-700 ${showAfter ? 'opacity-0' : 'opacity-100'}`} />
-      <Image src={after} alt="After" fill className={`object-cover transition-opacity duration-700 ${showAfter ? 'opacity-100' : 'opacity-0'}`} />
-      <div className="absolute top-3 left-3">
-        <span className={`text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm transition-colors ${showAfter ? 'bg-purple-500/90 text-white' : 'bg-white/20 text-white'}`}>
-          {showAfter ? 'After ✨' : 'Before'}
-        </span>
+    <div className="group">
+      <div className="grid grid-cols-2 gap-2 rounded-2xl overflow-hidden">
+        <div className="relative aspect-square">
+          <Image src={before} alt="Original photo" fill className="object-cover" />
+          <div className="absolute top-2 left-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-white/90 text-gray-600">
+              Before
+            </span>
+          </div>
+        </div>
+        <div className="relative aspect-square">
+          <Image src={after} alt={`${label} style`} fill className="object-cover" />
+          <div className="absolute top-2 left-2">
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full bg-[#FF90E8] text-white">
+              After
+            </span>
+          </div>
+        </div>
       </div>
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-        <p className="text-white font-semibold text-sm">{label}</p>
-      </div>
+      <p className="mt-3 text-center font-bold text-gray-900 text-sm">{label}</p>
     </div>
   )
 }
@@ -157,27 +155,23 @@ function EmailCapture() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (email) {
-      // Store for later
       localStorage.setItem('mymeme_email_capture', email)
       setSubmitted(true)
     }
   }
 
   return (
-    <div className="glass-card p-8 md:p-12 text-center max-w-2xl mx-auto">
+    <div className="bg-[#FF90E8] rounded-3xl p-8 md:p-12 text-center max-w-2xl mx-auto">
       {submitted ? (
         <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
           <div className="text-5xl mb-4">🎉</div>
-          <h3 className="text-2xl font-bold text-white mb-2">You&apos;re in!</h3>
-          <p className="text-white/60">Check your inbox for your 3 free credits.</p>
+          <h3 className="text-2xl font-black text-gray-900 mb-2">You&apos;re in!</h3>
+          <p className="text-gray-800/70">Check your inbox for your 3 free credits.</p>
         </motion.div>
       ) : (
         <>
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-300 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-            🎁 Limited Offer
-          </div>
-          <h3 className="text-3xl md:text-4xl font-black text-white mb-3">Get 3 Free Credits</h3>
-          <p className="text-white/50 mb-8">Sign up and instantly receive 3 free credits to transform any photo.</p>
+          <h3 className="text-3xl md:text-4xl font-black text-gray-900 mb-3">Get 3 Free Credits</h3>
+          <p className="text-gray-800/70 mb-8">Sign up and instantly receive 3 free credits to transform any photo.</p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <input
               type="email"
@@ -185,9 +179,9 @@ function EmailCapture() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500/50 transition-colors"
+              className="flex-1 px-4 py-3 rounded-xl bg-white border-2 border-gray-900/10 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-gray-900/30 transition-colors"
             />
-            <button type="submit" className="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold hover:opacity-90 transition-opacity whitespace-nowrap">
+            <button type="submit" className="px-6 py-3 rounded-xl bg-gray-900 text-white font-bold hover:bg-gray-800 transition-colors whitespace-nowrap">
               Claim Free Credits →
             </button>
           </form>
@@ -200,15 +194,15 @@ function EmailCapture() {
 /* ─── FAQ ─── */
 function FAQItem({ q, a, open, onClick }: { q: string; a: string; open: boolean; onClick: () => void }) {
   return (
-    <div className="border-b border-white/[0.06]">
+    <div className="border-b border-gray-200">
       <button onClick={onClick} className="w-full text-left py-5 flex items-center justify-between group">
-        <span className={`text-lg font-medium transition-colors ${open ? 'text-purple-400' : 'text-white/80 group-hover:text-white'}`}>{q}</span>
-        <motion.span animate={{ rotate: open ? 45 : 0 }} className="text-white/40 text-2xl flex-shrink-0 ml-4">+</motion.span>
+        <span className={`text-lg font-semibold transition-colors ${open ? 'text-[#FF90E8]' : 'text-gray-900 group-hover:text-gray-600'}`}>{q}</span>
+        <motion.span animate={{ rotate: open ? 45 : 0 }} className="text-gray-400 text-2xl flex-shrink-0 ml-4">+</motion.span>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <p className="pb-5 text-white/50 leading-relaxed">{a}</p>
+            <p className="pb-5 text-gray-500 leading-relaxed">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -241,12 +235,14 @@ export default function Home() {
   ]
 
   const beforeAfters = [
-    { before: '/styles/before.png', after: '/examples/ghibli.jpg', label: 'Studio Ghibli' },
-    { before: '/styles/before.png', after: '/examples/cyberpunk-neon.jpg', label: 'Cyberpunk Neon' },
-    { before: '/styles/before.png', after: '/examples/oil-painting.jpg', label: 'Oil Painting' },
-    { before: '/styles/before.png', after: '/examples/renaissance.jpg', label: 'Renaissance' },
-    { before: '/styles/before.png', after: '/examples/anime.jpg', label: 'Anime' },
-    { before: '/styles/before.png', after: '/examples/italian-brainrot.jpg', label: 'Italian Brainrot' },
+    { before: '/examples/before.png', after: '/examples/ghibli.jpg', label: 'Studio Ghibli' },
+    { before: '/examples/male-before.jpg', after: '/examples/male-cyberpunk-neon.jpg', label: 'Cyberpunk Neon' },
+    { before: '/examples/before.png', after: '/examples/oil-painting.jpg', label: 'Oil Painting' },
+    { before: '/examples/male-before.jpg', after: '/examples/male-anime.jpg', label: 'Anime' },
+    { before: '/examples/before.png', after: '/examples/renaissance.jpg', label: 'Renaissance' },
+    { before: '/examples/male-before.jpg', after: '/examples/male-oil-painting.jpg', label: 'Oil Painting' },
+    { before: '/examples/before.png', after: '/examples/pixar.jpg', label: 'Pixar 3D' },
+    { before: '/examples/male-before.jpg', after: '/examples/male-ghibli.jpg', label: 'Studio Ghibli' },
   ]
 
   const reviews = [
@@ -269,53 +265,30 @@ export default function Home() {
   ]
 
   return (
-    <div className="overflow-hidden">
+    <div className="bg-white text-gray-900 overflow-hidden">
       {/* ═══ HERO SECTION ═══ */}
-      <section className="relative min-h-screen flex items-center justify-center pt-16 pb-8 overflow-hidden">
-        {/* Background effects */}
-        <div className="absolute inset-0">
-          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[150px] animate-float" />
-          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-pink-600/15 rounded-full blur-[130px] animate-float-delayed" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[100px] animate-float-slow" />
-        </div>
-
-        {/* Floating style previews */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none hidden lg:block">
-          <motion.div animate={{ y: [0, -20, 0] }} transition={{ duration: 6, repeat: Infinity }} className="absolute top-32 left-[8%] w-24 h-24 rounded-xl overflow-hidden opacity-40 rotate-[-8deg]">
-            <Image src="/examples/ghibli.jpg" alt="" fill className="object-cover" />
-          </motion.div>
-          <motion.div animate={{ y: [0, -15, 0] }} transition={{ duration: 7, repeat: Infinity, delay: 1 }} className="absolute top-48 right-[10%] w-28 h-28 rounded-xl overflow-hidden opacity-30 rotate-[6deg]">
-            <Image src="/examples/cyberpunk-neon.jpg" alt="" fill className="object-cover" />
-          </motion.div>
-          <motion.div animate={{ y: [0, -18, 0] }} transition={{ duration: 5, repeat: Infinity, delay: 2 }} className="absolute bottom-40 left-[12%] w-20 h-20 rounded-xl overflow-hidden opacity-35 rotate-[12deg]">
-            <Image src="/examples/renaissance.jpg" alt="" fill className="object-cover" />
-          </motion.div>
-          <motion.div animate={{ y: [0, -22, 0] }} transition={{ duration: 8, repeat: Infinity, delay: 0.5 }} className="absolute bottom-32 right-[8%] w-24 h-24 rounded-xl overflow-hidden opacity-25 rotate-[-5deg]">
-            <Image src="/examples/oil-painting.jpg" alt="" fill className="object-cover" />
-          </motion.div>
-        </div>
-
+      <section className="relative min-h-screen flex items-center justify-center pt-20 pb-12">
         <div className="relative max-w-6xl mx-auto px-4 w-full">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left: Copy */}
             <div className="text-center lg:text-left">
               <Reveal>
-                <div className="inline-flex items-center gap-2 bg-white/[0.06] backdrop-blur-sm border border-white/10 text-white/70 px-4 py-2 rounded-full text-sm mb-8">
+                <div className="inline-flex items-center gap-2 bg-[#FF90E8]/10 text-[#FF90E8] px-4 py-2 rounded-full text-sm font-bold mb-8">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
                   Over 127,000 photos transformed
                 </div>
               </Reveal>
               <Reveal delay={100}>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] mb-6 tracking-tight">
-                  <span className="text-white">Your Photo.</span>
+                <h1 className="text-5xl md:text-6xl lg:text-7xl font-black leading-[0.95] mb-6 tracking-tight text-gray-900">
+                  Your Photo.
                   <br />
-                  <span className="text-gradient">Any Style.</span>
+                  <span className="text-[#FF90E8]">Any Style.</span>
                   <br />
-                  <span className="text-white">Instantly.</span>
+                  Instantly.
                 </h1>
               </Reveal>
               <Reveal delay={200}>
-                <p className="text-lg text-white/50 max-w-lg mb-8 leading-relaxed mx-auto lg:mx-0">
+                <p className="text-lg text-gray-500 max-w-lg mb-8 leading-relaxed mx-auto lg:mx-0">
                   Upload a photo. Choose from 15+ AI art styles — Ghibli, Cyberpunk, Renaissance and more. Get a stunning transformation in seconds.
                 </p>
               </Reveal>
@@ -323,26 +296,26 @@ export default function Home() {
                 <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-4">
                   <Link
                     href="/create"
-                    className="px-8 py-4 rounded-full text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/25"
+                    className="px-8 py-4 rounded-full text-lg font-black bg-gray-900 text-white hover:bg-gray-800 transition-all duration-300 shadow-lg"
                   >
                     Start Creating — Free ✨
                   </Link>
-                  <a href="#examples" className="px-6 py-4 rounded-full text-lg text-white/60 hover:text-white border border-white/10 hover:border-white/20 transition-all">
+                  <a href="#examples" className="px-6 py-4 rounded-full text-lg text-gray-500 hover:text-gray-900 border-2 border-gray-200 hover:border-gray-900 transition-all">
                     See Examples ↓
                   </a>
                 </div>
-                <p className="text-white/30 text-sm">3 free credits · No sign-up required</p>
+                <p className="text-gray-400 text-sm">3 free credits · No sign-up required</p>
               </Reveal>
             </div>
 
             {/* Right: Upload Tool */}
             <Reveal delay={400}>
-              <div className="glass-card p-6 glow-purple">
+              <div className="bg-gray-50 rounded-3xl p-6 border-2 border-gray-100">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-3 h-3 rounded-full bg-red-400/60" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-400/60" />
-                  <div className="w-3 h-3 rounded-full bg-green-400/60" />
-                  <span className="text-xs text-white/30 ml-2">Transform your photo</span>
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                  <span className="text-xs text-gray-400 ml-2">Transform your photo</span>
                 </div>
                 <UploadTool />
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -350,7 +323,7 @@ export default function Home() {
                     <Link
                       key={s}
                       href={`/create?style=${s.toLowerCase().replace(' ', '-')}`}
-                      className="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white hover:border-purple-500/30 transition-all"
+                      className="text-xs px-3 py-1.5 rounded-full bg-white border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-[#FF90E8] transition-all"
                     >
                       {s}
                     </Link>
@@ -363,7 +336,7 @@ export default function Home() {
       </section>
 
       {/* ═══ SOCIAL PROOF STATS ═══ */}
-      <section className="py-16 border-y border-white/[0.06]">
+      <section className="py-16 border-y-2 border-gray-100">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
@@ -373,24 +346,48 @@ export default function Home() {
               { target: 10, suffix: 's', label: 'Per Transform', prefix: '<' },
             ].map((stat, i) => (
               <Reveal key={stat.label} delay={i * 100}>
-                <p className="text-3xl md:text-4xl font-black text-white"><CountUp target={stat.target} suffix={stat.suffix} prefix={stat.prefix} /></p>
-                <p className="text-sm text-white/40 mt-1">{stat.label}</p>
+                <p className="text-3xl md:text-4xl font-black text-gray-900"><CountUp target={stat.target} suffix={stat.suffix} prefix={stat.prefix} /></p>
+                <p className="text-sm text-gray-400 mt-1">{stat.label}</p>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
+      {/* ═══ BEFORE/AFTER SHOWCASE ═══ */}
+      <section id="examples" className="py-20 md:py-28">
+        <div className="max-w-6xl mx-auto px-4">
+          <Reveal>
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Same Photo. Different Worlds.</h2>
+              <p className="text-gray-500 text-lg max-w-2xl mx-auto">Every transformation starts from the same original photo. See the AI magic side by side.</p>
+            </div>
+          </Reveal>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {beforeAfters.map((ex, i) => (
+              <Reveal key={i} delay={i * 80}>
+                <BeforeAfterPair {...ex} />
+              </Reveal>
+            ))}
+          </div>
+          <Reveal delay={500} className="text-center mt-12">
+            <Link href="/create" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-lg font-black bg-gray-900 text-white hover:bg-gray-800 transition-all shadow-lg">
+              Transform Your Photo →
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══ STYLE CAROUSEL ═══ */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 mb-12">
           <Reveal>
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 text-purple-300 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
+              <span className="inline-block bg-[#FF90E8]/10 text-[#FF90E8] px-4 py-1.5 rounded-full text-sm font-bold mb-4">
                 🔥 Trending Styles
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Explore Every Style</h2>
-              <p className="text-white/40 text-lg max-w-xl mx-auto">From Studio Ghibli to Cyberpunk — find the perfect artistic transformation.</p>
+              </span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Explore Every Style</h2>
+              <p className="text-gray-500 text-lg max-w-xl mx-auto">From Studio Ghibli to Cyberpunk — find the perfect artistic transformation.</p>
             </div>
           </Reveal>
         </div>
@@ -400,50 +397,26 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ BEFORE/AFTER ═══ */}
-      <section id="examples" className="py-20 md:py-28">
-        <div className="max-w-6xl mx-auto px-4">
-          <Reveal>
-            <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">See the Transformation</h2>
-              <p className="text-white/40 text-lg max-w-2xl mx-auto">Same photo, completely different vibes. Tap any image to toggle before/after.</p>
-            </div>
-          </Reveal>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-            {beforeAfters.map((ex, i) => (
-              <Reveal key={i} delay={i * 80}>
-                <BeforeAfterCard {...ex} />
-              </Reveal>
-            ))}
-          </div>
-          <Reveal delay={500} className="text-center mt-12">
-            <Link href="/create" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 hover:scale-105 transition-all shadow-lg shadow-purple-500/25">
-              Transform Your Photo →
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ═══ HOW IT WORKS ═══ */}
       <section className="py-20 md:py-28">
         <div className="max-w-4xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Three Steps. Ten Seconds.</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Three Steps. Ten Seconds.</h2>
             </div>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6">
             {[
-              { step: '01', icon: '📸', title: 'Upload', desc: 'Drop any photo — selfie, portrait, pet, anything.', color: 'from-purple-500/20 to-purple-600/5' },
-              { step: '02', icon: '🎨', title: 'Choose Style', desc: 'Pick from 15+ unique AI art styles.', color: 'from-pink-500/20 to-pink-600/5' },
-              { step: '03', icon: '⚡', title: 'Download', desc: 'Get your HD artwork in under 10 seconds.', color: 'from-blue-500/20 to-blue-600/5' },
+              { step: '01', icon: '📸', title: 'Upload', desc: 'Drop any photo — selfie, portrait, pet, anything.', bg: 'bg-[#FFF0FB]' },
+              { step: '02', icon: '🎨', title: 'Choose Style', desc: 'Pick from 15+ unique AI art styles.', bg: 'bg-[#F0F7FF]' },
+              { step: '03', icon: '⚡', title: 'Download', desc: 'Get your HD artwork in under 10 seconds.', bg: 'bg-[#F0FFF4]' },
             ].map((item, i) => (
               <Reveal key={item.step} delay={i * 150}>
-                <div className={`glass-card p-8 text-center bg-gradient-to-b ${item.color} hover-glow`}>
+                <div className={`${item.bg} rounded-3xl p-8 text-center border-2 border-gray-100 hover:border-gray-200 transition-colors`}>
                   <div className="text-5xl mb-4">{item.icon}</div>
-                  <div className="text-xs font-bold text-white/30 mb-2 tracking-widest">STEP {item.step}</div>
-                  <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-white/50">{item.desc}</p>
+                  <div className="text-xs font-bold text-gray-400 mb-2 tracking-widest">STEP {item.step}</div>
+                  <h3 className="text-xl font-black text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-500">{item.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -452,27 +425,27 @@ export default function Home() {
       </section>
 
       {/* ═══ REVIEWS ═══ */}
-      <section className="py-20 md:py-28">
+      <section className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Loved by Thousands</h2>
-              <div className="flex items-center justify-center gap-1 text-yellow-400 text-2xl mb-2">★★★★★</div>
-              <p className="text-white/40">4.9 out of 5 from 1,200+ reviews</p>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Loved by Thousands</h2>
+              <div className="flex items-center justify-center gap-1 text-yellow-500 text-2xl mb-2">★★★★★</div>
+              <p className="text-gray-400">4.9 out of 5 from 1,200+ reviews</p>
             </div>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6">
             {reviews.map((review, i) => (
               <Reveal key={review.name} delay={i * 100}>
-                <div className="glass-card p-6 hover-glow">
+                <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-gray-200 transition-colors">
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-2xl">{review.avatar}</span>
                     <div>
-                      <p className="font-bold text-white">{review.name}</p>
-                      <div className="text-yellow-400 text-sm">★★★★★</div>
+                      <p className="font-bold text-gray-900">{review.name}</p>
+                      <div className="text-yellow-500 text-sm">★★★★★</div>
                     </div>
                   </div>
-                  <p className="text-white/50 leading-relaxed">&ldquo;{review.text}&rdquo;</p>
+                  <p className="text-gray-500 leading-relaxed">&ldquo;{review.text}&rdquo;</p>
                 </div>
               </Reveal>
             ))}
@@ -485,20 +458,20 @@ export default function Home() {
         <div className="max-w-5xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">More Ways to Create</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">More Ways to Create</h2>
             </div>
           </Reveal>
           <div className="grid md:grid-cols-2 gap-6">
             {[
-              { icon: '🎬', title: 'Photo Animation', desc: 'Bring old photos to life. Watch loved ones smile and move again with AI-powered animation.', href: '/animate', color: 'from-purple-600/20' },
-              { icon: '📸', title: 'Cinematic Albums', desc: 'Turn your photo collection into a professional video with music, transitions, and cinematic flair.', href: '/album', color: 'from-pink-600/20' },
+              { icon: '🎬', title: 'Photo Animation', desc: 'Bring old photos to life. Watch loved ones smile and move again with AI-powered animation.', href: '/animate', bg: 'bg-[#FFF0FB]' },
+              { icon: '📸', title: 'Cinematic Albums', desc: 'Turn your photo collection into a professional video with music, transitions, and cinematic flair.', href: '/album', bg: 'bg-[#F0F7FF]' },
             ].map((item, i) => (
               <Reveal key={item.title} delay={i * 150}>
-                <div className={`glass-card p-8 bg-gradient-to-br ${item.color} to-transparent hover-glow`}>
+                <div className={`${item.bg} rounded-3xl p-8 border-2 border-gray-100 hover:border-gray-200 transition-colors`}>
                   <span className="text-4xl mb-4 block">{item.icon}</span>
-                  <h3 className="text-2xl font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-white/50 mb-6">{item.desc}</p>
-                  <Link href={item.href} className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 text-white font-medium hover:bg-white/5 transition-colors">
+                  <h3 className="text-2xl font-black text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-500 mb-6">{item.desc}</p>
+                  <Link href={item.href} className="inline-flex items-center gap-2 px-6 py-3 rounded-full border-2 border-gray-900 text-gray-900 font-bold hover:bg-gray-900 hover:text-white transition-all">
                     Try It →
                   </Link>
                 </div>
@@ -509,12 +482,12 @@ export default function Home() {
       </section>
 
       {/* ═══ PRICING ═══ */}
-      <section id="pricing" className="py-20 md:py-28">
+      <section id="pricing" className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Simple Pricing</h2>
-              <p className="text-white/40 text-lg">Start free. No credit card required.</p>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Simple Pricing</h2>
+              <p className="text-gray-500 text-lg">Start free. No credit card required.</p>
             </div>
           </Reveal>
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -526,32 +499,32 @@ export default function Home() {
               <Reveal key={plan.name} delay={i * 150}>
                 <div className={`rounded-3xl p-8 relative ${
                   plan.highlight
-                    ? 'bg-gradient-to-b from-purple-600/30 to-purple-900/20 border border-purple-500/30 scale-105 glow-purple'
-                    : 'glass-card'
+                    ? 'bg-gray-900 text-white scale-105 shadow-2xl'
+                    : 'bg-white border-2 border-gray-100'
                 }`}>
                   {plan.badge && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs font-bold px-4 py-1 rounded-full">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#FF90E8] text-white text-xs font-bold px-4 py-1 rounded-full">
                       {plan.badge}
                     </div>
                   )}
-                  <h3 className="text-lg font-bold text-white mb-1">{plan.name}</h3>
+                  <h3 className={`text-lg font-bold mb-1 ${plan.highlight ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
                   <div className="mb-6">
-                    <span className="text-4xl font-black text-white">{plan.price}</span>
-                    {plan.period && <span className="text-sm text-white/40 ml-1">{plan.period}</span>}
+                    <span className={`text-4xl font-black ${plan.highlight ? 'text-white' : 'text-gray-900'}`}>{plan.price}</span>
+                    {plan.period && <span className={`text-sm ml-1 ${plan.highlight ? 'text-gray-400' : 'text-gray-400'}`}>{plan.period}</span>}
                   </div>
                   <ul className="space-y-3 mb-8 text-sm">
                     {plan.features.map(f => (
-                      <li key={f} className="flex items-center gap-2 text-white/60">
-                        <span className="text-purple-400">✓</span> {f}
+                      <li key={f} className={`flex items-center gap-2 ${plan.highlight ? 'text-gray-300' : 'text-gray-500'}`}>
+                        <span className="text-[#FF90E8]">✓</span> {f}
                       </li>
                     ))}
                   </ul>
                   <Link
                     href={plan.href}
-                    className={`block text-center py-3 rounded-full font-semibold transition-all ${
+                    className={`block text-center py-3 rounded-full font-bold transition-all ${
                       plan.highlight
-                        ? 'bg-white text-[#0a0a0f] hover:bg-gray-100'
-                        : 'border border-white/20 text-white hover:bg-white/5'
+                        ? 'bg-white text-gray-900 hover:bg-gray-100'
+                        : 'border-2 border-gray-200 text-gray-900 hover:border-gray-900'
                     }`}
                   >
                     {plan.cta}
@@ -573,11 +546,11 @@ export default function Home() {
       </section>
 
       {/* ═══ FAQ ═══ */}
-      <section id="faq" className="py-20 md:py-28">
+      <section id="faq" className="py-20 md:py-28 bg-gray-50">
         <div className="max-w-3xl mx-auto px-4">
           <Reveal>
             <div className="text-center mb-16">
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">Frequently Asked Questions</h2>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">Frequently Asked Questions</h2>
             </div>
           </Reveal>
           <Reveal delay={200}>
@@ -592,23 +565,19 @@ export default function Home() {
 
       {/* ═══ FINAL CTA ═══ */}
       <section className="py-24 md:py-32 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-purple-600/15 rounded-full blur-[150px]" />
-          <div className="absolute bottom-0 right-1/3 w-[500px] h-[500px] bg-pink-600/10 rounded-full blur-[150px]" />
-        </div>
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           <Reveal>
-            <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-gray-900 mb-6 leading-tight">
               Ready to See Yourself
               <br />
-              <span className="text-gradient">Like Never Before?</span>
+              <span className="text-[#FF90E8]">Like Never Before?</span>
             </h2>
-            <p className="text-white/40 text-lg mb-10">
+            <p className="text-gray-400 text-lg mb-10">
               Join 127,000+ people who&apos;ve already discovered their artistic alter ego.
             </p>
             <Link
               href="/create"
-              className="inline-flex items-center gap-2 px-10 py-5 rounded-full text-xl font-black bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:opacity-90 hover:scale-105 transition-all duration-300 shadow-lg shadow-purple-500/25"
+              className="inline-flex items-center gap-2 px-10 py-5 rounded-full text-xl font-black bg-gray-900 text-white hover:bg-gray-800 transition-all duration-300 shadow-lg"
             >
               Start Creating — It&apos;s Free ✨
             </Link>
