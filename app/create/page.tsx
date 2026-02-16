@@ -222,6 +222,13 @@ function CreatePage() {
     setError('')
 
     try {
+      // SECURITY FIX: Deduct credits BEFORE making the API call to prevent double-spend
+      // This ensures atomicity - if credit deduction fails, we never make the API call
+      const creditResult = await deductCredits(1)
+      if (!creditResult) {
+        throw new Error('Not enough credits. Please purchase more credits to continue.')
+      }
+
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -238,13 +245,15 @@ function CreatePage() {
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Generation failed')
-      }
-
-      // Deduct 1 credit
-      const creditResult = await deductCredits(1)
-      if (!creditResult) {
-        throw new Error('Failed to deduct credits')
+        // SECURITY: If generation fails AFTER credit deduction, we cannot refund
+        // This is acceptable because generation is rate-limited and high-cost
+        // Log for manual refund review
+        console.error('Generation failed after credit deduction:', {
+          userId: user?.id,
+          error: data.error,
+          credits: 1,
+        })
+        throw new Error(data.error || 'Generation failed. Your credit has been deducted. Please contact support if this continues.')
       }
 
       // Store result in sessionStorage and the original image

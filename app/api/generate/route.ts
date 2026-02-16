@@ -3,6 +3,12 @@ import { randomUUID } from 'crypto'
 
 export const maxDuration = 60
 
+// SECURITY: Validate API key at module load
+const RUNWARE_API_KEY = process.env.RUNWARE_API_KEY
+if (!RUNWARE_API_KEY) {
+  console.warn('RUNWARE_API_KEY not configured - generate API will fail')
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { image, jobTitle, gender = '', style, accessories, location } = await req.json()
@@ -23,8 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Style is required' }, { status: 400 })
     }
 
-    const apiKey = process.env.RUNWARE_API_KEY
-    if (!apiKey) {
+    if (!RUNWARE_API_KEY) {
       console.error('Generate API: Missing Runware API key')
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
@@ -85,9 +90,10 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${RUNWARE_API_KEY}`,
       },
       body: JSON.stringify([uploadTask]),
+      signal: AbortSignal.timeout(15000), // 15s timeout
     })
 
     // Detailed error handling for upload
@@ -157,9 +163,10 @@ export async function POST(req: NextRequest) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': `Bearer ${RUNWARE_API_KEY}`,
         },
         body: JSON.stringify([generateTask]),
+        signal: AbortSignal.timeout(50000), // 50s timeout (maxDuration is 60s)
       })
 
       if (!runwareRes.ok) {

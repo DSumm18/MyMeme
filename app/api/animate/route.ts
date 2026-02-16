@@ -3,6 +3,12 @@ import { randomUUID } from 'crypto'
 
 export const maxDuration = 30
 
+// SECURITY: Validate API key at module load
+const RUNWARE_API_KEY = process.env.RUNWARE_API_KEY
+if (!RUNWARE_API_KEY) {
+  console.warn('RUNWARE_API_KEY not configured - animate API will fail')
+}
+
 // Step 1: Submit the video generation task and return taskUUID immediately
 export async function POST(req: NextRequest) {
   try {
@@ -23,8 +29,7 @@ export async function POST(req: NextRequest) {
       ? 'subtle natural movement, gentle smile, slight head turn, preserve exact facial features and age, flattering soft warm lighting, cinematic, smooth motion, high quality, beautiful, youthful glow'
       : 'maintain exact art style, keep illustration style, subtle movement, gentle expression change, smooth animation, do not convert to realistic photo, preserve the artistic medium exactly as shown'
 
-    const apiKey = process.env.RUNWARE_API_KEY
-    if (!apiKey) {
+    if (!RUNWARE_API_KEY) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
@@ -34,7 +39,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${RUNWARE_API_KEY}`,
       },
       body: JSON.stringify([{
         taskType: 'videoInference',
@@ -54,6 +59,7 @@ export async function POST(req: NextRequest) {
         includeCost: true,
         deliveryMethod: 'async'
       }]),
+      signal: AbortSignal.timeout(25000), // 25s timeout (maxDuration is 30s)
     })
 
     if (!submitRes.ok) {

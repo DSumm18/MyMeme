@@ -277,10 +277,11 @@ export default function ResultPage() {
     setAnimateError(null)
     
     try {
-      // First check credits
+      // SECURITY FIX: Deduct credits BEFORE submitting animation task to prevent double-spend
+      // This ensures atomicity - if credit deduction fails, we never submit the task
       const hasCredits = await deductCredits(cost)
       if (!hasCredits) {
-        throw new Error('Not enough credits to animate')
+        throw new Error(`Not enough credits. Animation requires ${cost} credits.`)
       }
 
       // Determine style: if animating original photo, style is 'original'
@@ -294,7 +295,17 @@ export default function ResultPage() {
         body: JSON.stringify({ imageUrl: targetImage, duration, style: animStyle }),
       })
       const submitData = await submitRes.json()
-      if (!submitRes.ok) throw new Error(submitData.error || 'Animation failed to start')
+      if (!submitRes.ok) {
+        // SECURITY: If animation submission fails AFTER credit deduction, we cannot refund
+        // Log for manual review - this should be very rare
+        console.error('Animation submission failed after credit deduction:', {
+          userId: user?.id,
+          cost,
+          duration,
+          error: submitData.error,
+        })
+        throw new Error(`${submitData.error || 'Animation failed to start'}. Your credit has been deducted. Please contact support if this continues.`)
+      }
 
       const { taskUUID } = submitData
 

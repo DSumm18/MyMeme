@@ -51,18 +51,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async () => {
     setLoading(true)
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: typeof window !== 'undefined' 
+    try {
+      // SECURITY: Use NEXT_PUBLIC_SITE_URL if available, otherwise use window.location.origin
+      const redirectUrl = process.env.NEXT_PUBLIC_SITE_URL || (
+        typeof window !== 'undefined' 
           ? window.location.origin
-          : 'https://my-meme-eta.vercel.app'
+          : undefined
+      )
+      
+      if (!redirectUrl) {
+        throw new Error('Cannot determine redirect URL. NEXT_PUBLIC_SITE_URL not set.')
       }
-    })
-    if (error) {
-      console.error('Sign in error:', error)
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl
+        }
+      })
+      if (error) {
+        console.error('Sign in error:', error)
+        throw error
+      }
+    } catch (error) {
+      console.error('Sign in failed:', error)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const signOut = async () => {

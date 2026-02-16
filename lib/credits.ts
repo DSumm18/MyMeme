@@ -5,23 +5,52 @@ import { supabase } from './supabase'
 const INITIAL_CREDITS = 3
 const CREDITS_KEY = 'mymeme_user_credits'
 
-export async function getUserCredits(userId: string): Promise<number> {
+// SECURITY: Validate Supabase is properly configured
+function isSupabaseConfigured(): boolean {
   try {
-    // Try Supabase first
-    const { data, error } = await supabase
-      .from('user_credits')
-      .select('credits')
-      .eq('user_id', userId)
-      .single()
+    return !!(
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    )
+  } catch {
+    return false
+  }
+}
 
-    if (error || !data) {
-      // Fallback to localStorage if Supabase query fails
-      const localCredits = localStorage.getItem(`${CREDITS_KEY}_${userId}`)
-      return localCredits ? parseInt(localCredits, 10) : INITIAL_CREDITS
+// SECURITY: Validate user ID format
+function isValidUserId(userId: string): boolean {
+  // Should be non-empty string (UUID v4 or similar)
+  return typeof userId === 'string' && userId.length > 0 && userId.length < 200
+}
+
+export async function getUserCredits(userId: string): Promise<number> {
+  // Validate input
+  if (!isValidUserId(userId)) {
+    console.error('Invalid userId:', userId)
+    return INITIAL_CREDITS
+  }
+
+  try {
+    // Try Supabase first if configured
+    if (isSupabaseConfigured()) {
+      const { data, error } = await supabase
+        .from('user_credits')
+        .select('credits')
+        .eq('user_id', userId)
+        .single()
+
+      if (error) {
+        console.warn('Supabase fetch failed, falling back to localStorage:', error.message)
+      } else if (data?.credits !== undefined) {
+        return data.credits
+      }
     }
 
-    return data.credits
+    // Fallback to localStorage
+    const localCredits = localStorage.getItem(`${CREDITS_KEY}_${userId}`)
+    return localCredits ? parseInt(localCredits, 10) : INITIAL_CREDITS
   } catch (err) {
+    console.error('Error getting credits:', err)
     // If everything fails, return initial credits
     return INITIAL_CREDITS
   }
@@ -49,54 +78,102 @@ export async function initializeUserCredits(userId: string): Promise<void> {
 }
 
 export async function deductCredits(userId: string, amount: number): Promise<boolean> {
-  try {
-    // Try Supabase first
-    const { data, error } = await supabase.rpc('deduct_credits', { 
-      p_user_id: userId, 
-      p_amount: amount 
-    })
+  // Validate inputs
+  if (!isValidUserId(userId)) {
+    console.error('Invalid userId for deductCredits:', userId)
+    return false
+  }
 
-    if (error || data === false) {
-      // Fallback to localStorage
+  if (!Number.isInteger(amount) || amount <= 0) {
+    console.error('Invalid deduct amount:', amount)
+    return false
+  }
+
+  try {
+    // Try Supabase first if configured
+    if (isSupabaseConfigured()) {
+      const { data, error } = await supabase.rpc('deduct_credits', { 
+        p_user_id: userId, 
+        p_amount: amount 
+      })
+
+      if (error) {
+        console.warn('Supabase RPC failed, falling back to localStorage:', error.message)
+      } else if (data === true) {
+        return true
+      } else if (data === false) {
+        console.warn('Insufficient credits for deduction')
+        return false
+      }
+    }
+
+    // Fallback to localStorage
+    const currentCredits = await getUserCredits(userId)
+    if (currentCredits < amount) {
+      console.warn('Insufficient credits (localStorage fallback)')
+      return false
+    }
+
+    const newCredits = currentCredits - amount
+    localStorage.setItem(`${CREDITS_KEY}_${userId}`, newCredits.toString())
+    return true
+  } catch (err) {
+    console.error('Error deducting credits:', err)
+    // Try localStorage fallback on error
+    try {
       const currentCredits = await getUserCredits(userId)
       if (currentCredits < amount) return false
 
       const newCredits = currentCredits - amount
       localStorage.setItem(`${CREDITS_KEY}_${userId}`, newCredits.toString())
       return true
+    } catch {
+      return false
     }
-
-    return data
-  } catch (err) {
-    // Fallback to localStorage
-    const currentCredits = await getUserCredits(userId)
-    if (currentCredits < amount) return false
-
-    const newCredits = currentCredits - amount
-    localStorage.setItem(`${CREDITS_KEY}_${userId}`, newCredits.toString())
-    return true
   }
 }
 
 export async function addCredits(userId: string, amount: number): Promise<void> {
-  try {
-    // Try Supabase first
-    const { error } = await supabase.rpc('add_credits', { 
-      p_user_id: userId, 
-      p_amount: amount 
-    })
+  // Validate inputs
+  if (!isValidUserId(userId)) {
+    console.error('Invalid userId for addCredits:', userId)
+    return
+  }
 
-    if (error) {
-      // Fallback to localStorage
-      const currentCredits = await getUserCredits(userId)
-      const newCredits = currentCredits + amount
-      localStorage.setItem(`${CREDITS_KEY}_${userId}`, newCredits.toString())
+  if (!Number.isInteger(amount) || amount <= 0) {
+    console.error('Invalid add amount:', amount)
+    return
+  }
+
+  try {
+    // Try Supabase first if configured
+    if (isSupabaseConfigured()) {
+      const { error } = await supabase.rpc('add_credits', { 
+        p_user_id: userId, 
+        p_amount: amount 
+      })
+
+      if (!error) {
+        return // Success
+      }
+
+      console.warn('Supabase RPC failed, falling back to localStorage:', error?.message)
     }
-  } catch (err) {
+
     // Fallback to localStorage
     const currentCredits = await getUserCredits(userId)
     const newCredits = currentCredits + amount
     localStorage.setItem(`${CREDITS_KEY}_${userId}`, newCredits.toString())
+  } catch (err) {
+    console.error('Error adding credits:', err)
+    // Try localStorage fallback
+    try {
+      const currentCredits = await getUserCredits(userId)
+      const newCredits = currentCredits + amount
+      localStorage.setItem(`${CREDITS_KEY}_${userId}`, newCredits.toString())
+    } catch {
+      console.error('Failed to add credits even in localStorage fallback')
+    }
   }
 }
 

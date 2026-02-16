@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const maxDuration = 15
 
+// SECURITY: Validate API key at module load
+const RUNWARE_API_KEY = process.env.RUNWARE_API_KEY
+if (!RUNWARE_API_KEY) {
+  console.warn('RUNWARE_API_KEY not configured - animate poll API will fail')
+}
+
 // Step 2: Poll for video completion by taskUUID
 export async function POST(req: NextRequest) {
   try {
@@ -11,8 +17,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'taskUUID is required' }, { status: 400 })
     }
 
-    const apiKey = process.env.RUNWARE_API_KEY
-    if (!apiKey) {
+    if (!RUNWARE_API_KEY) {
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
@@ -20,12 +25,13 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${RUNWARE_API_KEY}`,
       },
       body: JSON.stringify([{
         taskType: 'getResponse',
         taskUUID: taskUUID
       }]),
+      signal: AbortSignal.timeout(10000), // 10s timeout (maxDuration is 15s)
     })
 
     if (!pollRes.ok) {
