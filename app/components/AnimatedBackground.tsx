@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 
 /* ─── Cursor Glow ─── */
 function CursorGlow() {
@@ -34,14 +34,18 @@ function CursorGlow() {
 
 /* ─── Floating Particles ─── */
 function Particles() {
-  const particles = useMemo(() => Array.from({ length: 20 }, (_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    size: Math.random() * 3 + 1,
-    duration: Math.random() * 15 + 15,
-    delay: Math.random() * 10,
-    opacity: Math.random() * 0.4 + 0.1,
-  })), [])
+  const [particles, setParticles] = useState<Array<{id:number,left:string,size:number,duration:number,delay:number,opacity:number}>>([])
+  
+  useEffect(() => {
+    setParticles(Array.from({ length: 20 }, (_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      size: Math.random() * 3 + 1,
+      duration: Math.random() * 15 + 15,
+      delay: Math.random() * 10,
+      opacity: Math.random() * 0.4 + 0.1,
+    })))
+  }, [])
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
