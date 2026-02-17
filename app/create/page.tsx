@@ -176,27 +176,65 @@ function CreatePage() {
     if (!selectedImage) { setError('Please upload a photo!'); return }
     setLoading(true); setError('')
     try {
+      // Pre-check credits (don't deduct yet)
       if (user) {
-        const creditResult = await deductCredits(1)
-        if (!creditResult) throw new Error('Not enough credits.')
+        if (credits < 1 && !creditsLoading) throw new Error('Not enough credits.')
       } else {
-        // Anonymous user — deduct from localStorage
         const used = parseInt(localStorage.getItem('mymeme_anon_used') || '0', 10)
         if (used >= 3) throw new Error('No free credits left. Sign in for more!')
-        localStorage.setItem('mymeme_anon_used', String(used + 1))
       }
 
+      // Start the job (returns immediately with jobId)
       const res = await fetch('/api/generate-openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: selectedImage, style: selectedStyle, gender, jobTitle, accessories, location }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Generation failed.')
+      const startData = await res.json()
+      if (!res.ok) throw new Error(startData.error || 'Generation failed.')
 
-      sessionStorage.setItem('mymeme_original', selectedImage)
-      sessionStorage.setItem('mymeme_result', JSON.stringify({ imageUrl: data.imageUrl, prompt: data.prompt, cost: data.cost, style: selectedStyle, jobTitle }))
-      router.push('/result')
+      const jobId = startData.jobId
+      if (!jobId) throw new Error('No job ID returned.')
+
+      // Poll for result every 2.5 seconds
+      const maxPolls = 60 // 2.5 min max
+      let polls = 0
+      while (polls < maxPolls) {
+        await new Promise(r => setTimeout(r, 2500))
+        polls++
+
+        const pollRes = await fetch(`/api/generate-openai/${jobId}`)
+        const pollData = await pollRes.json()
+
+        if (!pollRes.ok) throw new Error(pollData.error || 'Failed to check status.')
+
+        if (pollData.status === 'completed') {
+          // Deduct credits only on success
+          if (user) {
+            const creditResult = await deductCredits(1)
+            if (!creditResult) {
+              // Credit deduction failed but image was generated — still show it
+              console.warn('Credit deduction failed after generation')
+            }
+          } else {
+            const used = parseInt(localStorage.getItem('mymeme_anon_used') || '0', 10)
+            localStorage.setItem('mymeme_anon_used', String(used + 1))
+          }
+
+          sessionStorage.setItem('mymeme_original', selectedImage)
+          sessionStorage.setItem('mymeme_result', JSON.stringify({ imageUrl: pollData.imageUrl, cost: pollData.cost, style: selectedStyle, jobTitle }))
+          router.push('/result')
+          return
+        }
+
+        if (pollData.status === 'failed') {
+          throw new Error(pollData.error || 'Generation failed.')
+        }
+
+        // Otherwise still processing, continue polling
+      }
+
+      throw new Error('Generation timed out. Please try again.')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
     } finally { setLoading(false) }
