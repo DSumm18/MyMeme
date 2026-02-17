@@ -5,23 +5,23 @@ export const maxDuration = 10
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY
 
 const styleDescriptions: Record<string, string> = {
-  ghibli: "Studio Ghibli anime style - soft hand-painted watercolor textures, dreamy pastel colors, gentle warm sunlight, whimsical magical atmosphere, Hayao Miyazaki art direction, cel-shaded with visible brush texture",
-  'oil-painting': "Classical oil painting style - rich impasto technique with visible thick brushstrokes, dramatic Rembrandt-style chiaroscuro lighting, warm golden tones and deep shadows, Dutch Golden Age masters quality",
-  'cyberpunk-neon': "Cyberpunk neon style - drenched in electric pink and cyan holographic lighting, rain-soaked reflections on chrome surfaces, dark moody Blade Runner atmosphere, glowing circuit patterns, volumetric neon fog",
-  renaissance: "Renaissance master painting style - Leonardo da Vinci sfumato technique, rich earth tones with subtle glazing layers, dramatic divine lighting, ornate period clothing with intricate embroidery",
-  'italian-brainrot': "Exaggerated Italian meme style - wildly dramatic hand pinching gesture, impossibly passionate facial expression, Italian flag background, chef's kiss pose, over-the-top Mediterranean energy, comedic meme aesthetic",
-  caricature: "Editorial caricature style - brilliantly exaggerated facial features, oversized expressive head on diminutive body, bold confident linework, professional magazine illustration quality",
-  anime: "Premium Japanese anime style - large luminous eyes with detailed iris reflections, dynamic flowing hair, crisp sharp lineart, richly saturated colors, Makoto Shinkai film quality",
-  pixar: "Pixar 3D animated character style - smooth skin with subsurface scattering, big round expressive eyes, warm cinematic golden-hour lighting, Disney Pixar feature film quality, charming character design",
-  gta: "GTA V loading screen style - bold graphic outlines, highly saturated stylized realism, authentic Grand Theft Auto artwork aesthetic, urban backdrop, swagger and attitude",
-  superhero: "Comic book superhero style - wearing a unique original costume with metallic and fabric textures, dramatic action-ready pose, volumetric rim lighting, Marvel/DC tier illustration",
-  'clay-3d': "Claymation character style - smooth sculpted polymer clay texture, soft round features, warm studio lighting, Aardman Studios quality, miniature diorama setting",
-  watercolor: "Loose watercolor painting style - wet-on-wet technique with beautiful color bleeds, artistic paint splatter accents, soft dreamy washes on textured paper, luminous skin tones",
-  'pop-art': "Andy Warhol and Roy Lichtenstein pop art style - vibrant primary color blocks, halftone Ben-Day dots pattern, thick black graphic outlines, screen print aesthetic",
-  'pencil-sketch': "Photorealistic pencil sketch style - incredibly detailed graphite work with masterful hatching, subtle tonal gradations, realistic texture on drawing paper, dramatic light and shadow",
-  'comic-book': "Professional comic book style - bold black ink outlines, dynamic cell shading, vivid saturated colors, action comic panel composition, contemporary superhero comic illustration",
-  sticker: "Die-cut sticker design style - thick clean white border, glossy holographic finish, cute kawaii chibi proportions, bright candy colors, trendy sticker sheet aesthetic",
-  'retro-80s': "Retro 1980s synthwave style - neon pink and electric blue lighting, chrome reflections, laser grid horizon background, VHS scan lines, classic outrun synthwave aesthetic",
+  ghibli: "Hand-painted 2D animation portrait with soft watercolor shading, warm sunlight, pastel background, gentle cel shading, whimsical and cosy illustration style.",
+  'oil-painting': "Classical oil painting portrait with soft brushwork, warm directional lighting, subtle canvas texture, realistic skin tones and natural facial detail.",
+  'cyberpunk-neon': "Cyberpunk neon portrait illustration with magenta and cyan rim lighting, soft futuristic city background, subtle holographic accents, cinematic glow, high detail but natural skin texture, balanced lighting on the face.",
+  renaissance: "Renaissance portrait painting with soft sfumato technique, warm earth tones, subtle glazing, gentle directional lighting, period-inspired clothing with fine detail.",
+  'italian-brainrot': "Exaggerated Italian meme portrait with dramatic hand pinching gesture, passionate expression, Italian flag hints in background, comedic Mediterranean energy, meme aesthetic but face stays recognisable.",
+  caricature: "Editorial caricature portrait with subtle exaggeration (maximum 15%), bold linework, magazine illustration style, person must remain clearly recognisable.",
+  anime: "Clean Japanese anime portrait with soft shading, expressive eyes that still match the real face, natural hair detail, cinematic background lighting.",
+  pixar: "Stylised 3D character portrait with soft skin rendering, gentle cinematic lighting, expressive but recognisable face, studio-quality render.",
+  gta: "GTA V loading screen portrait with bold graphic outlines, saturated stylized colours, urban backdrop, confident attitude, face clearly recognisable.",
+  superhero: "Comic book superhero portrait with a unique costume, dynamic pose, cinematic rim lighting, high detail illustration, face clearly the same person.",
+  'clay-3d': "Claymation character portrait with smooth sculpted clay texture, soft rounded features, warm studio lighting, miniature diorama feel, recognisable face.",
+  watercolor: "Soft watercolor portrait with gentle colour bleeding, light paper texture, luminous natural skin tones, artistic but recognisable likeness.",
+  'pop-art': "Pop art portrait with vibrant colour blocks, halftone dot pattern, bold graphic outlines, screen print aesthetic, face clearly recognisable.",
+  'pencil-sketch': "Highly detailed graphite portrait drawing, fine shading and hatching, realistic proportions, clean paper background.",
+  'comic-book': "Professional comic book portrait with bold ink outlines, dynamic cell shading, vivid colours, action panel composition, face clearly the same person.",
+  sticker: "Cute chibi-style portrait with simplified proportions, still recognisable as the same person, bright colours and sticker outline, die-cut border.",
+  'retro-80s': "Retro synthwave portrait with soft neon pink and blue rim lighting, chrome accents, laser grid background, natural skin texture preserved, VHS aesthetic.",
 }
 
 export async function POST(req: NextRequest) {
@@ -54,7 +54,19 @@ export async function POST(req: NextRequest) {
     ].filter(Boolean).join(', ')
     const sceneText = sceneDetails ? `, ${sceneDetails}` : ''
 
-    const prompt = `Transform this photo into ${style.replace(/-/g, ' ')} art style${sceneText}. CRITICAL: Preserve the person's EXACT identity - same age, same face shape, same features, same hair color/style, same body type, same clothing. The result must be clearly recognizable as the same person. Style: ${styleDesc}`
+    const prompt = `Create a stylised portrait transformation of the SAME PERSON in the reference photo${sceneText}.
+
+Identity rules (highest priority):
+- keep the exact face shape and proportions
+- keep the same age appearance
+- keep natural skin texture (do not age or smooth excessively)
+- keep the same hair colour and hairstyle
+- keep the same expression
+- keep the same clothing
+
+Only change the ART STYLE, lighting mood, and background.
+
+Style description: ${styleDesc}`
 
     console.log('OpenAI generate request:', { style, promptLength: prompt.length })
 
