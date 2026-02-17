@@ -699,10 +699,20 @@ export default function Home() {
             </div>
           </Reveal>
 
-          {/* Interactive Before/After Slider */}
+          {/* Interactive Before/After Sliders — multiple styles */}
           <Reveal delay={200}>
-            <div className="max-w-lg mx-auto mb-16">
-              <BeforeAfterSlider before="/examples/before.png" after="/examples/ghibli.jpg" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
+              {[
+                { after: '/examples/ghibli.jpg', label: 'Studio Ghibli' },
+                { after: '/examples/cyberpunk-neon.jpg', label: 'Cyberpunk Neon' },
+                { after: '/examples/renaissance.jpg', label: 'Renaissance' },
+                { after: '/examples/pixar.jpg', label: 'Pixar 3D' },
+              ].map((pair) => (
+                <div key={pair.label} className="space-y-3">
+                  <BeforeAfterSlider before="/examples/before.png" after={pair.after} />
+                  <p className="text-center text-sm font-bold text-[#A0998C] tracking-wide">{pair.label}</p>
+                </div>
+              ))}
             </div>
           </Reveal>
 

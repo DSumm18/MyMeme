@@ -208,6 +208,7 @@ function CreatePage() {
       
       <div className="min-h-screen pt-24 pb-16">
         <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-[#111111]/60 backdrop-blur-2xl border border-[#2A2A2A]/60 rounded-3xl p-6 md:p-10 shadow-2xl shadow-black/40">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-black text-[#F5F0E8] mb-2">Transform Your Photo</h1>
             <p className="text-[#888]">Choose a style and watch the magic happen</p>
@@ -364,6 +365,7 @@ function CreatePage() {
               {loading ? 'Creating...' : 'Transform Photo ✨'}
             </button>
             {!loading && <p className="text-sm text-[#888] mt-3">Uses 1 credit · ~10 seconds</p>}
+          </div>
           </div>
         </div>
       </div>

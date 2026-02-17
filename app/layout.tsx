@@ -9,6 +9,7 @@ import { AuthProvider } from '@/lib/auth-context'
 import { CreditsProvider } from '@/lib/credits-context'
 import JobPoller from '@/components/JobPoller'
 import JobTray from '@/components/JobTray'
+import AnimatedBackground from './components/AnimatedBackground'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -141,8 +142,9 @@ export default function RootLayout({
       <body className={`${inter.className} bg-[#0A0A0A] text-[#F5F0E8]`}>
         <AuthProvider>
           <CreditsProvider>
+            <AnimatedBackground />
             <Navbar />
-            <main className="min-h-screen">
+            <main className="relative z-10 min-h-screen">
               {children}
             </main>
             <Footer />
