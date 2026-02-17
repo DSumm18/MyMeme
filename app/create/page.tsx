@@ -29,9 +29,9 @@ const LoadingOverlay = ({ onCancel, currentPhrase, currentEmoji }: { onCancel: (
       <motion.p key={currentPhrase} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-lg text-white/80 mb-4">
         {currentPhrase}
       </motion.p>
-      <p className="text-sm text-white/40 mb-4">Usually takes about 15 seconds</p>
+      <p className="text-sm text-white/40 mb-4">Usually takes about 30 seconds</p>
       <div className="w-48 h-1 bg-[#111]/10 rounded-full mx-auto mb-6 overflow-hidden">
-        <motion.div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" animate={{ width: ['0%', '100%'] }} transition={{ duration: 15, ease: 'linear' }} />
+        <motion.div className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full" animate={{ width: ['0%', '100%'] }} transition={{ duration: 35, ease: 'linear' }} />
       </div>
       <button onClick={onCancel} className="px-4 py-2 text-sm text-white/50 hover:text-white border border-white/10 rounded-lg hover:bg-[#111]/5 transition-colors">
         Cancel
@@ -402,7 +402,7 @@ function CreatePage() {
             >
               {loading ? 'Creating...' : 'Transform Photo ✨'}
             </button>
-            {!loading && <p className="text-sm text-[#888] mt-3">Uses 1 credit · ~10 seconds</p>}
+            {!loading && <p className="text-sm text-[#888] mt-3">Uses 1 credit · ~30 seconds</p>}
           </div>
           </div>
         </div>
