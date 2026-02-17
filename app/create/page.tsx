@@ -261,7 +261,7 @@ function CreatePage() {
             >
               {selectedImage ? (
                 <div className="relative w-48 h-48 mx-auto rounded-xl overflow-hidden ring-2 ring-[#FF90E8]/30">
-                  <Image src={selectedImage} alt="Your photo" fill className="object-cover" />
+                  <img src={selectedImage} alt="Your photo" className="absolute inset-0 w-full h-full object-cover" />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
                     <span className="text-white text-sm font-medium">Change Photo</span>
                   </div>
