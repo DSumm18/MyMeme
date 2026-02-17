@@ -89,6 +89,7 @@ export async function POST(req: NextRequest) {
             size: '1024x1024',
           },
         ],
+        tool_choice: { type: 'image_generation' },
       }),
       signal: AbortSignal.timeout(55000),
     })
