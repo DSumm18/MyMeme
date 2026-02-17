@@ -87,7 +87,7 @@ export const styles: StyleConfig[] = [
       { q: 'How is Oil Painting different from Renaissance?', a: 'While Renaissance focuses on classical portraiture with dramatic lighting, Oil Painting emphasises visible brushstrokes, rich textures, and more vibrant, modern colour palettes.' },
       { q: 'Can I print the results?', a: 'Yes! The 1024×1024 HD output is perfect for printing up to A4 size. Many customers frame their oil painting transformations.' },
       { q: 'Does it work with landscapes?', a: 'Beautifully! Landscapes, cityscapes, and nature photos all look stunning in oil painting style.' },
-      { q: 'How many credits does it cost?', a: 'Each transformation costs 1 credit. You get 3 free credits to start — no sign-up required.' },
+      { q: 'How many credits does it cost?', a: 'Each transformation costs 1 credit. Sign up for free and get 3 credits to try it out!' },
     ],
   },
   {

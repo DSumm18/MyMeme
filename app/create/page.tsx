@@ -176,13 +176,14 @@ function CreatePage() {
     if (!selectedImage) { setError('Please upload a photo!'); return }
     setLoading(true); setError('')
     try {
-      // Pre-check credits (don't deduct yet)
-      if (user) {
-        if (credits < 1 && !creditsLoading) throw new Error('Not enough credits.')
-      } else {
-        const used = parseInt(localStorage.getItem('mymeme_anon_used') || '0', 10)
-        if (used >= 3) throw new Error('No free credits left. Sign in for more!')
+      // Require sign-in
+      if (!user) {
+        setError('Please sign in to generate images. You\'ll get 3 free credits!')
+        signIn()
+        return
       }
+      // Check credits
+      if (credits < 1 && !creditsLoading) throw new Error('Not enough credits. Buy more to continue!')
 
       // Start the job (returns immediately with jobId)
       const res = await fetch('/api/generate-openai', {
@@ -210,15 +211,9 @@ function CreatePage() {
 
         if (pollData.status === 'completed') {
           // Deduct credits only on success
-          if (user) {
-            const creditResult = await deductCredits(1)
-            if (!creditResult) {
-              // Credit deduction failed but image was generated — still show it
-              console.warn('Credit deduction failed after generation')
-            }
-          } else {
-            const used = parseInt(localStorage.getItem('mymeme_anon_used') || '0', 10)
-            localStorage.setItem('mymeme_anon_used', String(used + 1))
+          const creditResult = await deductCredits(1)
+          if (!creditResult) {
+            console.warn('Credit deduction failed after generation')
           }
 
           sessionStorage.setItem('mymeme_original', selectedImage)
