@@ -186,7 +186,7 @@ function CreatePage() {
         localStorage.setItem('mymeme_anon_used', String(used + 1))
       }
 
-      const res = await fetch('/api/generate', {
+      const res = await fetch('/api/generate-openai', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: selectedImage, style: selectedStyle, gender, jobTitle, accessories, location }),
